@@ -23,6 +23,11 @@ jobs:
 
       - run: yarn install --frozen-lockfile
 
+      # expo-env.d.ts e gerado pelo `expo start` e fica no .gitignore; sem ele o tsc
+      # nao conhece os imports de .css. Recria o mesmo conteudo que o Expo gera.
+      - name: Gerar tipos do Expo
+        run: echo '/// <reference types="expo/types" />' > expo-env.d.ts
+
       - name: Typecheck
         run: yarn typecheck
 
