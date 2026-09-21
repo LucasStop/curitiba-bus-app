@@ -1,0 +1,11 @@
+# Guarda local antes do commit. Depois de clonar: lefthook install
+# Pular uma vez: LEFTHOOK=0 git commit
+pre-commit:
+  parallel: true
+  commands:
+    segredo:
+      run: gitleaks git --staged --redact --no-banner
+    lint:
+      # ponytail: sem prettier de proposito (formatar o repo todo geraria diff enorme); eslint cobre o basico.
+      glob: "*.{js,jsx,ts,tsx}"
+      run: npx eslint {staged_files}
