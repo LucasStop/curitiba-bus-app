@@ -1,5 +1,7 @@
 # Especificação Mestre & Planejamento ClickUp: Curitiba Ônibus RIT (React Native + Expo)
 
+> **Documento histórico.** Foi o roadmap inicial gerado antes da revisão de 21/09/2026 e está substituído por [PRD](PRD.md), [SSD](SSD.md), [TDD](TDD.md) e [DESIGN.md](../DESIGN.md). Divergências conhecidas: os IDs `CU-101` a `CU-404` são fictícios (o ID real é o do ClickUp); o fluxo com `develop` e commits em português com `[CU-x]` não vale, a convenção é `feat/`, `fix/`, `docs/` com commits em inglês e PR; "Expo Router v4" está errado (SDK 57 usa expo-router ~57); NativeWind não está instalado; os épicos agora são E1 a E8 (não sprints).
+
 Este documento estabelece o **guia arquitetural definitivo, decisões técnicas pesquisadas, convenção de Git/Commits e o backlog exaustivo mapeado para o ClickUp** antes do início de qualquer nova etapa de código.
 
 ---

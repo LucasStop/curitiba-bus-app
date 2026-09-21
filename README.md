@@ -1,56 +1,45 @@
-# Welcome to your Expo app 👋
+# Curitiba Bus App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+App mobile (Expo / React Native) para acompanhar o transporte coletivo de Curitiba (RIT/URBS): mapa com linhas, paradas e ônibus, previsão de chegada, planejador "Como Ir" e favoritos.
 
-## Get started
+> Estado: protótipo com **dados simulados** (5 linhas, 17 paradas). A integração com os dados abertos da URBS ainda não foi feita. Veja o que falta em [docs/PRD.md](docs/PRD.md).
 
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Rodar
+Requisitos: Node 20, Yarn 1.22 e o app Expo Go (iOS) ou um simulador.
 
 ```bash
-npm run reset-project
+yarn install
+yarn start        # abre o Expo; pressione i (iOS), a (Android) ou w (web)
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Sobre o mapa: no iOS o Expo Go usa Apple Maps. No Android o Google Maps exige chave e um development build (`eas build --profile development`); a chave fica em segredo do EAS, nunca no repositório.
 
-### Other setup steps
+## Verificar
+```bash
+npx tsc --noEmit  # typecheck
+yarn lint
+```
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+## Estrutura
+```
+src/app/(tabs)/   telas: Mapa, Linhas, Como Ir, Favoritos
+src/components/   mapa, painel deslizante, badges
+src/hooks/        useLiveVehicles, useUserLocation
+src/stores/       zustand: seleção do mapa e favoritos (persistidos)
+src/services/     transitProvider (posição e ETA), tripPlanner
+src/data/         dataset simulado
+src/utils/geo.ts  Haversine, bearing, interpolação
+```
 
-## Learn more
+## Documentação
+- [PRD](docs/PRD.md): o que o produto deve fazer e o que já faz.
+- [SSD](docs/SSD.md): arquitetura, fluxos, integração URBS e limites conhecidos.
+- [TDD](docs/TDD.md): estratégia de testes e casos propostos.
+- [DESIGN.md](DESIGN.md): identidade visual e design system.
+- [docs/CLICKUP_ROADMAP.md](docs/CLICKUP_ROADMAP.md): roadmap original (histórico).
 
-To learn more about developing your project with Expo, look at the following resources:
+## Contribuir
+Branches `feat/…`, `fix/…`, `docs/…`; commits em inglês explicando o porquê; entrega por Pull Request (sem push direto na `main`). O pre-commit roda gitleaks e eslint (`lefthook install`).
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Fonte dos dados
+[Transporte Coletivo de Curitiba, Dados Abertos](https://dadosabertos.curitiba.pr.gov.br/conjuntodado/detalhe?chave=ca40f13b-ef61-472b-810f-dd705f85fd2e) (URBS).
