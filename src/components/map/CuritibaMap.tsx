@@ -5,7 +5,7 @@ import { useLiveVehicles } from '@/hooks/useLiveVehicles';
 import { useTransitStore } from '@/stores/useTransitStore';
 import { BusStop, BusVehicle, LatLng } from '@/types/transit';
 import { Layers, LocateFixed, Navigation2 } from 'lucide-react-native';
-import React, { useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import { LIGHT_MAP_STYLE } from '../../constants/mapStyles';
@@ -58,11 +58,13 @@ export const CuritibaMap: React.FC<CuritibaMapProps> = ({
     : [];
 
   // Paradas a exibir: todas ou apenas as da linha selecionada
-  const displayedStops = selectedLine
-    ? CURITIBA_STOPS.filter((stop) =>
-        (activeDirection === 'ida' ? selectedLine.paradasIda : selectedLine.paradasVolta).includes(stop.id)
-      )
-    : CURITIBA_STOPS;
+  // useMemo: sem isso o filter roda de novo a cada tick de veículo (3s), mesmo
+  // quando selectedLine/activeDirection não mudaram.
+  const displayedStops = useMemo(() => {
+    if (!selectedLine) return CURITIBA_STOPS;
+    const activeStopIds = activeDirection === 'ida' ? selectedLine.paradasIda : selectedLine.paradasVolta;
+    return CURITIBA_STOPS.filter((stop) => activeStopIds.includes(stop.id));
+  }, [selectedLine, activeDirection]);
 
   // Renderização Web simplificada caso execute no navegador
   if (Platform.OS === 'web') {
