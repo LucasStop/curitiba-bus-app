@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   bannerClose: {
-    color: Colors.light.textSubtle,
+    color: Colors.light.textMuted,
     fontSize: 16,
     fontWeight: '700',
     paddingHorizontal: 4,
@@ -308,7 +308,8 @@ const styles = StyleSheet.create({
   },
   webSubtitle: {
     fontSize: 14,
-    color: Colors.light.success,
+    // ponytail: success on background is ~3.3:1, fails AA 4.5:1 for 14pt/600 text.
+    color: Colors.light.text,
     fontWeight: '600',
     marginTop: 4,
   },

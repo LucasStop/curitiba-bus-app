@@ -127,3 +127,56 @@ describe('transitService — resiliência contra o provedor mock (RNF-02)', () =
     expect(transitService.getConnectionStatus().state).toBe('error');
   });
 });
+
+describe('calculateEtaMinutes', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { calculateEtaMinutes, MAX_ETA_DISTANCE_METERS } = require('./transitProvider');
+
+  it('distância zero (ônibus já chegou) dá o mínimo de 1 minuto', () => {
+    expect(calculateEtaMinutes(0)).toBe(1);
+  });
+
+  it('distância pequena arredonda para 1 minuto', () => {
+    expect(calculateEtaMinutes(100)).toBe(1);
+  });
+
+  it('bem no limite de previsão (MAX_ETA_DISTANCE_METERS) ainda calcula minutos', () => {
+    expect(calculateEtaMinutes(MAX_ETA_DISTANCE_METERS)).toBe(
+      Math.round(MAX_ETA_DISTANCE_METERS / 360),
+    );
+  });
+
+  it('distância muito além do limite continua crescendo linearmente', () => {
+    expect(calculateEtaMinutes(36000)).toBe(100);
+  });
+});
+
+describe('transitService.getArrivalsForStop', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { transitService, MAX_ETA_DISTANCE_METERS } = require('./transitProvider');
+
+  it('parada inexistente (input vazio/inválido) retorna lista vazia', () => {
+    expect(transitService.getArrivalsForStop('parada-que-nao-existe')).toEqual([]);
+  });
+
+  it('retorna estimativas ordenadas da mais próxima para a mais distante', () => {
+    const estimates = transitService.getArrivalsForStop('terminal-santa-candida');
+    const minutos = estimates.map((e: { minutosAteChegada: number }) => e.minutosAteChegada);
+    expect(minutos).toEqual([...minutos].sort((a: number, b: number) => a - b));
+  });
+
+  it('nunca inclui ônibus além do raio máximo de previsão', () => {
+    const estimates = transitService.getArrivalsForStop('terminal-santa-candida');
+    estimates.forEach((e: { distanciaMetros: number }) => {
+      expect(e.distanciaMetros).toBeLessThanOrEqual(MAX_ETA_DISTANCE_METERS);
+    });
+  });
+});
+
+afterAll(() => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { transitService } = require('./transitProvider');
+  if (typeof (transitService as { stopSimulation?: () => void }).stopSimulation === 'function') {
+    (transitService as { stopSimulation: () => void }).stopSimulation();
+  }
+});
