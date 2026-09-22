@@ -3,6 +3,8 @@ import { Bookmark, Bus, Map, Navigation } from 'lucide-react-native';
 import React from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Colors } from '@/constants/theme';
+
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
 
@@ -10,11 +12,11 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#E11D48', // Vermelho RIT
-        tabBarInactiveTintColor: '#64748B',
+        tabBarActiveTintColor: Colors.light.primary,
+        tabBarInactiveTintColor: Colors.light.textMuted,
         tabBarStyle: {
-          backgroundColor: '#FFFFFF',
-          borderTopColor: '#E2E8F0',
+          backgroundColor: Colors.light.surface,
+          borderTopColor: Colors.light.border,
           height: 60 + insets.bottom,
           paddingBottom: 8 + insets.bottom,
           paddingTop: 6,
