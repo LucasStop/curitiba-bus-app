@@ -11,7 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function MapScreen() {
   const { location } = useUserLocation();
-  const { totalActive } = useLiveVehicles();
+  const { totalActive, connectionMessage } = useLiveVehicles();
 
   const setSelectedStop = useTransitStore((s) => s.setSelectedStop);
   const setSelectedVehicle = useTransitStore((s) => s.setSelectedVehicle);
@@ -42,6 +42,16 @@ export default function MapScreen() {
             <Text style={styles.liveText}>{totalActive} ao vivo</Text>
           </View>
         </View>
+        {connectionMessage && (
+          <View
+            style={styles.connectionBanner}
+            testID="map-connection-banner"
+            accessible
+            accessibilityLiveRegion="polite"
+            accessibilityLabel={connectionMessage}>
+            <Text style={styles.connectionBannerText}>{connectionMessage}</Text>
+          </View>
+        )}
       </SafeAreaView>
 
       {/* Mapa Principal Interativo */}
@@ -111,6 +121,16 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
     color: Colors.light.success,
+  },
+  connectionBanner: {
+    backgroundColor: Colors.light.warningMuted,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  connectionBannerText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.light.text,
   },
   mapWrapper: {
     flex: 1,

@@ -39,6 +39,15 @@ export function getBearing(start: LatLng, end: LatLng): number {
 }
 
 /**
+ * Calcula a distância percorrida (em metros) em um intervalo de tempo, dada a
+ * velocidade do veículo. distance = speed * deltaTime.
+ */
+export function calculateStepDistanceMeters(speedKmH: number, deltaTimeMs: number): number {
+  const speedMetersPerSecond = (speedKmH * 1000) / 3600;
+  return speedMetersPerSecond * (deltaTimeMs / 1000);
+}
+
+/**
  * Interpola linearmente entre duas coordenadas com fator t (0 a 1)
  */
 export function interpolateLatLng(start: LatLng, end: LatLng, t: number): LatLng {
