@@ -7,7 +7,13 @@ import {
   nextConnectionStatus,
 } from '@/lib/resilience';
 import { ArrivalEstimate, BusLine, BusStop, BusVehicle, LatLng } from '@/types/transit';
-import { calculateStepDistanceMeters, getBearing, getDistanceInMeters, interpolateLatLng } from '@/utils/geo';
+import {
+  calculateStepDistanceMeters,
+  getBearing,
+  getDistanceInMeters,
+  interpolateLatLng,
+  isBusApproachingStop,
+} from '@/utils/geo';
 import { AppState, AppStateStatus } from 'react-native';
 
 const TICK_INTERVAL_MS = 3000;
@@ -291,6 +297,8 @@ class MockTransitProvider implements TransitProvider {
         .filter((b) => b.codLinha === codLinha);
 
       busesOnLine.forEach((bus) => {
+        if (!isBusApproachingStop(line, bus, stop)) return;
+
         const busCoord: LatLng = { latitude: bus.latitude, longitude: bus.longitude };
         const dist = getDistanceInMeters(busCoord, stopCoord);
 
