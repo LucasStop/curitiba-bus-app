@@ -4,7 +4,7 @@ import { CURITIBA_STOPS } from '@/data/curitibaDataset';
 import { useLiveVehicles } from '@/hooks/useLiveVehicles';
 import { useTransitStore } from '@/stores/useTransitStore';
 import { BusStop, BusVehicle, LatLng } from '@/types/transit';
-import { Compass, Layers, LocateFixed, Navigation2 } from 'lucide-react-native';
+import { Layers, LocateFixed, Navigation2 } from 'lucide-react-native';
 import React, { useRef } from 'react';
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';

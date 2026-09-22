@@ -88,8 +88,8 @@ Login social (Google/Apple), 2FA, perfil com dados pessoais, login obrigatório,
 | Baldeação simulada no planner mostra rota inexistente | Perda de confiança do usuário | Bug de prioridade alta (E6); substituir por algoritmo sobre dados reais |
 | Alertas sem fonte real | RF-11 não entregável | Definir fonte ou cortar do MVP |
 | Diretriz 5.1.1(v) da App Store: app sem função realmente dependente de conta não pode exigir login | Reprovação na App Store | Login **opcional**; visitante usa tudo (RF-16) |
-| Projeto gratuito do Supabase pausa após ~7 dias sem uso | Sincronização para; login e favoritos na nuvem indisponíveis | Visitante segue funcionando; definir keep-alive ou plano pago antes do release |
-| Entrega de e-mail de confirmação e recuperação (limite do SMTP padrão do Supabase) | Cadastro travado | Configurar SMTP próprio antes do release |
+| Projeto gratuito do Supabase pausa após ~7 dias sem uso | Sincronização para; login e favoritos na nuvem indisponíveis | **Aceito por ora** (22/09/2026): sem cron de keep-alive nem plano pago — é projeto de faculdade, não produção. Visitante segue funcionando; reativar manualmente no painel Supabase antes de demonstrar. Reavaliar se/quando publicar nas lojas de verdade. |
+| Entrega de e-mail de confirmação e recuperação (limite do SMTP padrão do Supabase) | Cadastro travado | Mesma decisão acima: aceito por ora, sem SMTP próprio configurado. |
 
 ## 8.1 Investigação E3: acesso a dados reais da URBS (22/09/2026)
 
@@ -105,6 +105,8 @@ Investigação com testes reais de rede (`curl`), não só leitura de documenta�
 2. `veiculos.json.xz` é o log acumulado do dia inteiro (uma posição a cada poucos segundos por veículo), publicado só depois do dia fechar — não é posição em tempo real, não atende RF-05.
 3. Não é canal oficial da URBS nem tem termo de uso/retenção próprio (diferente do GTFS citado no PDF, que exige a mesma credencial); não é base confiável para depender em produção.
 4. Preencher os tipos ricos do app (`BusLine.tarifa`, `frequenciaPico`, `horarioFuncionamento`, `paradasIda`/`paradasVolta` ordenadas por sentido) com esses campos exigiria inventar o que a fonte não tem — seria fabricar dado, o que esta investigação foi instruída a não fazer.
+
+**Status do pedido de acesso:** pedido de LAI protocolado em 22/09/2026 via sistema e-SIC da Prefeitura de Curitiba (`servicodigital.curitiba.pr.gov.br`), órgão destinatário Urbanização de Curitiba S.A., protocolo **00-088136/2026**. Aguardando resposta (prazo legal: até 20 dias corridos, prorrogável por mais 10). Consultar em `curitiba.pr.gov.br/leiacessoinformacao` → Consultar Protocolo.
 
 **O que desbloqueia:**
 - Pedir login/senha da URBS (processo administrativo, LAI ou protocolo presencial — não é tarefa de código).
