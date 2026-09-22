@@ -152,6 +152,14 @@ Limites conhecidos: Expo Go no iOS usa Apple Maps; o Google Maps do Android exig
 ## 4. Smoke inicial (antes de qualquer mudança de código)
 Executar S1 e S2 com `idb`, salvar os screenshots e registrar o que falha hoje como linha de base. Só depois iniciar E8 (instalar `jest-expo` e escrever a camada A em vermelho, depois corrigir).
 
+Script: [`scripts/smoke/s1-s2-baseline.sh`](../scripts/smoke/s1-s2-baseline.sh). Requer simulador iOS booted, `idb`/`idb_companion`, `jq` e o Expo Go com o projeto aberto (`npx expo start`). Roda sozinho: define o GPS, tira o screenshot de abertura, confere o indicador de ônibus ao vivo (S1) e toca as 4 abas em ordem salvando screenshot + árvore de acessibilidade de cada uma (S2). Saída em `docs/qa-prints/<timestamp>/` (fora do git).
+
+### Estado em 22/09/2026: S1 e S2 rodados, ambos **verdes**
+- S1: Mapa abriu com GPS em Curitiba, indicador "12 ônibus ao vivo agora" e marcadores de linha (203, 216, 303 etc.) visíveis sobre o Apple Maps.
+- S2: Mapa → Linhas → Como Ir → Favoritos, nessa ordem; cada tela mostrou seu título ("Catálogo de Linhas", "Planejador de Viagens", "Meus Favoritos & Alertas") com conteúdo real, sem tela em branco nem erro.
+- Achado de ambiente (não é bug do app): `idb screenshot` falhou aqui com "Failed to capture a screenshot"; o script usa `xcrun simctl io <udid> screenshot` como alternativa, que funcionou normalmente.
+- Achado de ambiente: `xcrun simctl location <udid> set` derrubou o Expo Go para o SpringBoard nesta máquina (nenhum servidor Metro estava de pé, só um bundle antigo em cache); reabrir com `npx expo start` resolveu. Rodar o script com `npx expo start` já ativo evita o problema.
+
 ## 5. O que NÃO testar
 Estilos, layout, cores, animações de UI, `StyleSheet`, componentes puramente visuais e as telas sem regra. Cobertura por número não é meta; cobertura das regras acima é.
 

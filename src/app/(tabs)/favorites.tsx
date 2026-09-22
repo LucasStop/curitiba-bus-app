@@ -141,7 +141,11 @@ export default function FavoritesScreen() {
         <View style={styles.tabToggle}>
           <TouchableOpacity
             onPress={() => setActiveTab('favorites')}
-            style={[styles.tabButton, activeTab === 'favorites' && styles.tabButtonActive]}>
+            style={[styles.tabButton, activeTab === 'favorites' && styles.tabButtonActive]}
+            testID="favorites-tab-favorites-button"
+            accessibilityRole="button"
+            accessibilityState={{ selected: activeTab === 'favorites' }}
+            accessibilityLabel={`Ver favoritos, ${favoriteLines.length + favoriteStops.length} salvos`}>
             <Bookmark
               size={16}
               color={activeTab === 'favorites' ? Colors.light.text : Colors.light.textMuted}
@@ -154,7 +158,11 @@ export default function FavoritesScreen() {
 
           <TouchableOpacity
             onPress={() => setActiveTab('alerts')}
-            style={[styles.tabButton, activeTab === 'alerts' && styles.tabButtonActive]}>
+            style={[styles.tabButton, activeTab === 'alerts' && styles.tabButtonActive]}
+            testID="favorites-tab-alerts-button"
+            accessibilityRole="button"
+            accessibilityState={{ selected: activeTab === 'alerts' }}
+            accessibilityLabel={`Ver alertas RIT, ${TRANSIT_ALERTS.length} avisos`}>
             <Bell size={16} color={activeTab === 'alerts' ? Colors.light.text : Colors.light.textMuted} />
             <Text style={[styles.tabButtonText, activeTab === 'alerts' && styles.tabButtonTextActive]}>
               Alertas RIT ({TRANSIT_ALERTS.length})
@@ -181,7 +189,10 @@ export default function FavoritesScreen() {
                     router.push('/(tabs)');
                   }}
                   style={styles.favoriteCard}
-                  activeOpacity={0.8}>
+                  activeOpacity={0.8}
+                  testID={`favorites-line-card-${line.codigo}`}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Ver linha ${line.codigo}, ${line.nome} no mapa`}>
                   <BusBadge codigo={line.codigo} corHex={line.corHex} size="large" />
                   <View style={{ flex: 1, marginLeft: 12 }}>
                     <Text style={styles.favLineName}>{line.nome}</Text>
@@ -195,7 +206,10 @@ export default function FavoritesScreen() {
                       e.stopPropagation();
                       toggleFavoriteLine(line.codigo);
                     }}
-                    style={styles.deleteButton}>
+                    style={styles.deleteButton}
+                    testID={`favorites-line-delete-button-${line.codigo}`}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Remover linha ${line.codigo} dos favoritos`}>
                     <Trash2 size={18} color={Colors.light.textSubtle} />
                   </TouchableOpacity>
                 </TouchableOpacity>
@@ -221,7 +235,10 @@ export default function FavoritesScreen() {
                       router.push('/(tabs)');
                     }}
                     style={styles.favoriteCard}
-                    activeOpacity={0.8}>
+                    activeOpacity={0.8}
+                    testID={`favorites-stop-card-${stop.id}`}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Ver parada ${stop.nome}, bairro ${stop.bairro} no mapa`}>
                     <View style={styles.stopIconWrapper}>
                       <MapPin size={20} color={Colors.light.primary} />
                     </View>
@@ -244,7 +261,10 @@ export default function FavoritesScreen() {
                         e.stopPropagation();
                         toggleFavoriteStop(stop.id);
                       }}
-                      style={styles.deleteButton}>
+                      style={styles.deleteButton}
+                      testID={`favorites-stop-delete-button-${stop.id}`}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Remover parada ${stop.nome} dos favoritos`}>
                       <Trash2 size={18} color={Colors.light.textSubtle} />
                     </TouchableOpacity>
                   </TouchableOpacity>
