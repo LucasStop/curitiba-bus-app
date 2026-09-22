@@ -11,7 +11,6 @@ import {
   AlertTriangle,
   Bell,
   Bookmark,
-  ChevronRight,
   Clock,
   Info,
   LogIn,
