@@ -45,7 +45,16 @@ export const TransitBottomSheet: React.FC = () => {
     return (
       <View style={styles.sheetContainer}>
         <View style={styles.sheetHeader}>
-          <View style={styles.dragHandle} />
+          <View
+            style={styles.dragHandle}
+            testID="sheet-drag-handle"
+            accessibilityRole="adjustable"
+            accessibilityLabel="Painel de informações. Arraste para redimensionar."
+            accessibilityActions={[
+              { name: 'increment', label: 'Expandir' },
+              { name: 'decrement', label: 'Recolher' },
+            ]}
+          />
           <View style={styles.headerRow}>
             <View style={{ flex: 1 }}>
               <View style={styles.typeBadge}>
@@ -60,11 +69,21 @@ export const TransitBottomSheet: React.FC = () => {
             <TouchableOpacity
               onPress={() => toggleFavoriteStop(selectedStop.id)}
               style={styles.iconButton}
-              activeOpacity={0.7}>
+              activeOpacity={0.7}
+              testID="sheet-stop-favorite-button"
+              accessibilityRole="button"
+              accessibilityState={{ selected: isFav }}
+              accessibilityLabel={`${isFav ? 'Remover' : 'Adicionar'} ${selectedStop.nome} dos favoritos`}>
               <Bookmark size={22} color={isFav ? '#E11D48' : '#94A3B8'} fill={isFav ? '#E11D48' : 'none'} />
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={clearSelection} style={styles.iconButton} activeOpacity={0.7}>
+            <TouchableOpacity
+              onPress={clearSelection}
+              style={styles.iconButton}
+              activeOpacity={0.7}
+              testID="sheet-stop-close-button"
+              accessibilityRole="button"
+              accessibilityLabel="Fechar detalhes da parada">
               <Text style={styles.closeText}>✕</Text>
             </TouchableOpacity>
           </View>
@@ -85,7 +104,10 @@ export const TransitBottomSheet: React.FC = () => {
                   const line = CURITIBA_LINES.find((l) => l.codigo === arr.codLinha);
                   if (line) setSelectedLine(line);
                 }}
-                style={styles.arrivalCard}>
+                style={styles.arrivalCard}
+                testID={`sheet-arrival-card-${arr.codLinha}-${idx}`}
+                accessibilityRole="button"
+                accessibilityLabel={`Linha ${arr.codLinha}, ${arr.nomeLinha}, chegando em ${formatMinutes(arr.minutosAteChegada)}${arr.acessivelPCD ? ', acessível' : ''}`}>
                 <BusBadge codigo={arr.codLinha} corHex={arr.corHex} size="medium" />
                 <View style={{ flex: 1, marginLeft: 12 }}>
                   <Text style={styles.arrivalLineName} numberOfLines={1}>
@@ -118,7 +140,16 @@ export const TransitBottomSheet: React.FC = () => {
     return (
       <View style={styles.sheetContainer}>
         <View style={styles.sheetHeader}>
-          <View style={styles.dragHandle} />
+          <View
+            style={styles.dragHandle}
+            testID="sheet-drag-handle"
+            accessibilityRole="adjustable"
+            accessibilityLabel="Painel de informações. Arraste para redimensionar."
+            accessibilityActions={[
+              { name: 'increment', label: 'Expandir' },
+              { name: 'decrement', label: 'Recolher' },
+            ]}
+          />
           <View style={styles.headerRow}>
             <BusBadge codigo={selectedLine.codigo} corHex={selectedLine.corHex} size="large" />
             <View style={{ flex: 1, marginLeft: 12 }}>
@@ -132,11 +163,20 @@ export const TransitBottomSheet: React.FC = () => {
 
             <TouchableOpacity
               onPress={() => toggleFavoriteLine(selectedLine.codigo)}
-              style={styles.iconButton}>
+              style={styles.iconButton}
+              testID="sheet-line-favorite-button"
+              accessibilityRole="button"
+              accessibilityState={{ selected: isFav }}
+              accessibilityLabel={`${isFav ? 'Remover' : 'Adicionar'} linha ${selectedLine.codigo} dos favoritos`}>
               <Bookmark size={22} color={isFav ? '#E11D48' : '#94A3B8'} fill={isFav ? '#E11D48' : 'none'} />
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={clearSelection} style={styles.iconButton}>
+            <TouchableOpacity
+              onPress={clearSelection}
+              style={styles.iconButton}
+              testID="sheet-line-close-button"
+              accessibilityRole="button"
+              accessibilityLabel="Fechar detalhes da linha">
               <Text style={styles.closeText}>✕</Text>
             </TouchableOpacity>
           </View>
@@ -145,7 +185,10 @@ export const TransitBottomSheet: React.FC = () => {
           <TouchableOpacity
             onPress={toggleActiveDirection}
             style={styles.directionToggle}
-            activeOpacity={0.8}>
+            activeOpacity={0.8}
+            testID="sheet-direction-toggle-button"
+            accessibilityRole="button"
+            accessibilityLabel={`Sentido atual: ${activeDirection === 'ida' ? 'ida' : 'volta'}. Toque para inverter`}>
             <ArrowLeftRight size={16} color="#0F172A" />
             <Text style={styles.directionToggleText}>
               Sentido: {activeDirection === 'ida' ? 'Ida' : 'Volta'} (Inverter)
@@ -160,7 +203,10 @@ export const TransitBottomSheet: React.FC = () => {
             <TouchableOpacity
               key={`line-stop-${stop.id}-${idx}`}
               onPress={() => setSelectedStop(stop)}
-              style={styles.timelineItem}>
+              style={styles.timelineItem}
+              testID={`sheet-timeline-stop-${stop.id}`}
+              accessibilityRole="button"
+              accessibilityLabel={`Parada ${stop.nome}, bairro ${stop.bairro}`}>
               <View style={styles.timelinePoint}>
                 <View
                   style={[
@@ -186,7 +232,16 @@ export const TransitBottomSheet: React.FC = () => {
   return (
     <View style={styles.sheetContainer}>
       <View style={styles.sheetHeader}>
-        <View style={styles.dragHandle} />
+        <View
+          style={styles.dragHandle}
+          testID="sheet-drag-handle"
+          accessibilityRole="adjustable"
+          accessibilityLabel="Painel de informações. Arraste para redimensionar."
+          accessibilityActions={[
+            { name: 'increment', label: 'Expandir' },
+            { name: 'decrement', label: 'Recolher' },
+          ]}
+        />
 
         {/* Barra de Pesquisa Flutuante */}
         <View style={styles.searchBar}>
@@ -197,9 +252,15 @@ export const TransitBottomSheet: React.FC = () => {
             style={styles.searchInput}
             value={localSearch}
             onChangeText={setLocalSearch}
+            testID="sheet-search-input"
+            accessibilityLabel="Buscar linha, terminal ou estação-tubo"
           />
           {localSearch.length > 0 && (
-            <TouchableOpacity onPress={() => setLocalSearch('')}>
+            <TouchableOpacity
+              onPress={() => setLocalSearch('')}
+              testID="sheet-search-clear-button"
+              accessibilityRole="button"
+              accessibilityLabel="Limpar busca">
               <Text style={styles.clearSearchText}>✕</Text>
             </TouchableOpacity>
           )}
@@ -217,7 +278,10 @@ export const TransitBottomSheet: React.FC = () => {
               <TouchableOpacity
                 key={line.id}
                 onPress={() => setSelectedLine(line)}
-                style={styles.lineSearchCard}>
+                style={styles.lineSearchCard}
+                testID={`sheet-line-result-${line.codigo}`}
+                accessibilityRole="button"
+                accessibilityLabel={`Linha ${line.codigo}, ${line.nome}, de ${line.terminalOrigem} até ${line.terminalDestino}`}>
                 <BusBadge codigo={line.codigo} corHex={line.corHex} size="medium" />
                 <View style={{ flex: 1, marginLeft: 12 }}>
                   <Text style={styles.lineCardTitle}>{line.nome}</Text>
@@ -234,7 +298,10 @@ export const TransitBottomSheet: React.FC = () => {
               <TouchableOpacity
                 key={stop.id}
                 onPress={() => setSelectedStop(stop)}
-                style={styles.stopCard}>
+                style={styles.stopCard}
+                testID={`sheet-stop-result-${stop.id}`}
+                accessibilityRole="button"
+                accessibilityLabel={`Parada ${stop.nome}, bairro ${stop.bairro}`}>
                 <MapPin size={18} color="#0284C7" />
                 <View style={{ flex: 1, marginLeft: 10 }}>
                   <Text style={styles.stopCardName}>{stop.nome}</Text>
@@ -251,7 +318,10 @@ export const TransitBottomSheet: React.FC = () => {
               <TouchableOpacity
                 key={stop.id}
                 onPress={() => setSelectedStop(stop)}
-                style={styles.stopCard}>
+                style={styles.stopCard}
+                testID={`sheet-stop-featured-${stop.id}`}
+                accessibilityRole="button"
+                accessibilityLabel={`${stop.tipo === 'terminal' ? 'Terminal' : 'Estação-tubo'} ${stop.nome}, linhas ${stop.linhas.join(', ')}`}>
                 <MapPin size={18} color={stop.tipo === 'terminal' ? '#F59E0B' : '#0284C7'} />
                 <View style={{ flex: 1, marginLeft: 10 }}>
                   <Text style={styles.stopCardName}>{stop.nome}</Text>
