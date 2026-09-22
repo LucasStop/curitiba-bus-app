@@ -29,6 +29,8 @@ export function mapAuthError(error: unknown, context: AuthErrorContext = 'other'
     return NETWORK;
   }
   if (e.status === 429 || RATE_LIMIT_CODES.includes(e.code ?? '')) return RATE_LIMIT;
+  // Senha fraca não revela nada sobre a conta: vale em qualquer contexto (cadastro ou troca de senha).
+  if (e.code === 'weak_password') return 'Senha fraca. Use pelo menos 8 caracteres.';
 
   switch (context) {
     case 'signIn': {
@@ -41,7 +43,6 @@ export function mapAuthError(error: unknown, context: AuthErrorContext = 'other'
       if (e.code === 'user_already_exists' || e.code === 'email_exists') {
         return 'Este e-mail já tem cadastro. Entre ou recupere a senha.';
       }
-      if (e.code === 'weak_password') return 'Senha fraca. Use pelo menos 8 caracteres.';
       return GENERIC;
     case 'reset':
       return RESET_FAILED;

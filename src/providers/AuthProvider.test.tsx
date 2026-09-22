@@ -12,6 +12,7 @@ const mockAuth = {
   signInWithPassword: jest.fn(),
   signOut: jest.fn(),
   resetPasswordForEmail: jest.fn(),
+  updateUser: jest.fn(),
   startAutoRefresh: jest.fn(),
   stopAutoRefresh: jest.fn(),
 };
@@ -23,6 +24,25 @@ jest.mock('@/lib/supabase', () => ({
   getSupabase: () => ({ auth: mockAuth, functions: { invoke: mockInvoke } }),
 }));
 jest.mock('expo-linking', () => ({ createURL: (p: string) => `curitibabusapp://${p}` }));
+
+// Sync de favoritos (Task 3): testado à parte em favoritesSync.test.ts. Aqui só a integração:
+// que o AuthProvider chama a coisa certa na hora certa, sem tocar em rede nem no store real.
+const mockPullAndMerge = jest.fn();
+const mockStartSync = jest.fn();
+const mockStopSync = jest.fn();
+jest.mock('@/lib/favoritesSync', () => ({
+  pullAndMergeFavorites: (...args: unknown[]) => mockPullAndMerge(...args),
+  startFavoritesSync: (...args: unknown[]) => mockStartSync(...args),
+  stopFavoritesSync: (...args: unknown[]) => mockStopSync(...args),
+}));
+const mockFavoritesState = { favoriteLines: ['203'], favoriteStops: [] };
+const mockSetFavoritesState = jest.fn();
+jest.mock('@/stores/useFavoritesStore', () => ({
+  useFavoritesStore: {
+    getState: () => mockFavoritesState,
+    setState: (...args: unknown[]) => mockSetFavoritesState(...args),
+  },
+}));
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -63,6 +83,7 @@ beforeEach(() => {
     return { data: { subscription: { unsubscribe } } };
   });
   mockAuth.signOut.mockResolvedValue({ error: null });
+  mockPullAndMerge.mockResolvedValue(mockFavoritesState);
   jest.spyOn(AppState, 'addEventListener').mockImplementation((_type, handler) => {
     appStateHandler = handler as (state: string) => void;
     return { remove: removeAppState } as never;
@@ -218,5 +239,53 @@ describe('AuthProvider: ações', () => {
     const res = await ctx().deleteAccount();
     expect(res.error).toBe('Algo deu errado. Tente novamente.');
     expect(mockAuth.signOut).not.toHaveBeenCalled();
+  });
+
+  it('updatePassword chama updateUser e devolve mensagem em falha', async () => {
+    await mount();
+    mockAuth.updateUser.mockResolvedValue({ data: {}, error: null });
+    expect(await ctx().updatePassword('novaSenha123')).toEqual({ error: null });
+    expect(mockAuth.updateUser).toHaveBeenCalledWith({ password: 'novaSenha123' });
+
+    mockAuth.updateUser.mockResolvedValue({ data: {}, error: { status: 422, code: 'weak_password', message: 'x' } });
+    expect(await ctx().updatePassword('123')).toEqual({ error: 'Senha fraca. Use pelo menos 8 caracteres.' });
+  });
+});
+
+describe('AuthProvider: sync de favoritos (RF-20)', () => {
+  it('ao restaurar sessão logada, une favoritos (C4) e inicia o espelhamento de toggles', async () => {
+    mockAuth.getSession.mockResolvedValue({ data: { session: fakeSession }, error: null });
+    await mount();
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(mockPullAndMerge).toHaveBeenCalledWith(expect.anything(), 'u1', mockFavoritesState);
+    expect(mockSetFavoritesState).toHaveBeenCalledWith(mockFavoritesState);
+    expect(mockStartSync).toHaveBeenCalledWith(expect.anything(), 'u1');
+  });
+
+  it('visitante (sem sessão) nunca chama o merge nem inicia o espelhamento', async () => {
+    await mount();
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(mockPullAndMerge).not.toHaveBeenCalled();
+    expect(mockStartSync).not.toHaveBeenCalled();
+  });
+
+  it('sair para de espelhar toggles, sem tocar nos favoritos locais', async () => {
+    mockAuth.getSession.mockResolvedValue({ data: { session: fakeSession }, error: null });
+    await mount();
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    mockStopSync.mockClear();
+
+    await act(async () => authListener('SIGNED_OUT', null));
+    expect(mockStopSync).toHaveBeenCalled();
+    expect(mockSetFavoritesState).toHaveBeenCalledTimes(1); // só a união do login, nada no logout
   });
 });
