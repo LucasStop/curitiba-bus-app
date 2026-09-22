@@ -15,7 +15,9 @@ export function getStopMarkerAccessibilityLabel(stop: BusStop, isSelected = fals
   }`;
 }
 
-export const StopMarker: React.FC<StopMarkerProps> = ({ stop, isSelected = false }) => {
+// Memoizado: stops são estáticos (CURITIBA_STOPS), mas sem isso todo tick de veículo
+// (3s) e toda mudança de seleção re-renderizam as ~20+ paradas junto com os ônibus.
+export const StopMarker: React.FC<StopMarkerProps> = React.memo(({ stop, isSelected = false }) => {
   const isTerminal = stop.tipo === 'terminal';
 
   return (
@@ -31,7 +33,9 @@ export const StopMarker: React.FC<StopMarkerProps> = ({ stop, isSelected = false
       )}
     </View>
   );
-};
+});
+
+StopMarker.displayName = 'StopMarker';
 
 const styles = StyleSheet.create({
   container: {
