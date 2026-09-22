@@ -6,7 +6,7 @@ import { transitService } from '@/services/transitProvider';
 import { useFavoritesStore } from '@/stores/useFavoritesStore';
 import { useTransitStore } from '@/stores/useTransitStore';
 import { BusStop } from '@/types/transit';
-import { formatMinutes } from '@/utils/geo';
+import { formatEtaPhrase, formatMinutes } from '@/utils/geo';
 import { ArrowLeftRight, Bookmark, ChevronRight, Clock, MapPin, Search } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -110,7 +110,7 @@ export const TransitBottomSheet: React.FC = () => {
                 style={styles.arrivalCard}
                 testID={`sheet-arrival-card-${arr.codLinha}-${idx}`}
                 accessibilityRole="button"
-                accessibilityLabel={`Linha ${arr.codLinha}, ${arr.nomeLinha}, chegando em ${formatMinutes(arr.minutosAteChegada)}${arr.acessivelPCD ? ', acessível' : ''}`}>
+                accessibilityLabel={`Linha ${arr.codLinha}, ${arr.nomeLinha}, ${formatEtaPhrase(arr.minutosAteChegada)}${arr.acessivelPCD ? ', acessível' : ''}`}>
                 <BusBadge codigo={arr.codLinha} corHex={arr.corHex} size="medium" />
                 <View style={{ flex: 1, marginLeft: 12 }}>
                   <Text style={styles.arrivalLineName} numberOfLines={1}>
