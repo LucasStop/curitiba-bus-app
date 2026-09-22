@@ -1,6 +1,6 @@
 import { FormField } from '@/components/auth/FormField';
-import { authScreenStyles as s } from '@/components/auth/authScreenStyles';
-import { Colors } from '@/constants/theme';
+import { useAuthScreenStyles } from '@/components/auth/authScreenStyles';
+import { useTheme } from '@/hooks/use-theme';
 import { getSupabase, isSupabaseConfigured } from '@/lib/supabase';
 import { validatePassword } from '@/lib/validation';
 import { useAuth } from '@/providers/AuthProvider';
@@ -24,6 +24,8 @@ export default function ResetPasswordScreen() {
   const router = useRouter();
   const { updatePassword } = useAuth();
   const url = Linking.useLinkingURL();
+  const s = useAuthScreenStyles();
+  const theme = useTheme();
 
   const [stage, setStage] = useState<Stage>('checking');
   const [password, setPassword] = useState('');
@@ -91,7 +93,7 @@ export default function ResetPasswordScreen() {
 
           {stage === 'checking' && (
             <View style={{ paddingVertical: 24, alignItems: 'center' }} testID="reset-password-checking">
-              <ActivityIndicator color={Colors.light.primary} />
+              <ActivityIndicator color={theme.primary} />
             </View>
           )}
 
@@ -147,7 +149,7 @@ export default function ResetPasswordScreen() {
                 accessibilityRole="button"
                 accessibilityLabel="Salvar nova senha"
                 accessibilityState={{ disabled: submitting, busy: submitting }}>
-                {submitting ? <ActivityIndicator color={Colors.light.onPrimary} /> : <Text style={s.primaryButtonText}>Salvar nova senha</Text>}
+                {submitting ? <ActivityIndicator color={theme.onPrimary} /> : <Text style={s.primaryButtonText}>Salvar nova senha</Text>}
               </TouchableOpacity>
             </>
           )}
