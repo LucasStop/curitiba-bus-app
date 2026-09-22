@@ -70,17 +70,19 @@ export const TransitBottomSheet: React.FC = () => {
             <TouchableOpacity
               onPress={() => toggleFavoriteStop(selectedStop.id)}
               style={styles.iconButton}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               activeOpacity={0.7}
               testID="sheet-stop-favorite-button"
               accessibilityRole="button"
               accessibilityState={{ selected: isFav }}
               accessibilityLabel={`${isFav ? 'Remover' : 'Adicionar'} ${selectedStop.nome} dos favoritos`}>
-              <Bookmark size={22} color={isFav ? Colors.light.danger : Colors.light.textSubtle} fill={isFav ? Colors.light.danger : 'none'} />
+              <Bookmark size={22} color={isFav ? Colors.light.danger : Colors.light.textMuted} fill={isFav ? Colors.light.danger : 'none'} />
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={clearSelection}
               style={styles.iconButton}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               activeOpacity={0.7}
               testID="sheet-stop-close-button"
               accessibilityRole="button"
@@ -165,16 +167,18 @@ export const TransitBottomSheet: React.FC = () => {
             <TouchableOpacity
               onPress={() => toggleFavoriteLine(selectedLine.codigo)}
               style={styles.iconButton}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               testID="sheet-line-favorite-button"
               accessibilityRole="button"
               accessibilityState={{ selected: isFav }}
               accessibilityLabel={`${isFav ? 'Remover' : 'Adicionar'} linha ${selectedLine.codigo} dos favoritos`}>
-              <Bookmark size={22} color={isFav ? Colors.light.danger : Colors.light.textSubtle} fill={isFav ? Colors.light.danger : 'none'} />
+              <Bookmark size={22} color={isFav ? Colors.light.danger : Colors.light.textMuted} fill={isFav ? Colors.light.danger : 'none'} />
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={clearSelection}
               style={styles.iconButton}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               testID="sheet-line-close-button"
               accessibilityRole="button"
               accessibilityLabel="Fechar detalhes da linha">
@@ -212,7 +216,7 @@ export const TransitBottomSheet: React.FC = () => {
                 <View
                   style={[
                     styles.timelineDot,
-                    { backgroundColor: idx === 0 || idx === lineStops.length - 1 ? selectedLine.corHex : Colors.light.textSubtle },
+                    { backgroundColor: idx === 0 || idx === lineStops.length - 1 ? selectedLine.corHex : Colors.light.textMuted },
                   ]}
                 />
                 {idx < lineStops.length - 1 && <View style={styles.timelineLine} />}
@@ -249,7 +253,7 @@ export const TransitBottomSheet: React.FC = () => {
           <Search size={18} color={Colors.light.textMuted} />
           <TextInput
             placeholder="Buscar linha, terminal ou estação-tubo..."
-            placeholderTextColor={Colors.light.textSubtle}
+            placeholderTextColor={Colors.light.textMuted}
             style={styles.searchInput}
             value={localSearch}
             onChangeText={setLocalSearch}
@@ -259,6 +263,7 @@ export const TransitBottomSheet: React.FC = () => {
           {localSearch.length > 0 && (
             <TouchableOpacity
               onPress={() => setLocalSearch('')}
+              hitSlop={{ top: 14, bottom: 14, left: 14, right: 14 }}
               testID="sheet-search-clear-button"
               accessibilityRole="button"
               accessibilityLabel="Limpar busca">
@@ -290,7 +295,7 @@ export const TransitBottomSheet: React.FC = () => {
                     {line.terminalOrigem} ➔ {line.terminalDestino}
                   </Text>
                 </View>
-                <ChevronRight size={16} color={Colors.light.textSubtle} />
+                <ChevronRight size={16} color={Colors.light.textMuted} />
               </TouchableOpacity>
             ))}
 
@@ -437,7 +442,7 @@ const styles = StyleSheet.create({
   },
   clearSearchText: {
     fontSize: 14,
-    color: Colors.light.textSubtle,
+    color: Colors.light.textMuted,
     fontWeight: '700',
   },
   sectionHeader: {
@@ -480,7 +485,8 @@ const styles = StyleSheet.create({
   etaText: {
     fontSize: 12,
     fontWeight: '800',
-    color: Colors.light.success,
+    // ponytail: success on successMuted is 3:1, fails AA 4.5:1 for 12pt text.
+    color: Colors.light.text,
   },
   timelineItem: {
     flexDirection: 'row',
@@ -555,7 +561,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    color: Colors.light.textSubtle,
+    color: Colors.light.textMuted,
     fontSize: 13,
   },
 });

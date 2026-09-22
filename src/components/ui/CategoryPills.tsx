@@ -39,6 +39,7 @@ export const CategoryPills: React.FC = () => {
                 styles.pill,
                 isSelected ? styles.pillSelected : styles.pillUnselected,
               ]}
+              hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}
               activeOpacity={0.7}
               testID={`category-pill-${cat.key}`}
               accessibilityRole="button"
