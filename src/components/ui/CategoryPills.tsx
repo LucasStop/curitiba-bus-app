@@ -3,7 +3,15 @@ import { Colors } from '@/constants/theme';
 import { useTransitStore } from '@/stores/useTransitStore';
 import { BusCategory } from '@/types/transit';
 import React from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  ScrollView,
+  StyleProp,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
 
 const CATEGORIES: { key: 'all' | BusCategory; label: string; dotColor?: string }[] = [
   { key: 'all', label: 'Todas as Linhas' },
@@ -13,18 +21,27 @@ const CATEGORIES: { key: 'all' | BusCategory; label: string; dotColor?: string }
   { key: 'alimentador', label: 'Alimentadores', dotColor: RIT_CATEGORIES.alimentador.corHex },
 ];
 
-export const CategoryPills: React.FC = () => {
+export interface CategoryPillsProps {
+  style?: StyleProp<ViewStyle>;
+  contentContainerStyle?: StyleProp<ViewStyle>;
+}
+
+export const CategoryPills: React.FC<CategoryPillsProps> = ({
+  style,
+  contentContainerStyle,
+}) => {
   const activeCategory = useTransitStore((s) => s.activeCategory);
   const setActiveCategory = useTransitStore((s) => s.setActiveCategory);
   const selectedLine = useTransitStore((s) => s.selectedLine);
   const setSelectedLine = useTransitStore((s) => s.setSelectedLine);
 
   return (
-    <View style={styles.wrapper}>
+    <View style={[styles.wrapper, style]}>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.container}>
+        style={styles.scrollView}
+        contentContainerStyle={[styles.container, contentContainerStyle]}>
         {CATEGORIES.map((cat) => {
           const isSelected = activeCategory === cat.key && !selectedLine;
 
@@ -64,15 +81,28 @@ export const CategoryPills: React.FC = () => {
 
 const styles = StyleSheet.create({
   wrapper: {
+    width: '100%',
+    alignSelf: 'stretch',
+    flexGrow: 0,
+    flexShrink: 0,
     paddingVertical: 6,
   },
+  scrollView: {
+    flexGrow: 0,
+    flexShrink: 0,
+    width: '100%',
+  },
   container: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 16,
     gap: 8,
   },
   pill: {
     flexDirection: 'row',
     alignItems: 'center',
+    alignSelf: 'center',
+    flexShrink: 0,
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
