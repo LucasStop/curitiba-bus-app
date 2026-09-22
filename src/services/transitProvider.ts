@@ -1,6 +1,8 @@
 import { CURITIBA_LINES, CURITIBA_STOPS } from '@/data/curitibaDataset';
 import { ArrivalEstimate, BusLine, BusStop, BusVehicle, LatLng } from '@/types/transit';
-import { getBearing, getDistanceInMeters, interpolateLatLng } from '@/utils/geo';
+import { calculateStepDistanceMeters, getBearing, getDistanceInMeters, interpolateLatLng } from '@/utils/geo';
+
+const TICK_INTERVAL_MS = 3000;
 
 interface VehicleSimState {
   vehicle: BusVehicle;
@@ -89,7 +91,7 @@ class MockTransitProvider implements TransitProvider {
 
     this.timer = setInterval(() => {
       this.tickSimulation();
-    }, 3000);
+    }, TICK_INTERVAL_MS);
   }
 
   private tickSimulation() {
@@ -98,7 +100,16 @@ class MockTransitProvider implements TransitProvider {
       if (!line) return item;
 
       const trajeto = item.direction === 'ida' ? line.trajetoIda : line.trajetoVolta;
-      let newProgress = item.segmentProgress + 0.15;
+
+      // Passo proporcional à velocidade do veículo e ao intervalo do tick
+      // (distance = speed * deltaTime), não um incremento fixo de progresso.
+      const segStart = trajeto[item.segmentIndex];
+      const segEnd = trajeto[Math.min(item.segmentIndex + 1, trajeto.length - 1)];
+      const segmentDistanceMeters = getDistanceInMeters(segStart, segEnd);
+      const stepDistanceMeters = calculateStepDistanceMeters(item.vehicle.velocidadeKmH, TICK_INTERVAL_MS);
+      const progressStep = segmentDistanceMeters > 0 ? stepDistanceMeters / segmentDistanceMeters : 1;
+
+      let newProgress = item.segmentProgress + progressStep;
       let newSegment = item.segmentIndex;
       let newDirection = item.direction;
 
