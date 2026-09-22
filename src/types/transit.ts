@@ -85,6 +85,8 @@ export interface TripLeg {
     embarqueParada: string;
     desembarqueParada: string;
     quantidadeParadas: number;
+    // Sentido do trajeto usado nesta perna (ida = paradasIda, volta = paradasVolta).
+    sentido?: 'ida' | 'volta';
   };
 }
 

@@ -182,6 +182,15 @@ export default function RoutesScreen() {
       <ScrollView style={styles.resultsList} contentContainerStyle={styles.resultsContent}>
         <Text style={styles.resultsHeader}>Melhores Itinerários Encontrados</Text>
 
+        {results.length === 0 && (
+          <Text
+            style={styles.pickerEmptyText}
+            testID="routes-empty-results"
+            accessibilityLabel="Nenhum itinerário: origem e destino são o mesmo lugar">
+            Você já está aqui — escolha um destino diferente.
+          </Text>
+        )}
+
         {results.map((opt, idx) => (
           <View key={opt.id} style={styles.optionCard}>
             <View style={styles.optionTop}>
@@ -227,7 +236,8 @@ export default function RoutesScreen() {
                     <Text style={styles.legInstruction}>{leg.instrucao}</Text>
                     {leg.linha && (
                       <Text style={styles.legSubtext}>
-                        Desembarque em: {leg.linha.desembarqueParada} ({leg.linha.quantidadeParadas} paradas)
+                        Desembarque em: {leg.linha.desembarqueParada} ({leg.linha.quantidadeParadas}{' '}
+                        {leg.linha.quantidadeParadas === 1 ? 'parada' : 'paradas'})
                       </Text>
                     )}
                   </View>
