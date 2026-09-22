@@ -127,3 +127,15 @@ export function formatMinutes(minutes: number): string {
   }
   return `${Math.round(minutes)} min`;
 }
+
+/**
+ * Frase de chegada pronta para composição (ex: "em 4 min", "chegando agora").
+ * formatMinutes() sozinho quebra frases como "Próximo: X em {formatMinutes()}" quando
+ * o valor é "Chegando" (status, não minutos) — esta função já devolve a frase completa.
+ */
+export function formatEtaPhrase(minutes: number): string {
+  if (minutes <= 1) {
+    return 'chegando agora';
+  }
+  return `em ${Math.round(minutes)} min`;
+}
