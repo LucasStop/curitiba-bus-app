@@ -1,0 +1,81 @@
+# PRD: Curitiba Bus App
+
+Documento de requisitos do produto. Estado do código em 21/09/2026 (commit `2da02cf` da branch de tooling sobre `a9ef1f2`). Complementos: [SSD](SSD.md) (design do sistema), [TDD](TDD.md) (estratégia de testes) e [DESIGN.md](../DESIGN.md) (identidade visual).
+
+Convenção: `RF-xx` = requisito funcional, `RNF-xx` = não funcional. Cada um aponta para a task do backlog (códigos `1.1` a `4.4` vêm do roadmap original em [CLICKUP_ROADMAP.md](CLICKUP_ROADMAP.md); `E1` a `E8` são os épicos).
+
+## 1. Problema
+Quem usa o transporte coletivo de Curitiba (RIT/URBS) precisa saber, na hora, onde estão os ônibus, quando o próximo chega em uma parada e como ir de um ponto a outro, inclusive com baldeação em terminal integrado. As informações oficiais existem como dados abertos (GTFS e WebService da URBS), mas não chegam ao passageiro de forma simples, no celular.
+
+## 2. Objetivo
+App mobile (iOS e Android, Expo/React Native) que mostra em mapa as linhas, paradas e ônibus da RIT, estima a chegada em cada parada e sugere rotas de A a B.
+
+Sucesso do MVP: um passageiro abre o app, escolhe uma parada ou destino e sabe em menos de 3 toques qual ônibus pegar e em quantos minutos ele chega, com dados reais da URBS.
+
+## 3. Público e personas
+| Persona | Necessidade principal |
+|---|---|
+| Passageiro diário | Ver "quando chega o meu ônibus" na parada de sempre; favoritos |
+| Passageiro ocasional / turista | Descobrir como ir de A a B, incluindo terminais e integração |
+| Passageiro com deficiência (PCD) | Saber se o veículo é acessível; app usável com leitor de tela |
+
+## 4. Escopo
+### Dentro do MVP
+- Mapa com ônibus, paradas (tubo, terminal, comum) e traçado da linha, ida e volta.
+- Catálogo de linhas com busca e filtro por categoria RIT.
+- Previsão de chegada por parada.
+- Planejador "Como Ir" com linha direta e 1 baldeação em terminal.
+- Favoritos persistentes (linhas e paradas).
+- Alertas operacionais da URBS (somente se houver fonte real; ver RF-11).
+- Dados reais da URBS no lugar do dataset simulado.
+
+### Fora do MVP
+Login/contas, pagamento ou recarga de cartão, notificações push, planejamento com outros modos (bicicleta, carro), suporte a outras cidades, versão web como produto (a web serve só para desenvolvimento).
+
+## 5. Requisitos funcionais
+| ID | Requisito | Task / épico | Estado |
+|---|---|---|---|
+| RF-01 | Mapa centrado em Curitiba com gestos, estilo limpo e botão de GPS que centraliza no usuário; permissão negada tratada | 1.3 (E2) | Implementado com mock, sem validação em device |
+| RF-02 | Navegação por 4 abas: Mapa, Linhas, Como Ir, Favoritos | 1.2 (E2) | Implementado |
+| RF-03 | Painel deslizante com 3 alturas (12%, 45%, 88%) sem bloquear os gestos do mapa | 1.4 (E2) | Implementado |
+| RF-04 | Exibir ônibus no mapa com cor da categoria, código da linha e direção de deslocamento | 2.2 (E4) | Implementado com mock |
+| RF-05 | Posição dos ônibus atualizada em tempo real a partir da URBS, com movimento suave entre leituras, pausando em segundo plano | 2.3 (E4), E3 | Só simulação; sem pausa em background |
+| RF-06 | Catálogo de linhas com busca por nome/número, filtro por categoria e "Ver no Mapa" | 2.4 (E4) | Implementado com mock |
+| RF-07 | Marcadores distintos de tubo e terminal; tocar abre a previsão da parada | 3.1 (E5) | Implementado |
+| RF-08 | Previsão de chegada por parada, considerando sentido e trajeto; "Chegando" abaixo de 400 m | 3.2 (E5) | Parcial: linha reta, sem sentido, sem limiar de 400 m |
+| RF-09 | Card da parada com próximas chegadas, prefixo, selo PCD e favoritar | 3.3 (E5) | Implementado com mock |
+| RF-10 | Traçado da linha ativa e alternador ida/volta que redesenha rota e paradas | 3.4 (E5) | Implementado com mock |
+| RF-11 | Alertas operacionais da URBS/156 com as linhas afetadas | 4.4 (E7) | Dados fixos; fonte real não identificada |
+| RF-12 | Planejador: origem e destino, troca de sentido (swap), rota direta ou com 1 baldeação em terminal integrado, ordenada por tempo, tarifa correta | 4.1, 4.2 (E6) | Parcial: baldeação é simulada (ver SSD, seção Limites) |
+| RF-13 | Planejador aceita origem/destino por GPS e por busca de lugar, não só paradas conhecidas | 4.2 (E6) | Não implementado |
+| RF-14 | Favoritos de linhas e paradas persistem após fechar o app; começam vazios | 4.3 (E7) | Persiste, mas nasce pré-preenchido com valores falsos |
+| RF-15 | Substituir o dataset simulado por dados reais (linhas, pontos, itinerários, GTFS) com cache offline | E3 | Não iniciado |
+
+## 6. Requisitos não funcionais
+| ID | Requisito | Task / épico |
+|---|---|---|
+| RNF-01 | Mapa e painel a 60 fps, medido em aparelho real, com todas as linhas ativas | Validação de performance (E8) |
+| RNF-02 | Funciona sem rede após a primeira carga (linhas e paradas); indica dado desatualizado | Resiliência (E3) |
+| RNF-03 | Modo claro e escuro em todas as telas (hoje as telas novas são só claras) | Dark mode (E8) |
+| RNF-04 | Acessibilidade: `accessibilityLabel` nos controles, contraste AA, leitor de tela; hoje não há nenhum rótulo no app | Design system / a11y (E8) |
+| RNF-05 | Privacidade: localização usada só no aparelho, sem envio nem log; política de privacidade para as lojas | Build de release (E8) |
+| RNF-06 | Segredos (chave da URBS, chave do Google Maps) nunca no repositório nem no bundle | E1, E3 |
+| RNF-07 | Regras de negócio e cálculos cobertos por testes automatizados antes de mudar o comportamento | Testes unitários (E8), [TDD](TDD.md) |
+| RNF-08 | Interface e mensagens em pt-BR | (transversal) |
+
+## 7. Métricas
+- Tempo até a primeira previsão de chegada (parada favorita): menor que 3 s com rede.
+- Erro médio entre ETA exibido e chegada real (medido com dados reais): meta a definir após a integração da URBS.
+- Crash-free sessions no TestFlight/Play interno: 99% ou mais.
+
+## 8. Riscos e dependências abertas
+| Risco | Impacto | Ação |
+|---|---|---|
+| Acesso à API da URBS não confirmado (endpoint de teste devolveu resposta vazia; provável exigência de chave); o conjunto de dados não tem dicionário | Bloqueia RF-05, RF-15 | Task "Obter acesso ao WebService URBS e mapear endpoints" (E3) |
+| Chave da API não pode ir no bundle do app | Segurança | Avaliar proxy ou pré-processamento do GTFS |
+| Google Maps no Android exige chave e development build (não roda no Expo Go) | Bloqueia validação Android | Task "Chave Google Maps + development build EAS" (E1) |
+| Baldeação simulada no planner mostra rota inexistente | Perda de confiança do usuário | Bug de prioridade alta (E6); substituir por algoritmo sobre dados reais |
+| Alertas sem fonte real | RF-11 não entregável | Definir fonte ou cortar do MVP |
+
+## 9. Fora deste documento
+Identidade visual e tokens: [DESIGN.md](../DESIGN.md). Arquitetura, modelo de dados e fluxos: [SSD.md](SSD.md). Testes: [TDD.md](TDD.md).
