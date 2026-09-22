@@ -7,7 +7,8 @@ import { BusCategory, BusLine } from '@/types/transit';
 import { useRouter } from 'expo-router';
 import { Bookmark, Clock, MapPin, Search } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function LinesScreen() {
   const router = useRouter();
@@ -31,7 +32,7 @@ export default function LinesScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>Catálogo de Linhas</Text>

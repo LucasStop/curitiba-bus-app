@@ -7,7 +7,8 @@ import { formatMinutes } from '@/utils/geo';
 import { useRouter } from 'expo-router';
 import { AlertTriangle, Bell, Bookmark, ChevronRight, Clock, Info, MapPin, Trash2 } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function FavoritesScreen() {
   const router = useRouter();
@@ -22,7 +23,7 @@ export default function FavoritesScreen() {
   const stops = CURITIBA_STOPS.filter((s) => favoriteStops.includes(s.id));
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       {/* Header com Abas */}
       <View style={styles.header}>
         <Text style={styles.title}>Meus Favoritos & Alertas</Text>
