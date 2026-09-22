@@ -49,4 +49,5 @@ jobs:
         run: yarn audit --level high
         continue-on-error: true
 
-      # Sem passo de testes ainda: jest-expo entra na task de testes unitarios (E8).
+      - name: Test
+        run: yarn test --ci
