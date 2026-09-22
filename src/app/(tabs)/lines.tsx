@@ -44,7 +44,7 @@ export default function LinesScreen() {
           <Search size={18} color={Colors.light.textMuted} />
           <TextInput
             placeholder="Buscar por número ou nome da linha..."
-            placeholderTextColor={Colors.light.textSubtle}
+            placeholderTextColor={Colors.light.textMuted}
             style={styles.searchInput}
             value={search}
             onChangeText={setSearch}
@@ -54,6 +54,7 @@ export default function LinesScreen() {
           {search.length > 0 && (
             <TouchableOpacity
               onPress={() => setSearch('')}
+              hitSlop={{ top: 14, bottom: 14, left: 14, right: 14 }}
               testID="lines-search-clear-button"
               accessibilityRole="button"
               accessibilityLabel="Limpar busca">
@@ -67,6 +68,7 @@ export default function LinesScreen() {
           <TouchableOpacity
             onPress={() => setSelectedCategory('all')}
             style={[styles.filterPill, selectedCategory === 'all' && styles.filterPillActive]}
+            hitSlop={{ top: 12, bottom: 12, left: 4, right: 4 }}
             testID="lines-filter-pill-all"
             accessibilityRole="button"
             accessibilityState={{ selected: selectedCategory === 'all' }}
@@ -84,6 +86,7 @@ export default function LinesScreen() {
                 key={cat}
                 onPress={() => setSelectedCategory(cat)}
                 style={[styles.filterPill, isActive && styles.filterPillActive]}
+                hitSlop={{ top: 12, bottom: 12, left: 4, right: 4 }}
                 testID={`lines-filter-pill-${cat}`}
                 accessibilityRole="button"
                 accessibilityState={{ selected: isActive }}
@@ -120,6 +123,7 @@ export default function LinesScreen() {
                 <TouchableOpacity
                   onPress={() => toggleFavoriteLine(line.codigo)}
                   style={styles.favButton}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                   activeOpacity={0.7}
                   testID={`lines-favorite-button-${line.codigo}`}
                   accessibilityRole="button"
@@ -127,7 +131,7 @@ export default function LinesScreen() {
                   accessibilityLabel={`${isFav ? 'Remover' : 'Adicionar'} linha ${line.codigo} dos favoritos`}>
                   <Bookmark
                     size={22}
-                    color={isFav ? Colors.light.danger : Colors.light.textSubtle}
+                    color={isFav ? Colors.light.danger : Colors.light.textMuted}
                     fill={isFav ? Colors.light.danger : 'none'}
                   />
                 </TouchableOpacity>
@@ -214,7 +218,7 @@ const styles = StyleSheet.create({
     padding: 0,
   },
   clearText: {
-    color: Colors.light.textSubtle,
+    color: Colors.light.textMuted,
     fontWeight: '700',
     fontSize: 14,
   },
@@ -243,7 +247,8 @@ const styles = StyleSheet.create({
   filterText: {
     fontSize: 12,
     fontWeight: '600',
-    color: Colors.light.textMuted,
+    // ponytail: textMuted on surfaceMuted is 4.34:1, just under AA 4.5:1 for 12pt text.
+    color: Colors.light.text,
   },
   filterTextActive: {
     color: Colors.light.surface,

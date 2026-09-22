@@ -5,7 +5,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import { transitService } from '@/services/transitProvider';
 import { useFavoritesStore } from '@/stores/useFavoritesStore';
 import { useTransitStore } from '@/stores/useTransitStore';
-import { formatMinutes } from '@/utils/geo';
+import { formatEtaPhrase } from '@/utils/geo';
 import { useRouter } from 'expo-router';
 import {
   AlertTriangle,
@@ -207,10 +207,11 @@ export default function FavoritesScreen() {
                       toggleFavoriteLine(line.codigo);
                     }}
                     style={styles.deleteButton}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                     testID={`favorites-line-delete-button-${line.codigo}`}
                     accessibilityRole="button"
                     accessibilityLabel={`Remover linha ${line.codigo} dos favoritos`}>
-                    <Trash2 size={18} color={Colors.light.textSubtle} />
+                    <Trash2 size={18} color={Colors.light.textMuted} />
                   </TouchableOpacity>
                 </TouchableOpacity>
               ))
@@ -250,7 +251,7 @@ export default function FavoritesScreen() {
                         <View style={styles.nextBusRow}>
                           <Clock size={12} color={Colors.light.success} />
                           <Text style={styles.nextBusText}>
-                            Próximo: {nextBus.codLinha} em {formatMinutes(nextBus.minutosAteChegada)}
+                            Próximo: {nextBus.codLinha} {formatEtaPhrase(nextBus.minutosAteChegada)}
                           </Text>
                         </View>
                       )}
@@ -262,10 +263,11 @@ export default function FavoritesScreen() {
                         toggleFavoriteStop(stop.id);
                       }}
                       style={styles.deleteButton}
+                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                       testID={`favorites-stop-delete-button-${stop.id}`}
                       accessibilityRole="button"
                       accessibilityLabel={`Remover parada ${stop.nome} dos favoritos`}>
-                      <Trash2 size={18} color={Colors.light.textSubtle} />
+                      <Trash2 size={18} color={Colors.light.textMuted} />
                     </TouchableOpacity>
                   </TouchableOpacity>
                 );
@@ -281,7 +283,8 @@ export default function FavoritesScreen() {
                 <View style={styles.alertHeader}>
                   <View style={styles.alertIconWrapper}>
                     {alert.tipo === 'obra' ? (
-                      <AlertTriangle size={18} color={Colors.light.warning} />
+                      // ponytail: warning icon on warningMuted bg is 1.9:1, fails the 3:1 non-text minimum.
+                      <AlertTriangle size={18} color={Colors.light.text} />
                     ) : (
                       <Info size={18} color={Colors.light.primary} />
                     )}
@@ -358,7 +361,8 @@ const styles = StyleSheet.create({
   tabButtonText: {
     fontSize: 12,
     fontWeight: '600',
-    color: Colors.light.textMuted,
+    // ponytail: textMuted on surfaceMuted is 4.34:1, just under AA 4.5:1 for 12pt text.
+    color: Colors.light.text,
   },
   tabButtonTextActive: {
     color: Colors.light.text,
@@ -420,7 +424,8 @@ const styles = StyleSheet.create({
   nextBusText: {
     fontSize: 11,
     fontWeight: '700',
-    color: Colors.light.success,
+    // ponytail: success on surface is ~3.3:1, fails AA 4.5:1 for 11pt text.
+    color: Colors.light.text,
   },
   emptyCard: {
     backgroundColor: Colors.light.surface,
@@ -429,7 +434,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    color: Colors.light.textSubtle,
+    color: Colors.light.textMuted,
     fontSize: 13,
   },
   alertCard: {
