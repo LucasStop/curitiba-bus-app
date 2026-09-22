@@ -93,7 +93,7 @@ Decisões: login **opcional** (D6), e-mail e senha (D7), sessão em `LargeSecure
 - Cliente `@supabase/supabase-js` em `src/lib/supabase.ts`, configurado com `EXPO_PUBLIC_SUPABASE_URL` e a chave **publishable** (pública por desenho). `autoRefreshToken` e `persistSession` ligados, `detectSessionInUrl: false`, e `AppState` chama `startAutoRefresh`/`stopAutoRefresh`.
 - `AuthProvider` (`src/providers/AuthProvider.tsx`): guarda a sessão via `onAuthStateChange`. Sem guard de rota: visitante entra em tudo.
 - Telas fora das abas: `src/app/(auth)/sign-in`, `sign-up`, `forgot-password`, `reset-password` (deep link `curitibabusapp://`) e seção "Conta" em Favoritos (entrar, sair, excluir conta).
-- Edge Function `delete-account`: valida o JWT do chamador e remove só o usuário do próprio token; usa a `service_role` do ambiente do Supabase, nunca do app.
+- Edge Function `delete-account` (`supabase/functions/delete-account/`): só POST; valida o JWT do chamador com um cliente de anon key (`auth.getUser`) e remove só o usuário do próprio token, ignorando qualquer id de corpo ou query; usa a `service_role` do ambiente do Supabase, nunca do app. Responde 204, 401, 405 (e 500 genérico se o Auth falhar), sem detalhe interno. Lógica em `handler.ts`, com os clientes injetados para teste; `index.ts` só liga os clientes reais.
 
 ### 10.2 Banco
 ```
@@ -105,7 +105,7 @@ favorites (
   primary key (user_id, kind, ref)
 )
 ```
-RLS ligada; políticas de select, insert e delete com `(select auth.uid()) = user_id`. O projeto foi criado com "Automatically expose new tables" **desligado**, então cada tabela nova precisa de `GRANT` explícito (`select, insert, delete` para o papel `authenticated`, nenhum para `anon`) na própria migration. "Enable automatic RLS" está ligado como rede de segurança. Migrations em `supabase/migrations/`. Sem tabela de perfil (dados mínimos: e-mail do Auth e favoritos).
+RLS ligada e forçada; políticas de select, insert e delete (`to authenticated`) com `(select auth.uid()) = user_id`. O projeto foi criado com "Automatically expose new tables" **desligado**, então cada tabela nova precisa de `GRANT` explícito (`select, insert, delete` para o papel `authenticated`, nenhum para `anon`) na própria migration. "Enable automatic RLS" está ligado como rede de segurança. Migrations em `supabase/migrations/`. Sem tabela de perfil (dados mínimos: e-mail do Auth e favoritos).
 
 ### 10.3 Fluxos
 - **Cadastro:** e-mail + senha, e-mail de confirmação com link para `curitibabusapp://`, só então a sessão fica ativa.
