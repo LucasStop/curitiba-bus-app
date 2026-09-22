@@ -32,7 +32,7 @@ export function itinerarioEntre(
   if (embarqueId === desembarqueId) {
     return { sentido: 'ida', quantidadeParadas: 0 };
   }
-  const sentidos: Array<'ida' | 'volta'> = ['ida', 'volta'];
+  const sentidos: ('ida' | 'volta')[] = ['ida', 'volta'];
   for (const sentido of sentidos) {
     const paradas = sentido === 'ida' ? line.paradasIda : line.paradasVolta;
     const embarqueIdx = paradas.indexOf(embarqueId);
