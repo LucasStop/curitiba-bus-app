@@ -34,11 +34,8 @@ jobs:
       - name: Typecheck
         run: yarn typecheck
 
-      # Falta para virar bloqueante: 2 erros react-hooks/set-state-in-effect
-      # (src/hooks/useUserLocation.ts, src/hooks/use-color-scheme.web.ts) e 10 warnings.
       - name: Lint
         run: yarn lint
-        continue-on-error: true
 
       # Falta para virar bloqueante: o yarn 1 filtra so a saida com --level; o exit code
       # continua contando todas as severidades (moderada = 4). Hoje resta 1 moderada sem
