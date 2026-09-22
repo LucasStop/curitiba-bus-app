@@ -1,6 +1,6 @@
 # PRD: Curitiba Bus App
 
-Documento de requisitos do produto. Estado do código em 21/09/2026 (commit `2da02cf` da branch de tooling sobre `a9ef1f2`). Complementos: [SSD](SSD.md) (design do sistema), [TDD](TDD.md) (estratégia de testes) e [DESIGN.md](../DESIGN.md) (identidade visual).
+Documento de requisitos do produto. Estado do código em 21/09/2026 (commit `2da02cf` da branch de tooling sobre `a9ef1f2`). Complementos: [SSD](SSD.md) (design do sistema), [TDD](TDD.md) (estratégia de testes), [SECURITY](SECURITY.md) (ameaças e controles), [PRIVACY](PRIVACY.md) (rascunho LGPD) e [DESIGN.md](../DESIGN.md) (identidade visual).
 
 Convenção: `RF-xx` = requisito funcional, `RNF-xx` = não funcional. Cada um aponta para a task do backlog (códigos `1.1` a `4.4` vêm do roadmap original em [CLICKUP_ROADMAP.md](CLICKUP_ROADMAP.md); `E1` a `E8` são os épicos).
 
@@ -28,9 +28,10 @@ Sucesso do MVP: um passageiro abre o app, escolhe uma parada ou destino e sabe e
 - Favoritos persistentes (linhas e paradas).
 - Alertas operacionais da URBS (somente se houver fonte real; ver RF-11).
 - Dados reais da URBS no lugar do dataset simulado.
+- Conta **opcional** (e-mail e senha) só para sincronizar favoritos entre aparelhos. O app inteiro funciona como visitante, sem cadastro (decisão de 21/09/2026, ver riscos).
 
 ### Fora do MVP
-Login/contas, pagamento ou recarga de cartão, notificações push, planejamento com outros modos (bicicleta, carro), suporte a outras cidades, versão web como produto (a web serve só para desenvolvimento).
+Login social (Google/Apple), 2FA, perfil com dados pessoais, login obrigatório, pagamento ou recarga de cartão, notificações push, planejamento com outros modos (bicicleta, carro), suporte a outras cidades, versão web como produto (a web serve só para desenvolvimento).
 
 ## 5. Requisitos funcionais
 | ID | Requisito | Task / épico | Estado |
@@ -50,6 +51,12 @@ Login/contas, pagamento ou recarga de cartão, notificações push, planejamento
 | RF-13 | Planejador aceita origem/destino por GPS e por busca de lugar, não só paradas conhecidas | 4.2 (E6) | Não implementado |
 | RF-14 | Favoritos de linhas e paradas persistem após fechar o app; começam vazios | 4.3 (E7) | Persiste, mas nasce pré-preenchido com valores falsos |
 | RF-15 | Substituir o dataset simulado por dados reais (linhas, pontos, itinerários, GTFS) com cache offline | E3 | Não iniciado |
+| RF-16 | Visitante usa mapa, linhas, previsão, planejador e favoritos locais sem criar conta | E9 | Já é assim hoje (sem contas) |
+| RF-17 | Cadastro com e-mail e senha, com confirmação por e-mail | E9 | Não iniciado |
+| RF-18 | Login e logout; a sessão persiste ao fechar e reabrir o app | E9 | Não iniciado |
+| RF-19 | Recuperar senha por e-mail, com link que abre o app | E9 | Não iniciado |
+| RF-20 | Logado, os favoritos sincronizam entre aparelhos (união no primeiro login, sem perder os locais) | E9 | Não iniciado |
+| RF-21 | Excluir a conta dentro do app, removendo e-mail e favoritos | E9 | Não iniciado |
 
 ## 6. Requisitos não funcionais
 | ID | Requisito | Task / épico |
@@ -58,10 +65,14 @@ Login/contas, pagamento ou recarga de cartão, notificações push, planejamento
 | RNF-02 | Funciona sem rede após a primeira carga (linhas e paradas); indica dado desatualizado | Resiliência (E3) |
 | RNF-03 | Modo claro e escuro em todas as telas (hoje as telas novas são só claras) | Dark mode (E8) |
 | RNF-04 | Acessibilidade: `accessibilityLabel` nos controles, contraste AA, leitor de tela; hoje não há nenhum rótulo no app | Design system / a11y (E8) |
-| RNF-05 | Privacidade: localização usada só no aparelho, sem envio nem log; política de privacidade para as lojas | Build de release (E8) |
+| RNF-05 | Privacidade: localização usada só no aparelho, sem envio nem log; política de privacidade publicada para as lojas (rascunho em [PRIVACY.md](PRIVACY.md), precisa revisão jurídica) | Build de release (E8), E9 |
 | RNF-06 | Segredos (chave da URBS, chave do Google Maps) nunca no repositório nem no bundle | E1, E3 |
 | RNF-07 | Regras de negócio e cálculos cobertos por testes automatizados antes de mudar o comportamento | Testes unitários (E8), [TDD](TDD.md) |
 | RNF-08 | Interface e mensagens em pt-BR | (transversal) |
+| RNF-09 | Sessão guardada cifrada (chave no Keychain/Keystore); nenhuma `service_role` no app | E9 |
+| RNF-10 | Toda tabela com RLS e testes de isolamento entre usuários | E9 |
+| RNF-11 | Dependências sem vulnerabilidade alta; Dependabot ativo; `main` protegida | E9 |
+| RNF-12 | Conformidade LGPD: dados mínimos, exclusão dentro do app, base legal e retenção documentadas | E9 |
 
 ## 7. Métricas
 - Tempo até a primeira previsão de chegada (parada favorita): menor que 3 s com rede.
@@ -76,6 +87,9 @@ Login/contas, pagamento ou recarga de cartão, notificações push, planejamento
 | Google Maps no Android exige chave e development build (não roda no Expo Go) | Bloqueia validação Android | Task "Chave Google Maps + development build EAS" (E1) |
 | Baldeação simulada no planner mostra rota inexistente | Perda de confiança do usuário | Bug de prioridade alta (E6); substituir por algoritmo sobre dados reais |
 | Alertas sem fonte real | RF-11 não entregável | Definir fonte ou cortar do MVP |
+| Diretriz 5.1.1(v) da App Store: app sem função realmente dependente de conta não pode exigir login | Reprovação na App Store | Login **opcional**; visitante usa tudo (RF-16) |
+| Projeto gratuito do Supabase pausa após ~7 dias sem uso | Sincronização para; login e favoritos na nuvem indisponíveis | Visitante segue funcionando; definir keep-alive ou plano pago antes do release |
+| Entrega de e-mail de confirmação e recuperação (limite do SMTP padrão do Supabase) | Cadastro travado | Configurar SMTP próprio antes do release |
 
 ## 9. Fora deste documento
-Identidade visual e tokens: [DESIGN.md](../DESIGN.md). Arquitetura, modelo de dados e fluxos: [SSD.md](SSD.md). Testes: [TDD.md](TDD.md).
+Identidade visual e tokens: [DESIGN.md](../DESIGN.md). Arquitetura, modelo de dados e fluxos: [SSD.md](SSD.md). Testes: [TDD.md](TDD.md). Segurança: [SECURITY.md](SECURITY.md). Privacidade: [PRIVACY.md](PRIVACY.md).
