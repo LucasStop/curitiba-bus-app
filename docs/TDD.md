@@ -2,7 +2,7 @@
 
 Regra do projeto: teste primeiro em regra de negócio, cálculo, dinheiro, auth e parsing. **Os casos são definidos pelo Lucas; a implementação é feita depois de aprovados.** CSS, layout e CRUD sem regra não levam teste. Requisitos: [PRD.md](PRD.md). Design: [SSD.md](SSD.md).
 
-Estado: **não há nenhum teste hoje** e `jest` não está instalado. Tudo abaixo é PROPOSTO até aprovação. A coluna "Hoje" diz se o caso deve falhar (vermelho) contra o código atual, o que confirma o bug.
+Estado: **os casos R1 a R6 (backend Supabase) estão implementados e passando**; o resto da camada A ainda não tem teste e `jest` não está instalado (PROPOSTO até aprovação). A coluna "Hoje" diz se o caso deve falhar (vermelho) contra o código atual, o que confirma o bug.
 
 ## 1. Camadas
 | Camada | Ferramenta | Onde roda | Gate |
@@ -72,15 +72,29 @@ Casos definidos depois que o acesso à API for confirmado e houver respostas rea
 | C6 | Sair da conta | volta a visitante e mantém os favoritos locais | não existe |
 | C7 | Nenhum log contém token, e-mail ou coordenadas | verdadeiro (busca em `console.*`) | a verificar |
 
-### A7. RLS no banco (SQL com duas contas de teste), PROPOSTO
-| # | Caso | Esperado |
-|---|---|---|
-| R1 | A lê `favorites` de B | 0 linhas |
-| R2 | A insere linha com `user_id` de B | negado |
-| R3 | A apaga linha de B | 0 linhas afetadas |
-| R4 | Anônimo (sem login) seleciona, insere ou apaga | negado |
-| R5 | Apagar o usuário A | favoritos de A somem (cascata), os de B ficam |
-| R6 | Edge Function `delete-account` chamada com o token de A e um `user_id` de B no corpo | só A é apagado; B intacto |
+### A7. RLS no banco e Edge Function, IMPLEMENTADO
+Casos R1 a R5 em `supabase/tests/favorites_rls.test.sql` (pgTAP, banco local do Docker, tudo em transação com rollback; o usuário é simulado com `set local role` + `set local request.jwt.claims`). Caso R6 em `supabase/functions/delete-account/handler_test.ts` (Deno, clientes falsos injetados no handler). Escritos antes da migration e da função, vistos falhar, depois verdes.
+
+| # | Caso | Esperado | Onde |
+|---|---|---|---|
+| R1 | A lê `favorites` de B | 0 linhas | pgTAP |
+| R2 | A insere linha com `user_id` de B | negado (42501) | pgTAP |
+| R3 | A apaga linha de B | 0 linhas afetadas | pgTAP |
+| R4 | Anônimo (sem login) seleciona, insere ou apaga | negado (42501, sem GRANT ao `anon`) | pgTAP |
+| R5 | Apagar o usuário A | favoritos de A somem (cascata), os de B ficam | pgTAP |
+| R6 | Edge Function `delete-account` chamada com o token de A e um `user_id` de B no corpo | só A é apagado; sem token 401; método diferente de POST 405 | Deno |
+
+Extras no mesmo arquivo pgTAP: RLS ligada e forçada, e sem `update` (nem o dono altera um favorito).
+
+Como rodar (precisa de Docker; nada disso toca o projeto remoto):
+```bash
+supabase start                 # sobe o Postgres local e aplica supabase/migrations
+supabase test db               # R1 a R5
+supabase stop
+deno test --config supabase/functions/delete-account/deno.json supabase/functions/delete-account/handler_test.ts   # R6
+deno check --config supabase/functions/delete-account/deno.json supabase/functions/delete-account/*.ts
+```
+O R6 acima cobre a lógica com clientes falsos. A integração de ponta a ponta (função real, Auth real, dois usuários) foi conferida à mão com `supabase functions serve`; não há teste automatizado dela.
 
 ## 3. Camada B: cenários no app com idb
 Ambiente: simulador `iPhone 17` (`8574D031-AD26-4A58-B522-8FF4B736B24B`, iOS 26.5), `idb_companion` ativo, app aberto no Expo Go (`host.exp.Exponent`) via `yarn start`. Não tocar no app "O Parceiro", que também está instalado no simulador.

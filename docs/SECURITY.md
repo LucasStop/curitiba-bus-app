@@ -18,12 +18,12 @@ Escopo: app Expo (iOS/Android), projeto Supabase (Auth + Postgres + Edge Functio
 | # | Ameaça | Controle | Estado |
 |---|---|---|---|
 | T1 | Segredo vazado no repositório público | gitleaks no pre-commit (lefthook), secret scanning e push protection do GitHub, `.env*.local` ignorado, `.env.example` sem valores, segredos só em EAS secrets | Ativo (exceto `.env.example`, ainda a criar; secret scanning e push protection dependem de configuração do dono no GitHub) |
-| T2 | Usuário A lê ou altera dados do usuário B | RLS ligada em toda tabela, políticas por `(select auth.uid()) = user_id`, testes de isolamento com duas contas | Proposto |
+| T2 | Usuário A lê ou altera dados do usuário B | RLS ligada em toda tabela, políticas por `(select auth.uid()) = user_id`, testes de isolamento com duas contas (R1 a R5) | Backend feito e testado; falta o app |
 | T3 | `service_role` exposta no app | Nunca no bundle nem no repo; só na Edge Function, que a recebe do ambiente do Supabase | Proposto |
 | T4 | Roubo de sessão no aparelho | Sessão cifrada (AES-256) no AsyncStorage com a chave no `expo-secure-store` (Keychain/Keystore); tokens de vida curta com refresh | Proposto |
 | T5 | Força bruta e enumeração de contas | Rate limits do Supabase Auth, senha mínima de 8, mensagens genéricas em login e recuperação ("e-mail ou senha incorretos"), confirmação de e-mail | Proposto |
 | T6 | Phishing ou desvio no link de recuperação/confirmação | Allowlist de redirect só `curitibabusapp://**`, links de uso único com expiração | Proposto |
-| T7 | Abuso da função de excluir conta | A função valida o JWT e apaga apenas o usuário do próprio token, nunca um id vindo de parâmetro | Proposto |
+| T7 | Abuso da função de excluir conta | A função valida o JWT e apaga apenas o usuário do próprio token, nunca um id vindo de parâmetro (teste R6) | Backend feito e testado; falta o deploy e o app |
 | T8 | Dependência vulnerável | `yarn audit` no CI (informativo), Dependabot version updates semanais (`.github/dependabot.yml`), `npx expo install --fix`, `resolutions` quando seguro | Parcial: 1 moderada sem correção segura (abaixo); Dependabot alerts/security updates dependem do dono |
 | T9 | Vazamento de localização | Usada só no aparelho; proibido enviar ou registrar coordenadas | Ativo (não há rede hoje) |
 | T10 | Push malicioso ou histórico reescrito na `main` | Proteção da `main`: PR obrigatório com CI verde, sem force push | Proposto (hoje desprotegida) |
