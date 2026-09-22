@@ -10,6 +10,13 @@ updates:
     groups:
       minor-and-patch:
         update-types: [minor, patch]
+    ignore:
+      # Majors incompativeis com Expo SDK 57 (causaram o incidente de 21/09 -
+      # bump quebrou o build). Remover quando o SDK 58 suportar essas majors.
+      - dependency-name: "@react-native-async-storage/async-storage"
+        versions: [">=3.0.0"]
+      - dependency-name: "react-native-gesture-handler"
+        versions: [">=3.0.0"]
 
   - package-ecosystem: github-actions
     directory: /
