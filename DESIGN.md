@@ -48,6 +48,12 @@ Grade de 4 px. Raios: `sm=8`, `md=12`, `lg=16`, `pill=999` (cobre 16 dos usos e 
 - Hoje: nenhum `accessibilityLabel` nem `testID` no app.
 - Proposta: rótulo em todo botão, ícone-botão e marcador; alvo de toque de 44 pt; contraste AA; informação nunca só por cor (a categoria também aparece pelo código da linha).
 
+## Telas de conta (proposta, E9)
+- Ficam fora das abas (`src/app/(auth)/`), abertas a partir da seção "Conta" em Favoritos. O app nunca bloqueia atrás delas: sempre há "Continuar como visitante".
+- Campos: rótulo visível acima, teclado correto (`email-address`, senha com mostrar/ocultar), `autoComplete` e `textContentType` para o gerenciador de senhas, erro em texto abaixo do campo (não só cor), botão principal com estado de carregando e desabilitado durante o envio.
+- Mensagens de erro em pt-BR, curtas e sem revelar se o e-mail existe ("E-mail ou senha incorretos."). Confirmação: "Enviamos um link para confirmar seu e-mail."
+- Excluir conta: ação destrutiva com confirmação em duas etapas e texto do que será apagado (e-mail e favoritos).
+
 ## Ativos de marca
 Hoje o ícone, o splash (fundo `#208AEF`) e os logos de exemplo são os do template Expo. Faltam: ícone do app (1024 px), splash, ícone adaptativo do Android, e remover os assets de exemplo (`react-logo*`, `expo-badge*`, `tutorial-web.png`, `tabIcons/explore.png`).
 

@@ -36,6 +36,8 @@ src/utils/geo.ts  Haversine, bearing, interpolação
 - [SSD](docs/SSD.md): arquitetura, fluxos, integração URBS e limites conhecidos.
 - [TDD](docs/TDD.md): estratégia de testes e casos propostos.
 - [DESIGN.md](DESIGN.md): identidade visual e design system.
+- [SECURITY](docs/SECURITY.md): modelo de ameaças e controles.
+- [PRIVACY](docs/PRIVACY.md): rascunho da política de privacidade (LGPD).
 - [docs/CLICKUP_ROADMAP.md](docs/CLICKUP_ROADMAP.md): roadmap original (histórico).
 
 ## Contribuir
