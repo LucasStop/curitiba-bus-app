@@ -5,9 +5,9 @@ import { CURITIBA_LINES, CURITIBA_STOPS } from '@/data/curitibaDataset';
 import { transitService } from '@/services/transitProvider';
 import { useFavoritesStore } from '@/stores/useFavoritesStore';
 import { useTransitStore } from '@/stores/useTransitStore';
-import { BusLine, BusStop } from '@/types/transit';
+import { BusStop } from '@/types/transit';
 import { formatMinutes } from '@/utils/geo';
-import { ArrowLeftRight, Bookmark, CheckCircle2, ChevronRight, Clock, MapPin, Search } from 'lucide-react-native';
+import { ArrowLeftRight, Bookmark, ChevronRight, Clock, MapPin, Search } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
