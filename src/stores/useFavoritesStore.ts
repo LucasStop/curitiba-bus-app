@@ -15,8 +15,8 @@ interface FavoritesState {
 export const useFavoritesStore = create<FavoritesState>()(
   persist(
     (set, get) => ({
-      favoriteLines: ['203', '500'],
-      favoriteStops: ['tubo-central', 'terminal-cabral'],
+      favoriteLines: [],
+      favoriteStops: [],
 
       toggleFavoriteLine: (codLinha: string) => {
         const current = get().favoriteLines;
