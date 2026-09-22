@@ -29,6 +29,8 @@ export default function TabLayout() {
         options={{
           title: 'Mapa',
           tabBarIcon: ({ color, size }) => <Map color={color} size={size || 22} />,
+          tabBarButtonTestID: 'tab-bar-map',
+          tabBarAccessibilityLabel: 'Mapa',
         }}
       />
       <Tabs.Screen
@@ -36,6 +38,8 @@ export default function TabLayout() {
         options={{
           title: 'Linhas',
           tabBarIcon: ({ color, size }) => <Bus color={color} size={size || 22} />,
+          tabBarButtonTestID: 'tab-bar-lines',
+          tabBarAccessibilityLabel: 'Linhas',
         }}
       />
       <Tabs.Screen
@@ -43,6 +47,8 @@ export default function TabLayout() {
         options={{
           title: 'Como Ir',
           tabBarIcon: ({ color, size }) => <Navigation color={color} size={size || 22} />,
+          tabBarButtonTestID: 'tab-bar-routes',
+          tabBarAccessibilityLabel: 'Como Ir',
         }}
       />
       <Tabs.Screen
@@ -50,6 +56,8 @@ export default function TabLayout() {
         options={{
           title: 'Favoritos',
           tabBarIcon: ({ color, size }) => <Bookmark color={color} size={size || 22} />,
+          tabBarButtonTestID: 'tab-bar-favorites',
+          tabBarAccessibilityLabel: 'Favoritos',
         }}
       />
     </Tabs>
