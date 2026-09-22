@@ -11,6 +11,39 @@ function walkMinutes(distanceMeters: number): number {
   return Math.max(1, Math.round(distanceMeters / 80));
 }
 
+// Baldeação acontece dentro do mesmo terminal (plataforma integrada RIT):
+// caminhada curta, sem sair do terminal.
+const TRANSFER_MINUTES = 3;
+
+export interface ItinerarioTrecho {
+  sentido: 'ida' | 'volta';
+  quantidadeParadas: number;
+}
+
+// Trecho embarque→desembarque dentro do itinerário real da linha (P7/P8).
+// Retorna null quando o embarque vem depois do desembarque nos dois
+// sentidos — nesse caso a linha não serve para o par de paradas.
+// Caso degenerado (mesma parada): trecho zero, sentido ida.
+export function itinerarioEntre(
+  line: BusLine,
+  embarqueId: string,
+  desembarqueId: string
+): ItinerarioTrecho | null {
+  if (embarqueId === desembarqueId) {
+    return { sentido: 'ida', quantidadeParadas: 0 };
+  }
+  const sentidos: Array<'ida' | 'volta'> = ['ida', 'volta'];
+  for (const sentido of sentidos) {
+    const paradas = sentido === 'ida' ? line.paradasIda : line.paradasVolta;
+    const embarqueIdx = paradas.indexOf(embarqueId);
+    const desembarqueIdx = paradas.indexOf(desembarqueId);
+    if (embarqueIdx >= 0 && desembarqueIdx > embarqueIdx) {
+      return { sentido, quantidadeParadas: desembarqueIdx - embarqueIdx };
+    }
+  }
+  return null;
+}
+
 // Retorna null quando a distância é desprezível, para omitir a perna de caminhada.
 function buildWalkLeg(distanceMeters: number, instrucao: string): TripLeg | null {
   if (distanceMeters < MIN_WALK_DISTANCE_METERS) return null;
@@ -23,6 +56,11 @@ function buildWalkLeg(distanceMeters: number, instrucao: string): TripLeg | null
 }
 
 export function planTransitTrip(origin: LatLng, destination: LatLng): TripPlanOption[] {
+  // P9: origem igual ao destino = sem rota (você já está lá).
+  if (getDistanceInMeters(origin, destination) < MIN_WALK_DISTANCE_METERS) {
+    return [];
+  }
+
   const options: TripPlanOption[] = [];
 
   // Encontra as 3 paradas mais próximas da origem
@@ -39,6 +77,12 @@ export function planTransitTrip(origin: LatLng, destination: LatLng): TripPlanOp
       commonLines.forEach((codLinha) => {
         const line = CURITIBA_LINES.find((l) => l.codigo === codLinha);
         if (!line) return;
+
+        // P8: a linha só serve se o embarque vier antes do desembarque
+        // no itinerário real (ida ou volta). P7: a contagem de paradas
+        // vem desse trecho, nunca de número fixo.
+        const trecho = itinerarioEntre(line, oStop.id, dStop.id);
+        if (!trecho) return;
 
         const walkToStopMeters = getDistanceInMeters(origin, {
           latitude: oStop.latitude,
@@ -66,7 +110,7 @@ export function planTransitTrip(origin: LatLng, destination: LatLng): TripPlanOp
           {
             tipo: 'bus',
             duracaoMinutos: busMin,
-            instrucao: `Embarque na linha ${line.codigo} - ${line.nome}`,
+            instrucao: `Embarque na linha ${line.codigo} - ${line.nome} (sentido ${trecho.sentido})`,
             linha: {
               codigo: line.codigo,
               nome: line.nome,
@@ -74,7 +118,8 @@ export function planTransitTrip(origin: LatLng, destination: LatLng): TripPlanOp
               categoria: line.categoria,
               embarqueParada: oStop.nome,
               desembarqueParada: dStop.nome,
-              quantidadeParadas: 4,
+              quantidadeParadas: trecho.quantidadeParadas,
+              sentido: trecho.sentido,
             },
           },
           buildWalkLeg(walkFromStopMeters, `Caminhe até o seu destino final`),
@@ -118,8 +163,27 @@ export function planTransitTrip(origin: LatLng, destination: LatLng): TripPlanOp
               continue;
             }
 
+            // P8: os dois trechos precisam respeitar o sentido dos
+            // itinerários (embarque antes do desembarque). P7: as
+            // contagens vêm desses trechos.
+            const trecho1 = itinerarioEntre(line1, oStop.id, transferStop.id);
+            const trecho2 = itinerarioEntre(line2, transferStop.id, dStop.id);
+            if (!trecho1 || !trecho2) {
+              continue;
+            }
+
             options.push(
-              buildTransferOption(origin, destination, oStop, dStop, line1, line2, transferStop)
+              buildTransferOption(
+                origin,
+                destination,
+                oStop,
+                dStop,
+                line1,
+                line2,
+                transferStop,
+                trecho1,
+                trecho2
+              )
             );
             break transferSearch;
           }
@@ -151,7 +215,9 @@ function buildTransferOption(
   dStop: BusStop,
   line1: BusLine,
   line2: BusLine,
-  transferStop: BusStop
+  transferStop: BusStop,
+  trecho1: ItinerarioTrecho,
+  trecho2: ItinerarioTrecho
 ): TripPlanOption {
   const walkToStopMeters = getDistanceInMeters(origin, {
     latitude: oStop.latitude,
@@ -174,7 +240,7 @@ function buildTransferOption(
   );
   const firstBusMin = Math.max(3, Math.round(firstLegMeters / 350));
   const secondBusMin = Math.max(3, Math.round(secondLegMeters / 350));
-  const integracaoMin = 3;
+  const integracaoMin = TRANSFER_MINUTES;
 
   const totalMinutes = walkToMin + firstBusMin + integracaoMin + secondBusMin + walkFromMin;
 
@@ -188,7 +254,7 @@ function buildTransferOption(
     {
       tipo: 'bus' as const,
       duracaoMinutos: firstBusMin,
-      instrucao: `Embarque na linha ${line1.codigo} até ${transferStop.nome}`,
+      instrucao: `Embarque na linha ${line1.codigo} até ${transferStop.nome} (sentido ${trecho1.sentido})`,
       linha: {
         codigo: line1.codigo,
         nome: line1.nome,
@@ -196,7 +262,8 @@ function buildTransferOption(
         categoria: line1.categoria,
         embarqueParada: oStop.nome,
         desembarqueParada: transferStop.nome,
-        quantidadeParadas: 3,
+        quantidadeParadas: trecho1.quantidadeParadas,
+        sentido: trecho1.sentido,
       },
     },
     {
@@ -207,7 +274,7 @@ function buildTransferOption(
     {
       tipo: 'bus' as const,
       duracaoMinutos: secondBusMin,
-      instrucao: `Embarque na linha ${line2.codigo} até ${dStop.nome}`,
+      instrucao: `Embarque na linha ${line2.codigo} até ${dStop.nome} (sentido ${trecho2.sentido})`,
       linha: {
         codigo: line2.codigo,
         nome: line2.nome,
@@ -215,7 +282,8 @@ function buildTransferOption(
         categoria: line2.categoria,
         embarqueParada: transferStop.nome,
         desembarqueParada: dStop.nome,
-        quantidadeParadas: 3,
+        quantidadeParadas: trecho2.quantidadeParadas,
+        sentido: trecho2.sentido,
       },
     },
     buildWalkLeg(walkFromStopMeters, `Caminhe até seu destino final`),
