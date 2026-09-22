@@ -29,6 +29,17 @@ interface VehicleSimState {
 // Teto do backoff: mesmo numa falha em loop, nunca espera mais que isso pra tentar de novo.
 const MAX_BACKOFF_MS = 60000;
 
+// Distância máxima (m) para um ônibus aparecer nas previsões de chegada de uma parada
+export const MAX_ETA_DISTANCE_METERS = 8000;
+
+/**
+ * Converte distância (m) até a parada em estimativa de minutos até a chegada.
+ * Velocidade média urbana com paradas em canaletas/trânsito ~22 km/h = ~360 m/min.
+ */
+export function calculateEtaMinutes(distanceMeters: number): number {
+  return Math.max(1, Math.round(distanceMeters / 360));
+}
+
 /**
  * Contrato que qualquer fonte de dados de transporte deve implementar.
  * Hoje só existe o mock (simulação em memória); quando a integração com a
@@ -171,7 +182,7 @@ class MockTransitProvider implements TransitProvider {
     this.statusListeners.forEach((cb) => cb(this.connectionStatus));
   }
 
-  private stopSimulation() {
+  public stopSimulation() {
     if (this.timer) {
       clearTimeout(this.timer);
       this.timer = null;
@@ -303,9 +314,8 @@ class MockTransitProvider implements TransitProvider {
         const dist = getDistanceInMeters(busCoord, stopCoord);
 
         // Se o ônibus estiver dentro de 8km
-        if (dist <= 8000) {
-          // Velocidade média urbana com paradas em canaletas/trânsito ~22 km/h = ~366 m/min
-          const minutos = Math.max(1, Math.round(dist / 360));
+        if (dist <= MAX_ETA_DISTANCE_METERS) {
+          const minutos = calculateEtaMinutes(dist);
 
           estimates.push({
             codLinha: line.codigo,
