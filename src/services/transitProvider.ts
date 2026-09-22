@@ -10,7 +10,23 @@ interface VehicleSimState {
   direction: 'ida' | 'volta';
 }
 
-class TransitService {
+/**
+ * Contrato que qualquer fonte de dados de transporte deve implementar.
+ * Hoje só existe o mock (simulação em memória); quando a integração com a
+ * URBS estiver disponível, uma segunda implementação entra aqui e a troca
+ * acontece só em `createTransitProvider`, sem mexer em quem consome `transitService`.
+ */
+export interface TransitProvider {
+  getVehicles(): BusVehicle[];
+  getLines(): BusLine[];
+  getLineByCode(codigo: string): BusLine | undefined;
+  getStops(): BusStop[];
+  getStopById(id: string): BusStop | undefined;
+  getArrivalsForStop(stopId: string): ArrivalEstimate[];
+  subscribeVehicles(cb: (vehicles: BusVehicle[]) => void): () => void;
+}
+
+class MockTransitProvider implements TransitProvider {
   private vehicles: VehicleSimState[] = [];
   private listeners: ((vehicles: BusVehicle[]) => void)[] = [];
   private timer: ReturnType<typeof setInterval> | null = null;
@@ -198,4 +214,10 @@ class TransitService {
   }
 }
 
-export const transitService = new TransitService();
+// ponytail: só o mock existe hoje; quando a URBS_CONFIG ganhar credenciais reais,
+// troca o retorno abaixo por `new UrbsTransitProvider(URBS_CONFIG)` sem tocar nos consumidores.
+function createTransitProvider(): TransitProvider {
+  return new MockTransitProvider();
+}
+
+export const transitService: TransitProvider = createTransitProvider();
