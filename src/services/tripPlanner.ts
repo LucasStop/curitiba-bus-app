@@ -2,6 +2,26 @@ import { CURITIBA_LINES, CURITIBA_STOPS } from '@/data/curitibaDataset';
 import { BusLine, BusStop, LatLng, TripLeg, TripPlanOption } from '@/types/transit';
 import { getDistanceInMeters } from '@/utils/geo';
 
+// Abaixo disso é ruído de GPS, não caminhada real (ex: origem já é a própria parada).
+const MIN_WALK_DISTANCE_METERS = 5;
+
+// 80 metros por minuto de caminhada
+function walkMinutes(distanceMeters: number): number {
+  if (distanceMeters < MIN_WALK_DISTANCE_METERS) return 0;
+  return Math.max(1, Math.round(distanceMeters / 80));
+}
+
+// Retorna null quando a distância é desprezível, para omitir a perna de caminhada.
+function buildWalkLeg(distanceMeters: number, instrucao: string): TripLeg | null {
+  if (distanceMeters < MIN_WALK_DISTANCE_METERS) return null;
+  return {
+    tipo: 'walk',
+    duracaoMinutos: walkMinutes(distanceMeters),
+    distanciaMetros: distanceMeters,
+    instrucao,
+  };
+}
+
 export function planTransitTrip(origin: LatLng, destination: LatLng): TripPlanOption[] {
   const options: TripPlanOption[] = [];
 
@@ -29,9 +49,8 @@ export function planTransitTrip(origin: LatLng, destination: LatLng): TripPlanOp
           longitude: dStop.longitude,
         });
 
-        // 80 metros por minuto de caminhada
-        const walkToMin = Math.max(1, Math.round(walkToStopMeters / 80));
-        const walkFromMin = Math.max(1, Math.round(walkFromStopMeters / 80));
+        const walkToMin = walkMinutes(walkToStopMeters);
+        const walkFromMin = walkMinutes(walkFromStopMeters);
 
         const busDistMeters = getDistanceInMeters(
           { latitude: oStop.latitude, longitude: oStop.longitude },
@@ -43,12 +62,7 @@ export function planTransitTrip(origin: LatLng, destination: LatLng): TripPlanOp
         const totalMinutes = walkToMin + busMin + walkFromMin;
 
         const legs: TripLeg[] = [
-          {
-            tipo: 'walk',
-            duracaoMinutos: walkToMin,
-            distanciaMetros: walkToStopMeters,
-            instrucao: `Caminhe até ${oStop.nome}`,
-          },
+          buildWalkLeg(walkToStopMeters, `Caminhe até ${oStop.nome}`),
           {
             tipo: 'bus',
             duracaoMinutos: busMin,
@@ -63,13 +77,8 @@ export function planTransitTrip(origin: LatLng, destination: LatLng): TripPlanOp
               quantidadeParadas: 4,
             },
           },
-          {
-            tipo: 'walk',
-            duracaoMinutos: walkFromMin,
-            distanciaMetros: walkFromStopMeters,
-            instrucao: `Caminhe até o seu destino final`,
-          },
-        ];
+          buildWalkLeg(walkFromStopMeters, `Caminhe até o seu destino final`),
+        ].filter((leg): leg is TripLeg => leg !== null);
 
         const now = new Date();
         const departure = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
@@ -152,8 +161,8 @@ function buildTransferOption(
     latitude: dStop.latitude,
     longitude: dStop.longitude,
   });
-  const walkToMin = Math.max(1, Math.round(walkToStopMeters / 80));
-  const walkFromMin = Math.max(1, Math.round(walkFromStopMeters / 80));
+  const walkToMin = walkMinutes(walkToStopMeters);
+  const walkFromMin = walkMinutes(walkFromStopMeters);
 
   const firstLegMeters = getDistanceInMeters(
     { latitude: oStop.latitude, longitude: oStop.longitude },
@@ -174,15 +183,10 @@ function buildTransferOption(
   const arrivalDate = new Date(now.getTime() + totalMinutes * 60000);
   const arrival = arrivalDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
-  const legs: TripLeg[] = [
+  const legs = [
+    buildWalkLeg(walkToStopMeters, `Caminhe até ${oStop.nome}`),
     {
-      tipo: 'walk',
-      duracaoMinutos: walkToMin,
-      distanciaMetros: walkToStopMeters,
-      instrucao: `Caminhe até ${oStop.nome}`,
-    },
-    {
-      tipo: 'bus',
+      tipo: 'bus' as const,
       duracaoMinutos: firstBusMin,
       instrucao: `Embarque na linha ${line1.codigo} até ${transferStop.nome}`,
       linha: {
@@ -196,12 +200,12 @@ function buildTransferOption(
       },
     },
     {
-      tipo: 'walk',
+      tipo: 'walk' as const,
       duracaoMinutos: integracaoMin,
       instrucao: `Faça integração gratuita no ${transferStop.nome} (mesma plataforma)`,
     },
     {
-      tipo: 'bus',
+      tipo: 'bus' as const,
       duracaoMinutos: secondBusMin,
       instrucao: `Embarque na linha ${line2.codigo} até ${dStop.nome}`,
       linha: {
@@ -214,13 +218,8 @@ function buildTransferOption(
         quantidadeParadas: 3,
       },
     },
-    {
-      tipo: 'walk',
-      duracaoMinutos: walkFromMin,
-      distanciaMetros: walkFromStopMeters,
-      instrucao: `Caminhe até seu destino final`,
-    },
-  ];
+    buildWalkLeg(walkFromStopMeters, `Caminhe até seu destino final`),
+  ].filter((leg): leg is TripLeg => leg !== null);
 
   return {
     id: `transfer-${line1.codigo}-${transferStop.id}-${line2.codigo}-${oStop.id}-${dStop.id}`,
