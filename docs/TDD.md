@@ -111,7 +111,7 @@ Ambiente: simulador `iPhone 17` (`8574D031-AD26-4A58-B522-8FF4B736B24B`, iOS 26.
 
 Ferramentas: `idb ui describe-all` (árvore de acessibilidade, para localizar elementos e ler texto), `idb ui tap X Y`, `idb ui swipe`, `idb ui text`, `idb screenshot <arquivo>`, `xcrun simctl location booted set <lat>,<lon>` (simula o GPS) e `xcrun simctl openurl booted exp://...` (abre o projeto). Sem cabo nem aparelho físico.
 
-**Pré-requisito no código:** hoje não há `testID` nem `accessibilityLabel` em nenhum componente, então o `describe-all` não tem como identificar os controles. Adicionar rótulos estáveis nos elementos abaixo (também é requisito de acessibilidade, RNF-04).
+**Pré-requisito no código:** `testID`/`accessibilityLabel` cobrem hoje 14 de 29 arquivos `.tsx` (telas de abas, telas de conta, marcadores do mapa, badges, bottom sheet); os 15 restantes (sobretudo componentes menores) ainda não têm — `describe-all` não identifica esses.
 
 | # | Cenário | Passos | Resultado esperado (observável) |
 |---|---|---|---|
@@ -134,6 +134,18 @@ Ferramentas: `idb ui describe-all` (árvore de acessibilidade, para localizar el
 | S17 | Sem rede | Abrir sem rede como visitante e como logado | App abre e mostra o cache local nos dois casos |
 
 Evidência: um screenshot por cenário, guardado fora do repositório (ou sem dado pessoal). Cada falha vira bug no backlog com o screenshot.
+
+### Estado em 22/09/2026: S11 a S16 rodados no iPhone 17, contra o projeto Supabase remoto (`hfnnzynusmnqzaxvqevi`)
+Conta de teste em `mailinator.com` (e-mail descartável, público, sem dado pessoal), confirmada pelo link real recebido por e-mail. Todos **verdes**:
+- S11: "Quase lá — Enviamos um link para confirmar seu e-mail." Sem sessão até confirmar.
+- S12: "E-mail ou senha incorretos." (senha errada, conta ainda não confirmada — mensagem genérica igual, não revela o estado da conta).
+- S13: login após confirmação funcionou; favorito novo (linha 303) sincronizou e sobreviveu ao fechar/reabrir.
+- S14: sessão persistiu após fechar e reabrir o app.
+- S15: Sair voltou a visitante; os 4 favoritos locais permaneceram.
+- S16: Excluir conta pediu confirmação em duas etapas ("Tem certeza? Essa ação não pode ser desfeita."), voltou a visitante com os favoritos locais intactos, e login subsequente com as mesmas credenciais falhou com a mesma mensagem genérica de S12.
+- S17: **não testado** — não há um jeito confiável de simular "sem rede" via `idb`/`simctl` (sem toggle de rede scriptável); precisa ser feito manualmente (Wi-Fi desligado na máquina host) ou fica pendente.
+
+Achado à parte, fora do escopo de auth: durante o teste, toques em `TouchableOpacity` pequenos (ex. `lines-favorite-button-<codigo>`, 34x34pt) no catálogo de linhas tiveram atualização de estado/rótulo de acessibilidade com atraso perceptível e inconsistente entre toques idênticos — pode ser um artefato do `idb ui tap` sintético ou um problema real de responsividade da lista; não investigado a fundo.
 
 Limites conhecidos: Expo Go no iOS usa Apple Maps; o Google Maps do Android exige development build. A camada B não roda no CI (depende de macOS e simulador).
 
