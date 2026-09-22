@@ -1,6 +1,13 @@
 import type { NetworkError as NetworkErrorType } from '@/lib/resilience';
 import type { transitService as TransitServiceInstance } from './transitProvider';
 
+// `simulateFailures` é um hook só de QA no MockTransitProvider, de propósito fora do
+// contrato público `TransitProvider` (uma implementação real não teria isso) — por isso
+// precisa desse tipo extra aqui em vez de vir junto do tipo exportado do módulo.
+type TestableTransitService = typeof TransitServiceInstance & {
+  simulateFailures(count: number, makeError?: () => Error): void;
+};
+
 // O singleton agenda a primeira tentativa (setTimeout) já na construção, no import do módulo.
 // Pra controlar isso com fake timers e isolar cada teste, ativa os fake timers e recarrega o
 // módulo antes de cada `it` — sem isso, o timer real da instância anterior vazaria pro próximo
@@ -8,7 +15,7 @@ import type { transitService as TransitServiceInstance } from './transitProvider
 // `require` fresco: com `resetModules`, um `import` estático no topo do arquivo pega uma cópia
 // diferente da classe e o `instanceof` dentro do serviço nunca bate.
 describe('transitService — resiliência contra o provedor mock (RNF-02)', () => {
-  let transitService: typeof TransitServiceInstance;
+  let transitService: TestableTransitService;
   let NetworkError: typeof NetworkErrorType;
 
   beforeEach(() => {
