@@ -1,6 +1,6 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * Design tokens da identidade visual do app (ver DESIGN.md § Cores). Categorias RIT (cor por
+ * linha) ficam em `src/constants/rit.ts` — não são tokens de UI, são branding por categoria.
  */
 
 import '@/global.css';
@@ -9,18 +9,40 @@ import { Platform } from 'react-native';
 
 export const Colors = {
   light: {
-    text: '#000000',
-    background: '#ffffff',
-    backgroundElement: '#F0F0F3',
-    backgroundSelected: '#E0E1E6',
-    textSecondary: '#60646C',
+    text: '#0F172A',
+    textMuted: '#64748B',
+    textSubtle: '#94A3B8',
+    border: '#E2E8F0',
+    borderStrong: '#CBD5E1',
+    surface: '#FFFFFF',
+    surfaceMuted: '#F1F5F9',
+    background: '#F8FAFC',
+    primary: '#0369A1',
+    primaryMuted: '#E0F2FE',
+    onPrimary: '#FFFFFF',
+    warning: '#F59E0B',
+    warningMuted: '#FEF3C7',
+    danger: '#DC2626',
+    success: '#16A34A',
+    successMuted: '#DCFCE7',
   },
   dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
-    backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
+    text: '#F1F5F9',
+    textMuted: '#94A3B8',
+    textSubtle: '#64748B',
+    border: '#334155',
+    borderStrong: '#475569',
+    surface: '#111827',
+    surfaceMuted: '#1E293B',
+    background: '#0B1220',
+    primary: '#7DD3FC',
+    primaryMuted: '#0C4A6E',
+    onPrimary: '#0B1220',
+    warning: '#F59E0B',
+    warningMuted: '#78350F',
+    danger: '#F87171',
+    success: '#4ADE80',
+    successMuted: '#14532D',
   },
 } as const;
 

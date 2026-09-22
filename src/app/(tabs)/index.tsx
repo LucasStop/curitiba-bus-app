@@ -1,5 +1,6 @@
 import { CuritibaMap } from '@/components/map/CuritibaMap';
 import { TransitBottomSheet } from '@/components/sheets/TransitBottomSheet';
+import { Colors } from '@/constants/theme';
 import { useLiveVehicles } from '@/hooks/useLiveVehicles';
 import { useUserLocation } from '@/hooks/useUserLocation';
 import { useTransitStore } from '@/stores/useTransitStore';
@@ -61,10 +62,10 @@ export default function MapScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F172A',
+    backgroundColor: Colors.light.text,
   },
   topSafeArea: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.light.surface,
     zIndex: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -78,23 +79,23 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 10,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.light.surface,
   },
   appTitle: {
     fontSize: 18,
     fontWeight: '900',
-    color: '#0F172A',
+    color: Colors.light.text,
     letterSpacing: -0.5,
   },
   appSubtitle: {
     fontSize: 11,
-    color: '#64748B',
+    color: Colors.light.textMuted,
     fontWeight: '500',
   },
   liveIndicator: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#DCFCE7',
+    backgroundColor: Colors.light.successMuted,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
@@ -104,12 +105,12 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#16A34A',
+    backgroundColor: Colors.light.success,
   },
   liveText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#16A34A',
+    color: Colors.light.success,
   },
   mapWrapper: {
     flex: 1,
