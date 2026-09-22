@@ -1,4 +1,4 @@
-import { Colors } from '@/constants/theme';
+import { Colors, Radius } from '@/constants/theme';
 import { BusStop } from '@/types/transit';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
   tuboBadge: {
     width: 22,
     height: 22,
-    borderRadius: 11,
+    borderRadius: Radius.pill,
     backgroundColor: Colors.light.primary, // Azul tubo
     borderWidth: 2,
     borderColor: Colors.light.surface,
@@ -65,13 +65,13 @@ const styles = StyleSheet.create({
   tuboCilindro: {
     width: 10,
     height: 6,
-    borderRadius: 3,
+    borderRadius: Radius.pill,
     backgroundColor: Colors.light.surface,
   },
   terminalBadge: {
     width: 28,
     height: 28,
-    borderRadius: 14,
+    borderRadius: Radius.pill,
     backgroundColor: Colors.light.text,
     borderWidth: 2,
     borderColor: Colors.light.warning, // Dourado terminal

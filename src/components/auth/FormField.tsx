@@ -2,6 +2,7 @@ import { Eye, EyeOff } from 'lucide-react-native';
 import React, { useMemo, useState } from 'react';
 import { StyleSheet, Text, TextInput, type TextInputProps, TouchableOpacity, View } from 'react-native';
 
+import { Radius } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 interface FormFieldProps extends TextInputProps {
@@ -36,7 +37,7 @@ export function FormField({ label, error, isPassword, testID, ...inputProps }: F
         input: {
           borderWidth: 1,
           borderColor: theme.border,
-          borderRadius: 12,
+          borderRadius: Radius.md,
           paddingHorizontal: 14,
           paddingVertical: 12,
           fontSize: 15,

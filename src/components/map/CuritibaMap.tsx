@@ -1,5 +1,5 @@
 import { CURITIBA_COORDINATES } from '@/constants/rit';
-import { Colors } from '@/constants/theme';
+import { Colors, Radius, Shadows } from '@/constants/theme';
 import { CURITIBA_STOPS } from '@/data/curitibaDataset';
 import { useLiveVehicles } from '@/hooks/useLiveVehicles';
 import { useTransitStore } from '@/stores/useTransitStore';
@@ -235,15 +235,11 @@ const styles = StyleSheet.create({
   fabButton: {
     width: 44,
     height: 44,
-    borderRadius: 22,
+    borderRadius: Radius.pill,
     backgroundColor: Colors.light.surface,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 4,
+    ...Shadows.card,
   },
   directionButton: {
     width: 'auto',
@@ -263,22 +259,18 @@ const styles = StyleSheet.create({
     left: 16,
     right: 76,
     backgroundColor: 'rgba(15, 23, 42, 0.95)',
-    borderRadius: 12,
+    borderRadius: Radius.md,
     paddingHorizontal: 14,
     paddingVertical: 10,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
+    ...Shadows.sheet,
   },
   lineDot: {
     width: 10,
     height: 10,
-    borderRadius: 5,
+    borderRadius: Radius.pill,
   },
   bannerTitle: {
     flex: 1,
@@ -316,7 +308,7 @@ const styles = StyleSheet.create({
   webMapSimulation: {
     flex: 1,
     backgroundColor: Colors.light.border,
-    borderRadius: 16,
+    borderRadius: Radius.lg,
     padding: 16,
     justifyContent: 'space-between',
   },
@@ -325,10 +317,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light.surface,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    borderRadius: Radius.pill,
+    ...Shadows.card,
   },
   webCenterText: {
     fontWeight: '700',
@@ -340,12 +330,10 @@ const styles = StyleSheet.create({
   },
   webVehicleCard: {
     backgroundColor: Colors.light.surface,
-    borderRadius: 10,
+    borderRadius: Radius.md,
     padding: 12,
     borderLeftWidth: 5,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
+    ...Shadows.card,
   },
   webCardRow: {
     flexDirection: 'row',
@@ -355,7 +343,7 @@ const styles = StyleSheet.create({
   webBadge: {
     paddingHorizontal: 6,
     paddingVertical: 2,
-    borderRadius: 4,
+    borderRadius: Radius.sm,
   },
   webBadgeText: {
     color: Colors.light.surface,
