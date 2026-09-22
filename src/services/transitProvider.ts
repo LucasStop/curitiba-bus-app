@@ -7,7 +7,14 @@ import {
   nextConnectionStatus,
 } from '@/lib/resilience';
 import { ArrivalEstimate, BusLine, BusStop, BusVehicle, LatLng } from '@/types/transit';
-import { calculateStepDistanceMeters, getBearing, getDistanceInMeters, interpolateLatLng, isBusApproachingStop } from '@/utils/geo';
+import {
+  calculateStepDistanceMeters,
+  getBearing,
+  getDistanceInMeters,
+  interpolateLatLng,
+  isBusApproachingStop,
+} from '@/utils/geo';
+import { AppState, AppStateStatus } from 'react-native';
 
 const TICK_INTERVAL_MS = 3000;
 
@@ -46,6 +53,7 @@ class MockTransitProvider implements TransitProvider {
   private statusListeners: ((status: ConnectionStatus) => void)[] = [];
   private timer: ReturnType<typeof setTimeout> | null = null;
   private connectionStatus: ConnectionStatus = INITIAL_CONNECTION_STATUS;
+  private appState: AppStateStatus = AppState.currentState;
   // Só pra QA/teste: número de próximos ticks que devem falhar de propósito. O provedor mock
   // nunca falha sozinho, então é assim que se exercita e testa o caminho de erro/backoff.
   private pendingFailures = 0;
@@ -53,8 +61,19 @@ class MockTransitProvider implements TransitProvider {
 
   constructor() {
     this.initSimulatedVehicles();
-    this.scheduleTick(TICK_INTERVAL_MS);
+    // A simulação só roda enquanto alguém está de fato ouvindo (mapa montado) e o app
+    // está em primeiro plano — evita side effect no import do módulo e vazamento de timer.
+    AppState.addEventListener('change', this.handleAppStateChange);
   }
+
+  private handleAppStateChange = (nextState: AppStateStatus) => {
+    this.appState = nextState;
+    if (nextState === 'active') {
+      this.startSimulation();
+    } else {
+      this.stopSimulation();
+    }
+  };
 
   private initSimulatedVehicles() {
     let idCounter = 1;
@@ -104,8 +123,21 @@ class MockTransitProvider implements TransitProvider {
     });
   }
 
+  private isAppActive(): boolean {
+    return typeof this.appState === 'string' ? this.appState === 'active' : true;
+  }
+
+  private startSimulation() {
+    if (this.timer) return;
+    if (this.listeners.length === 0) return;
+    if (!this.isAppActive()) return;
+    this.scheduleTick(TICK_INTERVAL_MS);
+  }
+
   private scheduleTick(delay: number) {
     if (this.timer) clearTimeout(this.timer);
+    this.timer = null;
+    if (this.listeners.length === 0 || !this.isAppActive()) return;
     this.timer = setTimeout(() => this.runTick(), delay);
   }
 
@@ -137,6 +169,13 @@ class MockTransitProvider implements TransitProvider {
     const activeList = this.getVehicles();
     this.listeners.forEach((cb) => cb(activeList));
     this.statusListeners.forEach((cb) => cb(this.connectionStatus));
+  }
+
+  private stopSimulation() {
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
   }
 
   private tickSimulation() {
@@ -217,6 +256,9 @@ class MockTransitProvider implements TransitProvider {
   public simulateFailures(count: number, makeError?: () => Error): void {
     this.pendingFailures = count;
     this.pendingFailureFactory = makeError ?? null;
+    if (!this.timer) {
+      this.timer = setTimeout(() => this.runTick(), TICK_INTERVAL_MS);
+    }
   }
 
   public getLines(): BusLine[] {
@@ -285,8 +327,12 @@ class MockTransitProvider implements TransitProvider {
 
   public subscribeVehicles(cb: (vehicles: BusVehicle[]) => void): () => void {
     this.listeners.push(cb);
+    this.startSimulation();
     return () => {
       this.listeners = this.listeners.filter((l) => l !== cb);
+      if (this.listeners.length === 0) {
+        this.stopSimulation();
+      }
     };
   }
 }

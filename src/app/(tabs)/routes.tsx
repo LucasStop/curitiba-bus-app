@@ -1,22 +1,40 @@
 import { BusBadge } from '@/components/ui/BusBadge';
 import { Colors } from '@/constants/theme';
 import { CURITIBA_STOPS } from '@/data/curitibaDataset';
+import { useUserLocation } from '@/hooks/useUserLocation';
 import { planTransitTrip } from '@/services/tripPlanner';
 import { TripPlanOption } from '@/types/transit';
-import { ArrowUpDown, Footprints, Sparkles } from 'lucide-react-native';
+import { ArrowUpDown, ChevronRight, Footprints, LocateFixed, Search, Sparkles, X } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Alert,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+// Um ponto de rota é uma parada conhecida (BusStop, com id/bairro/linhas) ou um
+// ponto de GPS/busca livre, que só precisa de nome + coordenadas.
+type RoutePoint = { nome: string; latitude: number; longitude: number };
+
 export default function RoutesScreen() {
-  const [originStop, setOriginStop] = useState(CURITIBA_STOPS[4]); // Praça Rui Barbosa
-  const [destStop, setDestStop] = useState(CURITIBA_STOPS[1]); // Terminal Cabral
+  const [originStop, setOriginStop] = useState<RoutePoint>(CURITIBA_STOPS[4]); // Praça Rui Barbosa
+  const [destStop, setDestStop] = useState<RoutePoint>(CURITIBA_STOPS[1]); // Terminal Cabral
   const [results, setResults] = useState<TripPlanOption[]>(() =>
     planTransitTrip(
       { latitude: CURITIBA_STOPS[4].latitude, longitude: CURITIBA_STOPS[4].longitude },
       { latitude: CURITIBA_STOPS[1].latitude, longitude: CURITIBA_STOPS[1].longitude }
     )
   );
+
+  const [pickerFor, setPickerFor] = useState<'origin' | 'destination' | null>(null);
+  const [pickerQuery, setPickerQuery] = useState('');
+  const { location: myLocation, hasPermission, loading: locationLoading } = useUserLocation();
 
   const handleSwap = () => {
     const temp = originStop;
@@ -30,7 +48,7 @@ export default function RoutesScreen() {
     setResults(newResults);
   };
 
-  const handleSelectRoute = (o: (typeof CURITIBA_STOPS)[0], d: (typeof CURITIBA_STOPS)[0]) => {
+  const handleSelectRoute = (o: RoutePoint, d: RoutePoint) => {
     setOriginStop(o);
     setDestStop(d);
     const newResults = planTransitTrip(
@@ -39,6 +57,35 @@ export default function RoutesScreen() {
     );
     setResults(newResults);
   };
+
+  const openPicker = (target: 'origin' | 'destination') => {
+    setPickerQuery('');
+    setPickerFor(target);
+  };
+
+  const handlePickPoint = (point: RoutePoint) => {
+    if (pickerFor === 'origin') {
+      handleSelectRoute(point, destStop);
+    } else if (pickerFor === 'destination') {
+      handleSelectRoute(originStop, point);
+    }
+    setPickerFor(null);
+  };
+
+  const handleUseMyLocation = () => {
+    if (hasPermission === false) {
+      Alert.alert(
+        'Permissão de localização negada',
+        'Habilite o acesso à localização nas configurações do app para usar sua posição atual.'
+      );
+      return;
+    }
+    handlePickPoint({ nome: 'Minha localização atual', ...myLocation });
+  };
+
+  const filteredStops = CURITIBA_STOPS.filter((stop) =>
+    stop.nome.toLowerCase().includes(pickerQuery.trim().toLowerCase())
+  );
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
@@ -58,8 +105,10 @@ export default function RoutesScreen() {
             {/* Origem */}
             <TouchableOpacity
               style={styles.inputField}
+              onPress={() => openPicker('origin')}
               testID="routes-origin-field"
-              accessibilityLabel={`Origem: ${originStop.nome}`}>
+              accessibilityRole="button"
+              accessibilityLabel={`Origem: ${originStop.nome}. Toque para alterar`}>
               <Text style={styles.fieldLabel}>Origem</Text>
               <Text style={styles.fieldText} numberOfLines={1}>
                 {originStop.nome}
@@ -71,8 +120,10 @@ export default function RoutesScreen() {
             {/* Destino */}
             <TouchableOpacity
               style={styles.inputField}
+              onPress={() => openPicker('destination')}
               testID="routes-destination-field"
-              accessibilityLabel={`Destino: ${destStop.nome}`}>
+              accessibilityRole="button"
+              accessibilityLabel={`Destino: ${destStop.nome}. Toque para alterar`}>
               <Text style={styles.fieldLabel}>Destino</Text>
               <Text style={styles.fieldText} numberOfLines={1}>
                 {destStop.nome}
@@ -187,6 +238,80 @@ export default function RoutesScreen() {
           </View>
         ))}
       </ScrollView>
+
+      {/* Seletor de Origem/Destino: localização atual ou busca por parada */}
+      <Modal
+        visible={pickerFor !== null}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setPickerFor(null)}>
+        <View style={styles.pickerOverlay}>
+          <View style={styles.pickerSheet}>
+            <View style={styles.pickerHandle} />
+
+            <View style={styles.pickerHeaderRow}>
+              <Text style={styles.pickerTitle}>
+                {pickerFor === 'origin' ? 'Selecionar origem' : 'Selecionar destino'}
+              </Text>
+              <TouchableOpacity
+                onPress={() => setPickerFor(null)}
+                style={styles.pickerCloseButton}
+                testID="routes-picker-close-button"
+                accessibilityRole="button"
+                accessibilityLabel="Fechar seletor">
+                <X size={20} color={Colors.light.textMuted} />
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity
+              onPress={handleUseMyLocation}
+              style={styles.useLocationButton}
+              disabled={locationLoading}
+              testID="routes-picker-use-location"
+              accessibilityRole="button"
+              accessibilityLabel="Usar minha localização atual">
+              <LocateFixed size={18} color={Colors.light.primary} />
+              <Text style={styles.useLocationText}>
+                {locationLoading ? 'Obtendo localização...' : 'Usar minha localização'}
+              </Text>
+            </TouchableOpacity>
+
+            <View style={styles.pickerSearchBar}>
+              <Search size={18} color={Colors.light.textMuted} />
+              <TextInput
+                placeholder="Buscar parada por nome..."
+                placeholderTextColor={Colors.light.textSubtle}
+                style={styles.pickerSearchInput}
+                value={pickerQuery}
+                onChangeText={setPickerQuery}
+                testID="routes-picker-search-input"
+                accessibilityLabel="Buscar parada por nome"
+              />
+            </View>
+
+            <ScrollView style={styles.pickerList} keyboardShouldPersistTaps="handled">
+              {filteredStops.map((stop) => (
+                <TouchableOpacity
+                  key={stop.id}
+                  onPress={() => handlePickPoint(stop)}
+                  style={styles.pickerStopRow}
+                  testID={`routes-picker-stop-${stop.id}`}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Parada ${stop.nome}, bairro ${stop.bairro}`}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.pickerStopName}>{stop.nome}</Text>
+                    <Text style={styles.pickerStopMeta}>Bairro {stop.bairro}</Text>
+                  </View>
+                  <ChevronRight size={16} color={Colors.light.borderStrong} />
+                </TouchableOpacity>
+              ))}
+              {filteredStops.length === 0 && (
+                <Text style={styles.pickerEmptyText}>Nenhuma parada encontrada</Text>
+              )}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -398,5 +523,98 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     color: Colors.light.textMuted,
+  },
+  pickerOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'flex-end',
+  },
+  pickerSheet: {
+    backgroundColor: Colors.light.surface,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 24,
+    maxHeight: '80%',
+  },
+  pickerHandle: {
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: Colors.light.borderStrong,
+    alignSelf: 'center',
+    marginBottom: 10,
+  },
+  pickerHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  pickerTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: Colors.light.text,
+  },
+  pickerCloseButton: {
+    padding: 4,
+  },
+  useLocationButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: Colors.light.primaryMuted,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderRadius: 12,
+    marginBottom: 12,
+  },
+  useLocationText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: Colors.light.primary,
+  },
+  pickerSearchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.light.surfaceMuted,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    gap: 8,
+    marginBottom: 8,
+  },
+  pickerSearchInput: {
+    flex: 1,
+    fontSize: 14,
+    color: Colors.light.text,
+    padding: 0,
+  },
+  pickerList: {
+    maxHeight: 320,
+  },
+  pickerStopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.light.surfaceMuted,
+  },
+  pickerStopName: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.light.text,
+  },
+  pickerStopMeta: {
+    fontSize: 11,
+    color: Colors.light.textMuted,
+    marginTop: 2,
+  },
+  pickerEmptyText: {
+    textAlign: 'center',
+    color: Colors.light.textSubtle,
+    fontSize: 13,
+    paddingVertical: 20,
   },
 });
