@@ -1,4 +1,4 @@
-import { Colors } from '@/constants/theme';
+import { Colors, Radius } from '@/constants/theme';
 import { BusVehicle } from '@/types/transit';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   busBadge: {
     paddingHorizontal: 7,
     paddingVertical: 3,
-    borderRadius: 8,
+    borderRadius: Radius.sm,
     borderWidth: 2,
     borderColor: Colors.light.surface,
     shadowColor: '#000',
@@ -96,11 +96,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(15, 23, 42, 0.85)',
     paddingHorizontal: 4,
     paddingVertical: 1,
-    borderRadius: 4,
+    borderRadius: Radius.sm,
     marginTop: 2,
   },
   prefixText: {
-    color: '#F8FAFC',
+    color: Colors.light.background,
     fontSize: 9,
     fontWeight: '700',
   },

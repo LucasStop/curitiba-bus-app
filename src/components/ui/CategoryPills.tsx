@@ -1,5 +1,5 @@
 import { RIT_CATEGORIES } from '@/constants/rit';
-import { Colors } from '@/constants/theme';
+import { Colors, Radius, Shadows, Typography } from '@/constants/theme';
 import { useTransitStore } from '@/stores/useTransitStore';
 import { BusCategory } from '@/types/transit';
 import React from 'react';
@@ -19,6 +19,7 @@ const CATEGORIES: { key: 'all' | BusCategory; label: string; dotColor?: string }
   { key: 'ligeirinho', label: 'Ligeirinhos', dotColor: RIT_CATEGORIES.ligeirinho.corHex },
   { key: 'interbairros', label: 'Interbairros', dotColor: RIT_CATEGORIES.interbairros.corHex },
   { key: 'alimentador', label: 'Alimentadores', dotColor: RIT_CATEGORIES.alimentador.corHex },
+  { key: 'troncal', label: 'Convencionais', dotColor: RIT_CATEGORIES.troncal.corHex },
 ];
 
 export interface CategoryPillsProps {
@@ -106,12 +107,8 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    borderRadius: Radius.pill,
+    ...Shadows.card,
   },
   pillSelected: {
     backgroundColor: Colors.light.text,
@@ -124,11 +121,12 @@ const styles = StyleSheet.create({
   dot: {
     width: 8,
     height: 8,
-    borderRadius: 4,
+    borderRadius: Radius.pill,
     marginRight: 6,
   },
   label: {
-    fontSize: 13,
+    fontSize: Typography.label.fontSize,
+    lineHeight: Typography.label.lineHeight,
     fontWeight: '600',
   },
   labelSelected: {

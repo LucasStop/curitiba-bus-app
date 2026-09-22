@@ -1,17 +1,14 @@
 import { useMemo } from 'react';
 import { StyleSheet } from 'react-native';
 
-import { Colors } from '@/constants/theme';
+import { Colors, Radius, Typography } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useTheme } from '@/hooks/use-theme';
 
 // Estilo comum das 4 telas de conta (sign-in, sign-up, forgot/reset password). Tokens de
 // DESIGN.md § Cores (src/constants/theme.ts), resolvidos por scheme (claro/escuro) via
 // useColorScheme (DESIGN.md "Modo claro e escuro obrigatórios em toda tela nova").
-// successBox/successText não usam o token `success` porque o par claro (`success`/`successMuted`)
-// tem só 3:1 de contraste, abaixo do AA (4,5:1) pra texto de corpo — ver DESIGN.md § Cores.
-// O par claro fica em verde escuro fixo; o par escuro reaproveita o token porque nele o contraste
-// (~5,2:1) já passa.
+// successBox e successText utilizam os tokens semânticos `successMuted` e `success`.
 export function useAuthScreenStyles() {
   const theme = useTheme();
   const scheme = useColorScheme();
@@ -29,13 +26,15 @@ export function useAuthScreenStyles() {
           paddingBottom: 40,
         },
         title: {
-          fontSize: 22,
+          fontSize: Typography.screenTitle.fontSize,
+          lineHeight: Typography.screenTitle.lineHeight,
           fontWeight: '900',
           color: theme.text,
           marginBottom: 4,
         },
         subtitle: {
-          fontSize: 13,
+          fontSize: Typography.label.fontSize,
+          lineHeight: Typography.label.lineHeight,
           color: theme.textMuted,
           marginBottom: 24,
         },
@@ -45,19 +44,19 @@ export function useAuthScreenStyles() {
           marginBottom: 12,
         },
         successBox: {
-          backgroundColor: isDark ? Colors.dark.successMuted : '#ECFDF5',
-          borderRadius: 12,
+          backgroundColor: isDark ? Colors.dark.successMuted : Colors.light.successMuted,
+          borderRadius: Radius.md,
           padding: 14,
           marginBottom: 16,
         },
         successText: {
-          fontSize: 13,
-          color: isDark ? Colors.dark.success : '#065F46',
-          lineHeight: 18,
+          fontSize: Typography.body.fontSize,
+          color: isDark ? Colors.dark.success : Colors.light.success,
+          lineHeight: Typography.body.lineHeight,
         },
         primaryButton: {
           backgroundColor: theme.primary,
-          borderRadius: 12,
+          borderRadius: Radius.md,
           paddingVertical: 14,
           alignItems: 'center',
           justifyContent: 'center',

@@ -1,5 +1,5 @@
 import { BusBadge } from '@/components/ui/BusBadge';
-import { Colors } from '@/constants/theme';
+import { Colors, Radius, Shadows, Typography } from '@/constants/theme';
 import { CURITIBA_STOPS } from '@/data/curitibaDataset';
 import { useUserLocation } from '@/hooks/useUserLocation';
 import { planTransitTrip } from '@/services/tripPlanner';
@@ -331,12 +331,14 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.light.border,
   },
   title: {
-    fontSize: 22,
+    fontSize: Typography.screenTitle.fontSize,
+    lineHeight: Typography.screenTitle.lineHeight,
     fontWeight: '900',
     color: Colors.light.text,
   },
   subtitle: {
-    fontSize: 13,
+    fontSize: Typography.label.fontSize,
+    lineHeight: Typography.label.lineHeight,
     color: Colors.light.textMuted,
     marginTop: 2,
     marginBottom: 12,
@@ -345,7 +347,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.light.surfaceMuted,
-    borderRadius: 16,
+    borderRadius: Radius.lg,
     padding: 12,
   },
   dotLineCol: {
@@ -356,7 +358,7 @@ const styles = StyleSheet.create({
   greenDot: {
     width: 10,
     height: 10,
-    borderRadius: 5,
+    borderRadius: Radius.pill,
     backgroundColor: Colors.light.success,
   },
   vertLine: {
@@ -368,7 +370,7 @@ const styles = StyleSheet.create({
   redDot: {
     width: 10,
     height: 10,
-    borderRadius: 5,
+    borderRadius: Radius.pill,
     backgroundColor: Colors.light.danger,
   },
   fieldsCol: {
@@ -379,14 +381,16 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   fieldLabel: {
-    fontSize: 10,
+    fontSize: Typography.label.fontSize,
+    lineHeight: Typography.label.lineHeight,
     fontWeight: '700',
     // ponytail: textMuted on surfaceMuted is 4.34:1, just under AA 4.5:1 for 10pt text.
     color: Colors.light.text,
     textTransform: 'uppercase',
   },
   fieldText: {
-    fontSize: 14,
+    fontSize: Typography.body.fontSize,
+    lineHeight: Typography.body.lineHeight,
     fontWeight: '700',
     color: Colors.light.text,
   },
@@ -398,15 +402,12 @@ const styles = StyleSheet.create({
   swapButton: {
     width: 36,
     height: 36,
-    borderRadius: 18,
+    borderRadius: Radius.pill,
     backgroundColor: Colors.light.surface,
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 8,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    ...Shadows.card,
   },
   quickChips: {
     gap: 8,
@@ -418,11 +419,12 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light.primaryMuted,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 16,
+    borderRadius: Radius.pill,
     gap: 6,
   },
   chipText: {
-    fontSize: 12,
+    fontSize: Typography.label.fontSize,
+    lineHeight: Typography.label.lineHeight,
     fontWeight: '700',
     color: Colors.light.primary,
   },
@@ -434,7 +436,8 @@ const styles = StyleSheet.create({
     gap: 14,
   },
   resultsHeader: {
-    fontSize: 13,
+    fontSize: Typography.label.fontSize,
+    lineHeight: Typography.label.lineHeight,
     fontWeight: '700',
     color: Colors.light.textMuted,
     textTransform: 'uppercase',
@@ -442,13 +445,9 @@ const styles = StyleSheet.create({
   },
   optionCard: {
     backgroundColor: Colors.light.surface,
-    borderRadius: 16,
+    borderRadius: Radius.lg,
     padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 3,
-    elevation: 2,
+    ...Shadows.card,
   },
   optionTop: {
     flexDirection: 'row',
@@ -461,7 +460,9 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   durationMinutes: {
-    fontSize: 22,
+    fontSize: Typography.heroEta.fontSize,
+    lineHeight: Typography.heroEta.lineHeight,
+    fontVariant: ['tabular-nums'],
     fontWeight: '900',
     color: Colors.light.text,
   },
@@ -469,16 +470,17 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light.successMuted,
     paddingHorizontal: 8,
     paddingVertical: 2,
-    borderRadius: 6,
+    borderRadius: Radius.sm,
   },
   bestBadgeText: {
-    fontSize: 10,
+    fontSize: Typography.label.fontSize,
     fontWeight: '800',
     // ponytail: success on successMuted is 3:1, fails AA 4.5:1 for 10pt text.
     color: Colors.light.text,
   },
   scheduleText: {
-    fontSize: 12,
+    fontSize: Typography.label.fontSize,
+    lineHeight: Typography.label.lineHeight,
     color: Colors.light.textMuted,
     marginTop: 2,
   },
@@ -489,10 +491,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light.surfaceMuted,
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 8,
+    borderRadius: Radius.sm,
   },
   walkText: {
-    fontSize: 11,
+    fontSize: Typography.label.fontSize,
     fontWeight: '600',
     // ponytail: textMuted on surfaceMuted is 4.34:1, just under AA 4.5:1 for 11pt text.
     color: Colors.light.text,
@@ -514,17 +516,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   legInstruction: {
-    fontSize: 13,
+    fontSize: Typography.body.fontSize,
+    lineHeight: Typography.body.lineHeight,
     fontWeight: '600',
     color: Colors.light.text,
   },
   legSubtext: {
-    fontSize: 11,
+    fontSize: Typography.label.fontSize,
+    lineHeight: Typography.label.lineHeight,
     color: Colors.light.textMuted,
     marginTop: 2,
   },
   legDuration: {
-    fontSize: 12,
+    fontSize: Typography.label.fontSize,
+    lineHeight: Typography.label.lineHeight,
+    fontVariant: ['tabular-nums'],
     fontWeight: '700',
     color: Colors.light.textMuted,
   },
@@ -535,8 +541,8 @@ const styles = StyleSheet.create({
   },
   pickerSheet: {
     backgroundColor: Colors.light.surface,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderTopLeftRadius: Radius.lg,
+    borderTopRightRadius: Radius.lg,
     paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 24,
@@ -545,7 +551,7 @@ const styles = StyleSheet.create({
   pickerHandle: {
     width: 36,
     height: 4,
-    borderRadius: 2,
+    borderRadius: Radius.pill,
     backgroundColor: Colors.light.borderStrong,
     alignSelf: 'center',
     marginBottom: 10,
@@ -557,7 +563,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   pickerTitle: {
-    fontSize: 16,
+    fontSize: Typography.itemTitle.fontSize,
+    lineHeight: Typography.itemTitle.lineHeight,
     fontWeight: '800',
     color: Colors.light.text,
   },
@@ -571,11 +578,11 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light.primaryMuted,
     paddingHorizontal: 12,
     paddingVertical: 12,
-    borderRadius: 12,
+    borderRadius: Radius.md,
     marginBottom: 12,
   },
   useLocationText: {
-    fontSize: 14,
+    fontSize: Typography.body.fontSize,
     fontWeight: '700',
     color: Colors.light.primary,
   },
@@ -583,7 +590,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.light.surfaceMuted,
-    borderRadius: 12,
+    borderRadius: Radius.md,
     paddingHorizontal: 12,
     paddingVertical: 8,
     gap: 8,
@@ -591,7 +598,7 @@ const styles = StyleSheet.create({
   },
   pickerSearchInput: {
     flex: 1,
-    fontSize: 14,
+    fontSize: Typography.body.fontSize,
     color: Colors.light.text,
     padding: 0,
   },
@@ -606,19 +613,19 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.light.surfaceMuted,
   },
   pickerStopName: {
-    fontSize: 13,
+    fontSize: Typography.body.fontSize,
     fontWeight: '600',
     color: Colors.light.text,
   },
   pickerStopMeta: {
-    fontSize: 11,
+    fontSize: Typography.label.fontSize,
     color: Colors.light.textMuted,
     marginTop: 2,
   },
   pickerEmptyText: {
     textAlign: 'center',
     color: Colors.light.textSubtle,
-    fontSize: 13,
+    fontSize: Typography.body.fontSize,
     paddingVertical: 20,
   },
 });
