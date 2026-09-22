@@ -1,5 +1,5 @@
 import { BusBadge } from '@/components/ui/BusBadge';
-import { Colors } from '@/constants/theme';
+import { Colors, Radius, Shadows, Typography } from '@/constants/theme';
 import { CURITIBA_LINES, CURITIBA_STOPS, TRANSIT_ALERTS } from '@/data/curitibaDataset';
 import { useAuth } from '@/providers/AuthProvider';
 import { transitService } from '@/services/transitProvider';
@@ -326,12 +326,14 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.light.border,
   },
   title: {
-    fontSize: 22,
+    fontSize: Typography.screenTitle.fontSize,
+    lineHeight: Typography.screenTitle.lineHeight,
     fontWeight: '900',
     color: Colors.light.text,
   },
   subtitle: {
-    fontSize: 13,
+    fontSize: Typography.label.fontSize,
+    lineHeight: Typography.label.lineHeight,
     color: Colors.light.textMuted,
     marginTop: 2,
     marginBottom: 12,
@@ -339,7 +341,7 @@ const styles = StyleSheet.create({
   tabToggle: {
     flexDirection: 'row',
     backgroundColor: Colors.light.surfaceMuted,
-    borderRadius: 12,
+    borderRadius: Radius.md,
     padding: 4,
   },
   tabButton: {
@@ -348,18 +350,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 8,
-    borderRadius: 8,
+    borderRadius: Radius.sm,
     gap: 6,
   },
   tabButtonActive: {
     backgroundColor: Colors.light.surface,
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 2,
-    elevation: 2,
+    ...Shadows.card,
   },
   tabButtonText: {
-    fontSize: 12,
+    fontSize: Typography.label.fontSize,
+    lineHeight: Typography.label.lineHeight,
     fontWeight: '600',
     // ponytail: textMuted on surfaceMuted is 4.34:1, just under AA 4.5:1 for 12pt text.
     color: Colors.light.text,
@@ -376,7 +376,8 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   sectionTitle: {
-    fontSize: 13,
+    fontSize: Typography.label.fontSize,
+    lineHeight: Typography.label.lineHeight,
     fontWeight: '700',
     color: Colors.light.textMuted,
     textTransform: 'uppercase',
@@ -386,21 +387,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.light.surface,
-    borderRadius: 16,
+    borderRadius: Radius.lg,
     padding: 14,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 3,
-    elevation: 2,
+    ...Shadows.card,
   },
   favLineName: {
-    fontSize: 15,
+    fontSize: Typography.itemTitle.fontSize,
+    lineHeight: Typography.itemTitle.lineHeight,
     fontWeight: '800',
     color: Colors.light.text,
   },
   favLineTerminals: {
-    fontSize: 12,
+    fontSize: Typography.label.fontSize,
+    lineHeight: Typography.label.lineHeight,
     color: Colors.light.textMuted,
     marginTop: 2,
   },
@@ -410,7 +409,7 @@ const styles = StyleSheet.create({
   stopIconWrapper: {
     width: 44,
     height: 44,
-    borderRadius: 22,
+    borderRadius: Radius.pill,
     backgroundColor: Colors.light.primaryMuted,
     alignItems: 'center',
     justifyContent: 'center',
@@ -422,7 +421,9 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   nextBusText: {
-    fontSize: 11,
+    fontSize: Typography.label.fontSize,
+    lineHeight: Typography.label.lineHeight,
+    fontVariant: ['tabular-nums'],
     fontWeight: '700',
     // ponytail: success on surface is ~3.3:1, fails AA 4.5:1 for 11pt text.
     color: Colors.light.text,
@@ -430,22 +431,19 @@ const styles = StyleSheet.create({
   emptyCard: {
     backgroundColor: Colors.light.surface,
     padding: 16,
-    borderRadius: 12,
+    borderRadius: Radius.md,
     alignItems: 'center',
   },
   emptyText: {
     color: Colors.light.textMuted,
-    fontSize: 13,
+    fontSize: Typography.body.fontSize,
+    lineHeight: Typography.body.lineHeight,
   },
   alertCard: {
     backgroundColor: Colors.light.surface,
-    borderRadius: 16,
+    borderRadius: Radius.lg,
     padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 3,
-    elevation: 2,
+    ...Shadows.card,
     gap: 8,
   },
   alertHeader: {
@@ -455,25 +453,27 @@ const styles = StyleSheet.create({
   alertIconWrapper: {
     width: 36,
     height: 36,
-    borderRadius: 18,
+    borderRadius: Radius.pill,
     backgroundColor: Colors.light.warningMuted,
     alignItems: 'center',
     justifyContent: 'center',
   },
   alertTitle: {
-    fontSize: 14,
+    fontSize: Typography.body.fontSize,
+    lineHeight: Typography.body.lineHeight,
     fontWeight: '800',
     color: Colors.light.text,
   },
   alertDate: {
-    fontSize: 11,
+    fontSize: Typography.label.fontSize,
+    lineHeight: Typography.label.lineHeight,
     color: Colors.light.textMuted,
     marginTop: 2,
   },
   alertDesc: {
-    fontSize: 13,
+    fontSize: Typography.body.fontSize,
     color: Colors.light.text,
-    lineHeight: 18,
+    lineHeight: Typography.body.lineHeight,
   },
   alertFooter: {
     flexDirection: 'row',
@@ -482,14 +482,15 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   alertLinhasLabel: {
-    fontSize: 11,
+    fontSize: Typography.label.fontSize,
+    lineHeight: Typography.label.lineHeight,
     fontWeight: '700',
     color: Colors.light.textMuted,
   },
   accountSection: {
     marginTop: 12,
     backgroundColor: Colors.light.background,
-    borderRadius: 12,
+    borderRadius: Radius.md,
     borderWidth: 1,
     borderColor: Colors.light.border,
     padding: 12,
@@ -503,19 +504,21 @@ const styles = StyleSheet.create({
   accountIconWrapper: {
     width: 28,
     height: 28,
-    borderRadius: 14,
+    borderRadius: Radius.pill,
     backgroundColor: Colors.light.primaryMuted,
     alignItems: 'center',
     justifyContent: 'center',
   },
   accountEmail: {
     flex: 1,
-    fontSize: 13,
+    fontSize: Typography.body.fontSize,
+    lineHeight: Typography.body.lineHeight,
     fontWeight: '700',
     color: Colors.light.text,
   },
   accountGuestText: {
-    fontSize: 12,
+    fontSize: Typography.label.fontSize,
+    lineHeight: Typography.label.lineHeight,
     color: Colors.light.textMuted,
   },
   accountActions: {
@@ -528,7 +531,7 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 8,
+    borderRadius: Radius.sm,
     borderWidth: 1,
     borderColor: Colors.light.border,
     backgroundColor: Colors.light.surface,
@@ -538,7 +541,8 @@ const styles = StyleSheet.create({
     borderColor: Colors.light.primary,
   },
   accountButtonText: {
-    fontSize: 12,
+    fontSize: Typography.label.fontSize,
+    lineHeight: Typography.label.lineHeight,
     fontWeight: '700',
     color: Colors.light.text,
   },
