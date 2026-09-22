@@ -1,5 +1,6 @@
 import { BusBadge } from '@/components/ui/BusBadge';
 import { RIT_CATEGORIES } from '@/constants/rit';
+import { Colors } from '@/constants/theme';
 import { CURITIBA_LINES } from '@/data/curitibaDataset';
 import { useFavoritesStore } from '@/stores/useFavoritesStore';
 import { useTransitStore } from '@/stores/useTransitStore';
@@ -40,10 +41,10 @@ export default function LinesScreen() {
 
         {/* Busca */}
         <View style={styles.searchBar}>
-          <Search size={18} color="#64748B" />
+          <Search size={18} color={Colors.light.textMuted} />
           <TextInput
             placeholder="Buscar por número ou nome da linha..."
-            placeholderTextColor="#94A3B8"
+            placeholderTextColor={Colors.light.textSubtle}
             style={styles.searchInput}
             value={search}
             onChangeText={setSearch}
@@ -126,8 +127,8 @@ export default function LinesScreen() {
                   accessibilityLabel={`${isFav ? 'Remover' : 'Adicionar'} linha ${line.codigo} dos favoritos`}>
                   <Bookmark
                     size={22}
-                    color={isFav ? '#E11D48' : '#94A3B8'}
-                    fill={isFav ? '#E11D48' : 'none'}
+                    color={isFav ? Colors.light.danger : Colors.light.textSubtle}
+                    fill={isFav ? Colors.light.danger : 'none'}
                   />
                 </TouchableOpacity>
               </View>
@@ -136,13 +137,13 @@ export default function LinesScreen() {
 
               <View style={styles.terminalsRow}>
                 <View style={styles.terminalItem}>
-                  <MapPin size={14} color="#64748B" />
+                  <MapPin size={14} color={Colors.light.textMuted} />
                   <Text style={styles.terminalText} numberOfLines={1}>
                     Origem: {line.terminalOrigem}
                   </Text>
                 </View>
                 <View style={styles.terminalItem}>
-                  <MapPin size={14} color="#64748B" />
+                  <MapPin size={14} color={Colors.light.textMuted} />
                   <Text style={styles.terminalText} numberOfLines={1}>
                     Destino: {line.terminalDestino}
                   </Text>
@@ -151,7 +152,7 @@ export default function LinesScreen() {
 
               <View style={styles.cardBottom}>
                 <View style={styles.metaBadge}>
-                  <Clock size={12} color="#64748B" />
+                  <Clock size={12} color={Colors.light.textMuted} />
                   <Text style={styles.metaText}>Pico a cada {line.frequenciaMinutosPico} min</Text>
                 </View>
 
@@ -176,31 +177,31 @@ export default function LinesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: Colors.light.background,
   },
   header: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.light.surface,
     paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: Colors.light.border,
   },
   title: {
     fontSize: 22,
     fontWeight: '900',
-    color: '#0F172A',
+    color: Colors.light.text,
   },
   subtitle: {
     fontSize: 13,
-    color: '#64748B',
+    color: Colors.light.textMuted,
     marginTop: 2,
     marginBottom: 12,
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F1F5F9',
+    backgroundColor: Colors.light.surfaceMuted,
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 10,
@@ -209,11 +210,11 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 14,
-    color: '#0F172A',
+    color: Colors.light.text,
     padding: 0,
   },
   clearText: {
-    color: '#94A3B8',
+    color: Colors.light.textSubtle,
     fontWeight: '700',
     fontSize: 14,
   },
@@ -225,13 +226,13 @@ const styles = StyleSheet.create({
   filterPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F1F5F9',
+    backgroundColor: Colors.light.surfaceMuted,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
   },
   filterPillActive: {
-    backgroundColor: '#0F172A',
+    backgroundColor: Colors.light.text,
   },
   dot: {
     width: 6,
@@ -242,10 +243,10 @@ const styles = StyleSheet.create({
   filterText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#475569',
+    color: Colors.light.textMuted,
   },
   filterTextActive: {
-    color: '#FFFFFF',
+    color: Colors.light.surface,
   },
   list: {
     flex: 1,
@@ -255,7 +256,7 @@ const styles = StyleSheet.create({
     gap: 14,
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.light.surface,
     borderRadius: 16,
     padding: 14,
     shadowColor: '#000',
@@ -271,11 +272,11 @@ const styles = StyleSheet.create({
   lineName: {
     fontSize: 15,
     fontWeight: '800',
-    color: '#0F172A',
+    color: Colors.light.text,
   },
   categoryLabel: {
     fontSize: 12,
-    color: '#64748B',
+    color: Colors.light.textMuted,
     marginTop: 2,
   },
   favButton: {
@@ -283,7 +284,7 @@ const styles = StyleSheet.create({
   },
   cardDivider: {
     height: 1,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: Colors.light.surfaceMuted,
     marginVertical: 10,
   },
   terminalsRow: {
@@ -297,7 +298,7 @@ const styles = StyleSheet.create({
   },
   terminalText: {
     fontSize: 12,
-    color: '#475569',
+    color: Colors.light.textMuted,
   },
   cardBottom: {
     flexDirection: 'row',
@@ -308,14 +309,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: Colors.light.background,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
   },
   metaText: {
     fontSize: 11,
-    color: '#64748B',
+    color: Colors.light.textMuted,
     fontWeight: '600',
   },
   mapButton: {
@@ -324,7 +325,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   mapButtonText: {
-    color: '#FFFFFF',
+    color: Colors.light.surface,
     fontWeight: '700',
     fontSize: 12,
   },

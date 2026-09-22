@@ -1,4 +1,5 @@
 import { RIT_CATEGORIES } from '@/constants/rit';
+import { Colors } from '@/constants/theme';
 import { useTransitStore } from '@/stores/useTransitStore';
 import { BusCategory } from '@/types/transit';
 import React from 'react';
@@ -82,12 +83,12 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   pillSelected: {
-    backgroundColor: '#0F172A', // Slate 900
+    backgroundColor: Colors.light.text,
   },
   pillUnselected: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.light.surface,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: Colors.light.border,
   },
   dot: {
     width: 8,
@@ -100,9 +101,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   labelSelected: {
-    color: '#FFFFFF',
+    color: Colors.light.surface,
   },
   labelUnselected: {
-    color: '#334155',
+    color: Colors.light.text,
   },
 });

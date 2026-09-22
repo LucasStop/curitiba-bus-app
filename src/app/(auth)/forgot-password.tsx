@@ -1,5 +1,6 @@
 import { FormField } from '@/components/auth/FormField';
 import { authScreenStyles as s } from '@/components/auth/authScreenStyles';
+import { Colors } from '@/constants/theme';
 import { RESET_SENT_MESSAGE } from '@/lib/authErrors';
 import { validateEmail } from '@/lib/validation';
 import { useAuth } from '@/providers/AuthProvider';
@@ -75,7 +76,7 @@ export default function ForgotPasswordScreen() {
                 accessibilityRole="button"
                 accessibilityLabel="Enviar link de recuperação"
                 accessibilityState={{ disabled: submitting, busy: submitting }}>
-                {submitting ? <ActivityIndicator color="#FFFFFF" /> : <Text style={s.primaryButtonText}>Enviar link</Text>}
+                {submitting ? <ActivityIndicator color={Colors.light.onPrimary} /> : <Text style={s.primaryButtonText}>Enviar link</Text>}
               </TouchableOpacity>
             </>
           )}

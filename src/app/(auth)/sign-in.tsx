@@ -1,5 +1,6 @@
 import { FormField } from '@/components/auth/FormField';
 import { authScreenStyles as s } from '@/components/auth/authScreenStyles';
+import { Colors } from '@/constants/theme';
 import { validateEmail, validatePassword } from '@/lib/validation';
 import { useAuth } from '@/providers/AuthProvider';
 import { Link, useRouter } from 'expo-router';
@@ -79,7 +80,7 @@ export default function SignInScreen() {
             accessibilityRole="button"
             accessibilityLabel="Entrar"
             accessibilityState={{ disabled: submitting, busy: submitting }}>
-            {submitting ? <ActivityIndicator color="#FFFFFF" /> : <Text style={s.primaryButtonText}>Entrar</Text>}
+            {submitting ? <ActivityIndicator color={Colors.light.onPrimary} /> : <Text style={s.primaryButtonText}>Entrar</Text>}
           </TouchableOpacity>
 
           <Link href="/(auth)/forgot-password" asChild>

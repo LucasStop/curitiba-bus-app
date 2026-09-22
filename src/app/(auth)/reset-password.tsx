@@ -1,5 +1,6 @@
 import { FormField } from '@/components/auth/FormField';
 import { authScreenStyles as s } from '@/components/auth/authScreenStyles';
+import { Colors } from '@/constants/theme';
 import { getSupabase, isSupabaseConfigured } from '@/lib/supabase';
 import { validatePassword } from '@/lib/validation';
 import { useAuth } from '@/providers/AuthProvider';
@@ -90,7 +91,7 @@ export default function ResetPasswordScreen() {
 
           {stage === 'checking' && (
             <View style={{ paddingVertical: 24, alignItems: 'center' }} testID="reset-password-checking">
-              <ActivityIndicator color="#0284C7" />
+              <ActivityIndicator color={Colors.light.primary} />
             </View>
           )}
 
@@ -146,7 +147,7 @@ export default function ResetPasswordScreen() {
                 accessibilityRole="button"
                 accessibilityLabel="Salvar nova senha"
                 accessibilityState={{ disabled: submitting, busy: submitting }}>
-                {submitting ? <ActivityIndicator color="#FFFFFF" /> : <Text style={s.primaryButtonText}>Salvar nova senha</Text>}
+                {submitting ? <ActivityIndicator color={Colors.light.onPrimary} /> : <Text style={s.primaryButtonText}>Salvar nova senha</Text>}
               </TouchableOpacity>
             </>
           )}

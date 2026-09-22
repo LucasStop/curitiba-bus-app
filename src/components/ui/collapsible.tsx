@@ -21,7 +21,7 @@ export function Collapsible({ children, title }: PropsWithChildren & { title: st
         accessibilityRole="button"
         accessibilityState={{ expanded: isOpen }}
         accessibilityLabel={`${title}, ${isOpen ? 'expandido' : 'recolhido'}`}>
-        <ThemedView type="backgroundElement" style={styles.button}>
+        <ThemedView type="surfaceMuted" style={styles.button}>
           <SymbolView
             name={{ ios: 'chevron.right', android: 'chevron_right', web: 'chevron_right' }}
             size={14}
@@ -35,7 +35,7 @@ export function Collapsible({ children, title }: PropsWithChildren & { title: st
       </Pressable>
       {isOpen && (
         <Animated.View entering={FadeIn.duration(200)}>
-          <ThemedView type="backgroundElement" style={styles.content}>
+          <ThemedView type="surfaceMuted" style={styles.content}>
             {children}
           </ThemedView>
         </Animated.View>
