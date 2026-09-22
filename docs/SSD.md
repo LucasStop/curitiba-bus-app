@@ -3,7 +3,7 @@
 Descreve como o app funciona hoje e como deve evoluir. Requisitos em [PRD.md](PRD.md); testes em [TDD.md](TDD.md). Tudo aqui foi conferido no código em 21/09/2026; o que ainda não existe está marcado como **Proposto**.
 
 ## 1. Visão geral
-App Expo (SDK 57) / React Native 0.86 / React 19 / TypeScript estrito, sem backend próprio. Toda a lógica roda no aparelho. Hoje a única fonte de dados é um dataset local simulado.
+App Expo (SDK 57) / React Native 0.86 / React 19 / TypeScript estrito, sem backend próprio hoje. Toda a lógica roda no aparelho e a única fonte de dados é um dataset local simulado. **Proposto:** Supabase gerenciado (Auth + Postgres + Edge Functions) só para contas opcionais e sincronização de favoritos, ver seção 10.
 
 Stack: expo-router ~57 (rotas em `src/app/`), react-native-maps (Apple Maps no iOS, Google Maps no Android), @gorhom/bottom-sheet, react-native-reanimated e gesture-handler, zustand (estado), @tanstack/react-query (instalado, ainda sem uso), AsyncStorage (favoritos), expo-location, lucide-react-native. Gerenciador de pacotes: Yarn 1.22.
 
@@ -63,11 +63,14 @@ Endpoint e formato de resposta ainda não estão confirmados (um teste com chave
 ## 7. Decisões
 | # | Decisão | Motivo |
 |---|---|---|
-| D1 | Sem backend próprio no MVP | Trabalho solo; dados abertos bastam. Reavaliar só se a URBS exigir proxy |
+| D1 | Sem API própria; backend gerenciado (Supabase) apenas para contas | Trabalho solo; dados de transporte são abertos. O app nunca fala direto com Postgres/MySQL, pois a credencial iria no bundle |
 | D2 | react-native-maps (nativo) | Desempenho de mapa com muitos marcadores; `tracksViewChanges={false}` após montagem |
 | D3 | zustand para estado de UI, react-query para dado remoto | Simplicidade; cada um no seu papel |
 | D4 | Expo Router com rotas em `src/app/` | Padrão do SDK 57 |
 | D5 | Docs em `docs/` do repo como fonte; ClickUp espelha | O repo é versionado e lido em toda sessão |
+| D6 | Login opcional; o app funciona como visitante | Diretriz 5.1.1(v) da App Store e pausa do plano gratuito do Supabase |
+| D7 | E-mail e senha, sem login social no MVP | Login social obrigaria a oferecer "Entrar com Apple" |
+| D8 | Sessão em `LargeSecureStore` (AES-256 no AsyncStorage, chave no `expo-secure-store`) | SecureStore limita 2048 bytes; padrão da documentação do Supabase para Expo |
 
 ## 8. Limites conhecidos (dívida validada no código)
 1. **ETA sem sentido nem trajeto**: conta ônibus em qualquer sentido, mesmo já tendo passado da parada; usa distância reta. Sem o estado "Chegando" abaixo de 400 m.
@@ -79,6 +82,41 @@ Endpoint e formato de resposta ainda não estão confirmados (um teste com chave
 7. **Restos do template Expo** ainda no repo (animated-icon, hint-row, web-badge, external-link, collapsible, ícones e logos de exemplo).
 8. **Dados**: 100% simulados; trajetos aproximados, não o traçado real.
 9. **Lint**: 2 erros `react-hooks/set-state-in-effect` (`useUserLocation.ts` e `use-color-scheme.web.ts`) e 10 avisos de variável não usada/import duplicado.
+10. **Config nativa**: `app.json` não tem o plugin `expo-location`; sem `NSLocationWhenInUseUsageDescription` (iOS) e permissões (Android), o GPS só funciona no Expo Go.
+11. **Dependências**: `yarn audit` acusa 5 vulnerabilidades moderadas transitivas (ex.: `expo-router > query-string > decode-uri-component`).
+12. **Repositório**: `main` sem proteção de branch, Dependabot security updates desligado, workflow de CI sem `permissions` explícitas, sem `.env.example`.
+
+## 10. Contas e backend (Supabase) — **Proposto**
+Decisões: login **opcional** (D6), e-mail e senha (D7), sessão em `LargeSecureStore` (D8). Ameaças e controles em [SECURITY.md](SECURITY.md); dados e direitos em [PRIVACY.md](PRIVACY.md).
+
+### 10.1 Componentes
+- Cliente `@supabase/supabase-js` em `src/lib/supabase.ts`, configurado com `EXPO_PUBLIC_SUPABASE_URL` e a chave **publishable** (pública por desenho). `autoRefreshToken` e `persistSession` ligados, `detectSessionInUrl: false`, e `AppState` chama `startAutoRefresh`/`stopAutoRefresh`.
+- `AuthProvider` (`src/providers/AuthProvider.tsx`): guarda a sessão via `onAuthStateChange`. Sem guard de rota: visitante entra em tudo.
+- Telas fora das abas: `src/app/(auth)/sign-in`, `sign-up`, `forgot-password`, `reset-password` (deep link `curitibabusapp://`) e seção "Conta" em Favoritos (entrar, sair, excluir conta).
+- Edge Function `delete-account`: valida o JWT do chamador e remove só o usuário do próprio token; usa a `service_role` do ambiente do Supabase, nunca do app.
+
+### 10.2 Banco
+```
+favorites (
+  user_id    uuid references auth.users on delete cascade,
+  kind       text check (kind in ('line','stop')),
+  ref        text,                       -- código da linha ou id da parada
+  created_at timestamptz default now(),
+  primary key (user_id, kind, ref)
+)
+```
+RLS ligada; políticas de select, insert e delete com `(select auth.uid()) = user_id`. Migrations em `supabase/migrations/`. Sem tabela de perfil (dados mínimos: e-mail do Auth e favoritos).
+
+### 10.3 Fluxos
+- **Cadastro:** e-mail + senha, e-mail de confirmação com link para `curitibabusapp://`, só então a sessão fica ativa.
+- **Login:** sessão cifrada no aparelho; o app abre logado sem rede com os favoritos do cache local.
+- **Primeiro login:** favoritos locais e da nuvem são unidos (sem duplicar e sem perder nenhum lado).
+- **Sync:** alterações locais vão para a nuvem com atualização otimista; falha de rede não bloqueia o uso.
+- **Sair:** volta a visitante mantendo os favoritos locais.
+- **Excluir conta:** confirmação, chamada à Edge Function, limpeza do estado de sessão, volta a visitante.
+
+### 10.4 Configuração do projeto
+Região São Paulo, confirmação de e-mail ligada, senha mínima 8, provedores sociais desligados, allowlist de redirect só `curitibabusapp://**`, SMTP próprio antes do release. Projetos gratuitos pausam após ~7 dias sem uso: definir keep-alive ou plano pago antes do release.
 
 ## 9. Qualidade e entrega
 - Typecheck (`yarn typecheck`), lint (`yarn lint`) e gitleaks no pre-commit (lefthook); CI no PR roda typecheck e lint (lint ainda não bloqueante).
