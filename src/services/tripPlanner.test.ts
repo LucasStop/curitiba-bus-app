@@ -61,6 +61,62 @@ describe('planTransitTrip — baldeação', () => {
 const TERMINAL_SANTA_CANDIDA = { latitude: -25.378, longitude: -49.229 };
 const TERMINAL_CABRAL = { latitude: -25.4055, longitude: -49.252 };
 
+describe('planTransitTrip — P7/P8 itinerário e sentido', () => {
+  it('P7: quantidade de paradas da direta vem do itinerário (203 Santa Cândida→Cabral = 1)', () => {
+    const options = planTransitTrip(TERMINAL_SANTA_CANDIDA, TERMINAL_CABRAL);
+    const option = options.find(
+      (o) => o.id === 'direct-203-terminal-santa-candida-terminal-cabral'
+    );
+
+    expect(option).toBeDefined();
+    const busLeg = option!.pernas.find((leg) => leg.tipo === 'bus');
+    expect(busLeg?.linha?.quantidadeParadas).toBe(1);
+    expect(busLeg?.linha?.sentido).toBe('ida');
+  });
+
+  it('P8: respeita o sentido — 500 Boqueirão→Hauer só vale na volta, com 2 paradas', () => {
+    const boqueirao = stop('terminal-boqueirao');
+    const hauer = stop('terminal-hauer');
+
+    const options = planTransitTrip(
+      { latitude: boqueirao.latitude, longitude: boqueirao.longitude },
+      { latitude: hauer.latitude, longitude: hauer.longitude }
+    );
+    const option = options.find(
+      (o) => o.id === 'direct-500-terminal-boqueirao-terminal-hauer'
+    );
+
+    // Na ida a 500 vai Carlos Gomes→Boqueirão (embarque depois do
+    // desembarque); só a volta serve. O código antigo retornava 4 fixo.
+    expect(option).toBeDefined();
+    const busLeg = option!.pernas.find((leg) => leg.tipo === 'bus');
+    expect(busLeg?.linha?.quantidadeParadas).toBe(2);
+    expect(busLeg?.linha?.sentido).toBe('volta');
+  });
+
+  it('P7: pernas da baldeação usam contagem do itinerário (500 Carmo→Hauer = 1, 020 Hauer→Portão = 1)', () => {
+    // Carmo só tem a 500; Portão tem 203/020/216. Direta 020 Hauer→Portão
+    // existe (1 parada), então a busca de baldeação roda e acha
+    // 500 Carmo→Hauer (volta, 1 parada) + 020 Hauer→Portão (ida, 1 parada).
+    const origin = stop('terminal-carmo');
+    const destination = stop('terminal-portao');
+
+    const options = planTransitTrip(
+      { latitude: origin.latitude, longitude: origin.longitude },
+      { latitude: destination.latitude, longitude: destination.longitude }
+    );
+    const transferOption = options.find((o) => o.id.startsWith('transfer-'));
+
+    expect(transferOption).toBeDefined();
+    const busLegs = transferOption!.pernas.filter((leg) => leg.tipo === 'bus');
+    expect(busLegs).toHaveLength(2);
+    expect(busLegs[0]?.linha?.quantidadeParadas).toBe(1);
+    expect(busLegs[0]?.linha?.sentido).toBe('volta');
+    expect(busLegs[1]?.linha?.quantidadeParadas).toBe(1);
+    expect(busLegs[1]?.linha?.sentido).toBe('ida');
+  });
+});
+
 describe('planTransitTrip — caminhada zero e cálculo de pernas', () => {
   it('omite a perna de caminhada quando a origem já é a própria parada', () => {
     const options = planTransitTrip(TERMINAL_SANTA_CANDIDA, TERMINAL_CABRAL);
@@ -83,10 +139,8 @@ describe('planTransitTrip — caminhada zero e cálculo de pernas', () => {
     expect(walkLegs[0].duracaoMinutos).toBeGreaterThanOrEqual(1);
   });
 
-  it('origem igual ao destino (distância zero) não quebra e retorna opção com caminhada zero', () => {
-    const options = planTransitTrip(TERMINAL_SANTA_CANDIDA, TERMINAL_SANTA_CANDIDA);
-    expect(options.length).toBeGreaterThan(0);
-    expect(options.some((o) => o.caminhadaTotalMetros === 0)).toBe(true);
+  it('P9: origem igual ao destino retorna sem rota (você já está lá)', () => {
+    expect(planTransitTrip(TERMINAL_SANTA_CANDIDA, TERMINAL_SANTA_CANDIDA)).toEqual([]);
   });
 
   it('encontra rota direta entre dois terminais que compartilham linha', () => {
