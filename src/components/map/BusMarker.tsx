@@ -17,7 +17,9 @@ export function getBusMarkerAccessibilityLabel(vehicle: BusVehicle, isSelected =
   }`;
 }
 
-export const BusMarker: React.FC<BusMarkerProps> = ({ vehicle, isSelected = false }) => {
+// Memoizado: sem isso, cada tick de simulação (3s) recria todos os veículos e força
+// re-render de TODOS os BusMarker, mesmo os que não mudaram de seleção/veículo props.
+export const BusMarker: React.FC<BusMarkerProps> = React.memo(({ vehicle, isSelected = false }) => {
   return (
     <View style={[styles.container, isSelected && styles.selectedContainer]}>
       {/* Indicador direcional com rotação baseada no bearing */}
@@ -40,7 +42,9 @@ export const BusMarker: React.FC<BusMarkerProps> = ({ vehicle, isSelected = fals
       </View>
     </View>
   );
-};
+});
+
+BusMarker.displayName = 'BusMarker';
 
 const styles = StyleSheet.create({
   container: {

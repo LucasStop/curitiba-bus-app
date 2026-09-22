@@ -38,10 +38,12 @@ jobs:
         run: yarn lint
 
       # Falta para virar bloqueante: o yarn 1 filtra so a saida com --level; o exit code
-      # continua contando todas as severidades (moderada = 4). Hoje resta 1 moderada sem
-      # correcao segura (expo-router > query-string > decode-uri-component, ver
-      # docs/SECURITY.md T8), entao o passo falharia. Tirar o continue-on-error quando ela
-      # for resolvida, ou trocar por um teste do exit code que ignore o bit de moderada.
+      # continua contando todas as severidades (moderada = 4). Revalidado em 22/09/2026,
+      # resta a mesma 1 moderada sem correcao segura (expo-router > query-string >
+      # decode-uri-component, ver docs/SECURITY.md T8 — expo-router@57.0.22, a ultima do
+      # SDK 57, ainda fixa query-string@^7.1.3), entao o passo falharia. Tirar o
+      # continue-on-error quando ela for resolvida, ou trocar por um teste do exit code
+      # que ignore o bit de moderada.
       - name: Audit de dependencias
         run: yarn audit --level high
         continue-on-error: true
