@@ -1,5 +1,17 @@
-import { calculateStepDistanceMeters, isBusApproachingStop } from './geo';
+import { calculateStepDistanceMeters, formatEtaPhrase, isBusApproachingStop } from './geo';
 import { BusLine, BusStop, BusVehicle } from '@/types/transit';
+
+describe('formatEtaPhrase', () => {
+  it('chegada iminente (<=1 min) gera frase completa, sem "em" solto na frente', () => {
+    expect(formatEtaPhrase(1)).toBe('chegando agora');
+    expect(formatEtaPhrase(0)).toBe('chegando agora');
+  });
+
+  it('minutos normais gera "em N min"', () => {
+    expect(formatEtaPhrase(4)).toBe('em 4 min');
+    expect(formatEtaPhrase(4.6)).toBe('em 5 min');
+  });
+});
 
 // C4 — Bug: ônibus que já passou da parada no seu sentido ainda entrava na lista de chegadas.
 describe('isBusApproachingStop', () => {
@@ -77,7 +89,6 @@ describe('isBusApproachingStop', () => {
   });
 });
 
-// C1
 describe('calculateStepDistanceMeters', () => {
   it('calcula distance = speed * deltaTime (36 km/h = 10 m/s por 3s = 30m)', () => {
     expect(calculateStepDistanceMeters(36, 3000)).toBeCloseTo(30);
