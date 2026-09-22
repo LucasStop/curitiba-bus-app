@@ -1,6 +1,6 @@
 import { BusBadge } from '@/components/ui/BusBadge';
 import { RIT_CATEGORIES } from '@/constants/rit';
-import { Colors } from '@/constants/theme';
+import { Colors, Radius, Shadows, Typography } from '@/constants/theme';
 import { CURITIBA_LINES } from '@/data/curitibaDataset';
 import { useFavoritesStore } from '@/stores/useFavoritesStore';
 import { useTransitStore } from '@/stores/useTransitStore';
@@ -192,12 +192,14 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.light.border,
   },
   title: {
-    fontSize: 22,
+    fontSize: Typography.screenTitle.fontSize,
+    lineHeight: Typography.screenTitle.lineHeight,
     fontWeight: '900',
     color: Colors.light.text,
   },
   subtitle: {
-    fontSize: 13,
+    fontSize: Typography.label.fontSize,
+    lineHeight: Typography.label.lineHeight,
     color: Colors.light.textMuted,
     marginTop: 2,
     marginBottom: 12,
@@ -206,21 +208,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.light.surfaceMuted,
-    borderRadius: 12,
+    borderRadius: Radius.md,
     paddingHorizontal: 12,
     paddingVertical: 10,
     gap: 8,
   },
   searchInput: {
     flex: 1,
-    fontSize: 14,
+    fontSize: Typography.body.fontSize,
     color: Colors.light.text,
     padding: 0,
   },
   clearText: {
     color: Colors.light.textMuted,
     fontWeight: '700',
-    fontSize: 14,
+    fontSize: Typography.body.fontSize,
   },
   filterRow: {
     gap: 8,
@@ -233,7 +235,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light.surfaceMuted,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 16,
+    borderRadius: Radius.pill,
   },
   filterPillActive: {
     backgroundColor: Colors.light.text,
@@ -241,11 +243,12 @@ const styles = StyleSheet.create({
   dot: {
     width: 6,
     height: 6,
-    borderRadius: 3,
+    borderRadius: Radius.pill,
     marginRight: 6,
   },
   filterText: {
-    fontSize: 12,
+    fontSize: Typography.label.fontSize,
+    lineHeight: Typography.label.lineHeight,
     fontWeight: '600',
     // ponytail: textMuted on surfaceMuted is 4.34:1, just under AA 4.5:1 for 12pt text.
     color: Colors.light.text,
@@ -262,25 +265,23 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: Colors.light.surface,
-    borderRadius: 16,
+    borderRadius: Radius.lg,
     padding: 14,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 3,
-    elevation: 2,
+    ...Shadows.card,
   },
   cardTop: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   lineName: {
-    fontSize: 15,
+    fontSize: Typography.itemTitle.fontSize,
+    lineHeight: Typography.itemTitle.lineHeight,
     fontWeight: '800',
     color: Colors.light.text,
   },
   categoryLabel: {
-    fontSize: 12,
+    fontSize: Typography.label.fontSize,
+    lineHeight: Typography.label.lineHeight,
     color: Colors.light.textMuted,
     marginTop: 2,
   },
@@ -302,7 +303,8 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   terminalText: {
-    fontSize: 12,
+    fontSize: Typography.label.fontSize,
+    lineHeight: Typography.label.lineHeight,
     color: Colors.light.textMuted,
   },
   cardBottom: {
@@ -317,21 +319,21 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light.background,
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 6,
+    borderRadius: Radius.sm,
   },
   metaText: {
-    fontSize: 11,
+    fontSize: Typography.label.fontSize,
     color: Colors.light.textMuted,
     fontWeight: '600',
   },
   mapButton: {
     paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: 8,
+    borderRadius: Radius.sm,
   },
   mapButtonText: {
     color: Colors.light.surface,
     fontWeight: '700',
-    fontSize: 12,
+    fontSize: Typography.label.fontSize,
   },
 });

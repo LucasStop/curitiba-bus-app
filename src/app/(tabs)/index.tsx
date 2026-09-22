@@ -1,6 +1,6 @@
 import { CuritibaMap } from '@/components/map/CuritibaMap';
 import { TransitBottomSheet } from '@/components/sheets/TransitBottomSheet';
-import { Colors } from '@/constants/theme';
+import { Colors, Radius, Typography } from '@/constants/theme';
 import { useLiveVehicles } from '@/hooks/useLiveVehicles';
 import { useUserLocation } from '@/hooks/useUserLocation';
 import { useTransitStore } from '@/stores/useTransitStore';
@@ -92,13 +92,15 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light.surface,
   },
   appTitle: {
-    fontSize: 18,
+    fontSize: Typography.screenTitle.fontSize,
+    lineHeight: Typography.screenTitle.lineHeight,
     fontWeight: '900',
     color: Colors.light.text,
     letterSpacing: -0.5,
   },
   appSubtitle: {
-    fontSize: 11,
+    fontSize: Typography.label.fontSize,
+    lineHeight: Typography.label.lineHeight,
     color: Colors.light.textMuted,
     fontWeight: '500',
   },
@@ -108,17 +110,19 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light.successMuted,
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 12,
+    borderRadius: Radius.pill,
     gap: 6,
   },
   pulseDot: {
     width: 8,
     height: 8,
-    borderRadius: 4,
+    borderRadius: Radius.pill,
     backgroundColor: Colors.light.success,
   },
   liveText: {
-    fontSize: 11,
+    fontSize: Typography.label.fontSize,
+    lineHeight: Typography.label.lineHeight,
+    fontVariant: ['tabular-nums'],
     fontWeight: '700',
     // ponytail: Colors.light.success on successMuted is ~3:1, fails AA 4.5:1 for text this size.
     // text passes easily; green meaning stays carried by the dot + badge background.
