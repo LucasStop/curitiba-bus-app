@@ -120,7 +120,9 @@ const styles = StyleSheet.create({
   liveText: {
     fontSize: 11,
     fontWeight: '700',
-    color: Colors.light.success,
+    // ponytail: Colors.light.success on successMuted is ~3:1, fails AA 4.5:1 for text this size.
+    // text passes easily; green meaning stays carried by the dot + badge background.
+    color: Colors.light.text,
   },
   connectionBanner: {
     backgroundColor: Colors.light.warningMuted,
