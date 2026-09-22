@@ -1,3 +1,4 @@
+import { Colors } from '@/constants/theme';
 import { BusVehicle } from '@/types/transit';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
@@ -75,7 +76,7 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     borderRadius: 8,
     borderWidth: 2,
-    borderColor: '#FFFFFF',
+    borderColor: Colors.light.surface,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.35,
@@ -83,7 +84,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   lineCode: {
-    color: '#FFFFFF',
+    color: Colors.light.surface,
     fontSize: 12,
     fontWeight: '900',
   },

@@ -1,3 +1,4 @@
+import { Colors } from '@/constants/theme';
 import { BusStop } from '@/types/transit';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
@@ -46,9 +47,9 @@ const styles = StyleSheet.create({
     width: 22,
     height: 22,
     borderRadius: 11,
-    backgroundColor: '#0284C7', // Azul tubo
+    backgroundColor: Colors.light.primary, // Azul tubo
     borderWidth: 2,
-    borderColor: '#FFFFFF',
+    borderColor: Colors.light.surface,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
@@ -61,15 +62,15 @@ const styles = StyleSheet.create({
     width: 10,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.light.surface,
   },
   terminalBadge: {
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: '#0F172A',
+    backgroundColor: Colors.light.text,
     borderWidth: 2,
-    borderColor: '#F59E0B', // Dourado terminal
+    borderColor: Colors.light.warning, // Dourado terminal
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',

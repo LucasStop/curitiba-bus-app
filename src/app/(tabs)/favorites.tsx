@@ -1,4 +1,5 @@
 import { BusBadge } from '@/components/ui/BusBadge';
+import { Colors } from '@/constants/theme';
 import { CURITIBA_LINES, CURITIBA_STOPS, TRANSIT_ALERTS } from '@/data/curitibaDataset';
 import { useAuth } from '@/providers/AuthProvider';
 import { transitService } from '@/services/transitProvider';
@@ -81,7 +82,7 @@ export default function FavoritesScreen() {
             <>
               <View style={styles.accountRow}>
                 <View style={styles.accountIconWrapper}>
-                  <UserIcon size={16} color="#0284C7" />
+                  <UserIcon size={16} color={Colors.light.primary} />
                 </View>
                 <Text style={styles.accountEmail} numberOfLines={1} testID="account-email">
                   {user.email}
@@ -94,7 +95,7 @@ export default function FavoritesScreen() {
                   testID="account-sign-out"
                   accessibilityRole="button"
                   accessibilityLabel="Sair da conta">
-                  <LogOut size={15} color="#334155" />
+                  <LogOut size={15} color={Colors.light.text} />
                   <Text style={styles.accountButtonText}>Sair</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -105,7 +106,7 @@ export default function FavoritesScreen() {
                   accessibilityRole="button"
                   accessibilityLabel="Excluir conta"
                   accessibilityState={{ disabled: deleting, busy: deleting }}>
-                  <Trash2 size={15} color="#DC2626" />
+                  <Trash2 size={15} color={Colors.light.danger} />
                   <Text style={[styles.accountButtonText, styles.accountButtonDangerText]}>
                     {deleting ? 'Excluindo…' : 'Excluir conta'}
                   </Text>
@@ -122,7 +123,7 @@ export default function FavoritesScreen() {
                   testID="account-go-sign-in"
                   accessibilityRole="button"
                   accessibilityLabel="Entrar">
-                  <LogIn size={15} color="#0284C7" />
+                  <LogIn size={15} color={Colors.light.primary} />
                   <Text style={styles.accountButtonText}>Entrar</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -144,8 +145,8 @@ export default function FavoritesScreen() {
             style={[styles.tabButton, activeTab === 'favorites' && styles.tabButtonActive]}>
             <Bookmark
               size={16}
-              color={activeTab === 'favorites' ? '#0F172A' : '#64748B'}
-              fill={activeTab === 'favorites' ? '#0F172A' : 'none'}
+              color={activeTab === 'favorites' ? Colors.light.text : Colors.light.textMuted}
+              fill={activeTab === 'favorites' ? Colors.light.text : 'none'}
             />
             <Text style={[styles.tabButtonText, activeTab === 'favorites' && styles.tabButtonTextActive]}>
               Favoritos ({favoriteLines.length + favoriteStops.length})
@@ -155,7 +156,7 @@ export default function FavoritesScreen() {
           <TouchableOpacity
             onPress={() => setActiveTab('alerts')}
             style={[styles.tabButton, activeTab === 'alerts' && styles.tabButtonActive]}>
-            <Bell size={16} color={activeTab === 'alerts' ? '#0F172A' : '#64748B'} />
+            <Bell size={16} color={activeTab === 'alerts' ? Colors.light.text : Colors.light.textMuted} />
             <Text style={[styles.tabButtonText, activeTab === 'alerts' && styles.tabButtonTextActive]}>
               Alertas RIT ({TRANSIT_ALERTS.length})
             </Text>
@@ -196,7 +197,7 @@ export default function FavoritesScreen() {
                       toggleFavoriteLine(line.codigo);
                     }}
                     style={styles.deleteButton}>
-                    <Trash2 size={18} color="#94A3B8" />
+                    <Trash2 size={18} color={Colors.light.textSubtle} />
                   </TouchableOpacity>
                 </TouchableOpacity>
               ))
@@ -223,7 +224,7 @@ export default function FavoritesScreen() {
                     style={styles.favoriteCard}
                     activeOpacity={0.8}>
                     <View style={styles.stopIconWrapper}>
-                      <MapPin size={20} color="#0284C7" />
+                      <MapPin size={20} color={Colors.light.primary} />
                     </View>
                     <View style={{ flex: 1, marginLeft: 12 }}>
                       <Text style={styles.favLineName}>{stop.nome}</Text>
@@ -231,7 +232,7 @@ export default function FavoritesScreen() {
 
                       {nextBus && (
                         <View style={styles.nextBusRow}>
-                          <Clock size={12} color="#16A34A" />
+                          <Clock size={12} color={Colors.light.success} />
                           <Text style={styles.nextBusText}>
                             Próximo: {nextBus.codLinha} em {formatMinutes(nextBus.minutosAteChegada)}
                           </Text>
@@ -245,7 +246,7 @@ export default function FavoritesScreen() {
                         toggleFavoriteStop(stop.id);
                       }}
                       style={styles.deleteButton}>
-                      <Trash2 size={18} color="#94A3B8" />
+                      <Trash2 size={18} color={Colors.light.textSubtle} />
                     </TouchableOpacity>
                   </TouchableOpacity>
                 );
@@ -261,9 +262,9 @@ export default function FavoritesScreen() {
                 <View style={styles.alertHeader}>
                   <View style={styles.alertIconWrapper}>
                     {alert.tipo === 'obra' ? (
-                      <AlertTriangle size={18} color="#EA580C" />
+                      <AlertTriangle size={18} color={Colors.light.warning} />
                     ) : (
-                      <Info size={18} color="#0284C7" />
+                      <Info size={18} color={Colors.light.primary} />
                     )}
                   </View>
                   <View style={{ flex: 1, marginLeft: 10 }}>
@@ -292,30 +293,30 @@ export default function FavoritesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: Colors.light.background,
   },
   header: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.light.surface,
     paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: Colors.light.border,
   },
   title: {
     fontSize: 22,
     fontWeight: '900',
-    color: '#0F172A',
+    color: Colors.light.text,
   },
   subtitle: {
     fontSize: 13,
-    color: '#64748B',
+    color: Colors.light.textMuted,
     marginTop: 2,
     marginBottom: 12,
   },
   tabToggle: {
     flexDirection: 'row',
-    backgroundColor: '#F1F5F9',
+    backgroundColor: Colors.light.surfaceMuted,
     borderRadius: 12,
     padding: 4,
   },
@@ -329,7 +330,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   tabButtonActive: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.light.surface,
     shadowColor: '#000',
     shadowOpacity: 0.08,
     shadowRadius: 2,
@@ -338,10 +339,10 @@ const styles = StyleSheet.create({
   tabButtonText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#64748B',
+    color: Colors.light.textMuted,
   },
   tabButtonTextActive: {
-    color: '#0F172A',
+    color: Colors.light.text,
     fontWeight: '700',
   },
   content: {
@@ -354,14 +355,14 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#64748B',
+    color: Colors.light.textMuted,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   favoriteCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.light.surface,
     borderRadius: 16,
     padding: 14,
     shadowColor: '#000',
@@ -373,11 +374,11 @@ const styles = StyleSheet.create({
   favLineName: {
     fontSize: 15,
     fontWeight: '800',
-    color: '#0F172A',
+    color: Colors.light.text,
   },
   favLineTerminals: {
     fontSize: 12,
-    color: '#64748B',
+    color: Colors.light.textMuted,
     marginTop: 2,
   },
   deleteButton: {
@@ -387,7 +388,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#E0F2FE',
+    backgroundColor: Colors.light.primaryMuted,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -400,20 +401,20 @@ const styles = StyleSheet.create({
   nextBusText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#16A34A',
+    color: Colors.light.success,
   },
   emptyCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.light.surface,
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
   },
   emptyText: {
-    color: '#94A3B8',
+    color: Colors.light.textSubtle,
     fontSize: 13,
   },
   alertCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.light.surface,
     borderRadius: 16,
     padding: 16,
     shadowColor: '#000',
@@ -431,23 +432,23 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#FEF3C7',
+    backgroundColor: Colors.light.warningMuted,
     alignItems: 'center',
     justifyContent: 'center',
   },
   alertTitle: {
     fontSize: 14,
     fontWeight: '800',
-    color: '#0F172A',
+    color: Colors.light.text,
   },
   alertDate: {
     fontSize: 11,
-    color: '#64748B',
+    color: Colors.light.textMuted,
     marginTop: 2,
   },
   alertDesc: {
     fontSize: 13,
-    color: '#334155',
+    color: Colors.light.text,
     lineHeight: 18,
   },
   alertFooter: {
@@ -459,14 +460,14 @@ const styles = StyleSheet.create({
   alertLinhasLabel: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#64748B',
+    color: Colors.light.textMuted,
   },
   accountSection: {
     marginTop: 12,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: Colors.light.background,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: Colors.light.border,
     padding: 12,
     gap: 10,
   },
@@ -479,7 +480,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: '#E0F2FE',
+    backgroundColor: Colors.light.primaryMuted,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -487,11 +488,11 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 13,
     fontWeight: '700',
-    color: '#0F172A',
+    color: Colors.light.text,
   },
   accountGuestText: {
     fontSize: 12,
-    color: '#64748B',
+    color: Colors.light.textMuted,
   },
   accountActions: {
     flexDirection: 'row',
@@ -505,22 +506,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    backgroundColor: '#FFFFFF',
+    borderColor: Colors.light.border,
+    backgroundColor: Colors.light.surface,
   },
   accountButtonPrimary: {
-    backgroundColor: '#0284C7',
-    borderColor: '#0284C7',
+    backgroundColor: Colors.light.primary,
+    borderColor: Colors.light.primary,
   },
   accountButtonText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#334155',
+    color: Colors.light.text,
   },
   accountButtonPrimaryText: {
-    color: '#FFFFFF',
+    color: Colors.light.onPrimary,
   },
   accountButtonDangerText: {
-    color: '#DC2626',
+    color: Colors.light.danger,
   },
 });
