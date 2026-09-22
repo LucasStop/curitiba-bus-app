@@ -1,6 +1,7 @@
 import { CURITIBA_LINES, CURITIBA_STOPS } from '@/data/curitibaDataset';
 import { ArrivalEstimate, BusLine, BusStop, BusVehicle, LatLng } from '@/types/transit';
 import { getBearing, getDistanceInMeters, interpolateLatLng } from '@/utils/geo';
+import { AppState, AppStateStatus } from 'react-native';
 
 interface VehicleSimState {
   vehicle: BusVehicle;
@@ -14,11 +15,23 @@ class TransitService {
   private vehicles: VehicleSimState[] = [];
   private listeners: ((vehicles: BusVehicle[]) => void)[] = [];
   private timer: ReturnType<typeof setInterval> | null = null;
+  private appState: AppStateStatus = AppState.currentState;
 
   constructor() {
     this.initSimulatedVehicles();
-    this.startSimulation();
+    // A simulação só roda enquanto alguém está de fato ouvindo (mapa montado) e o app
+    // está em primeiro plano — evita side effect no import do módulo e vazamento de timer.
+    AppState.addEventListener('change', this.handleAppStateChange);
   }
+
+  private handleAppStateChange = (nextState: AppStateStatus) => {
+    this.appState = nextState;
+    if (nextState === 'active') {
+      this.startSimulation();
+    } else {
+      this.stopSimulation();
+    }
+  };
 
   private initSimulatedVehicles() {
     let idCounter = 1;
@@ -70,10 +83,19 @@ class TransitService {
 
   private startSimulation() {
     if (this.timer) return;
+    if (this.listeners.length === 0) return;
+    if (this.appState !== 'active') return;
 
     this.timer = setInterval(() => {
       this.tickSimulation();
     }, 3000);
+  }
+
+  private stopSimulation() {
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
+    }
   }
 
   private tickSimulation() {
@@ -192,8 +214,12 @@ class TransitService {
 
   public subscribeVehicles(cb: (vehicles: BusVehicle[]) => void): () => void {
     this.listeners.push(cb);
+    this.startSimulation();
     return () => {
       this.listeners = this.listeners.filter((l) => l !== cb);
+      if (this.listeners.length === 0) {
+        this.stopSimulation();
+      }
     };
   }
 }
