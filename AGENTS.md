@@ -34,6 +34,11 @@ Run lint and typecheck before declaring any task done.
 Use EAS to build, sign, and submit the app in the cloud (`eas build`, `eas submit`) and to ship over-the-air updates (`eas update`) — no local Xcode or Android Studio required. Run EAS CLI as `bunx eas-cli <command>` in Bun projects, or `npx eas-cli@latest <command>` otherwise; substitute that for bare `eas` in docs examples.
 Docs: https://docs.expo.dev/eas/index.md
 
+## Teste em dispositivo (agente)
+
+- **iPhone real** → `phone-harness` (via iPhone Mirroring; OCR + HID). Rodar `phone-harness --doctor ios` antes; Mirroring precisa estar aberto e o iPhone bloqueado/pareado. Supervisionar: o agente pode abrir qualquer app. É o que já usamos pra capturar os smokes/QA manuais em `docs/qa-prints/` e o benchmark em `docs/app-base/`.
+- **Simulador iOS** → `idb` (`idb ui describe-all`, `idb ui tap`), usa árvore de acessibilidade — mais confiável que OCR. Preferir o simulador para fluxos repetíveis.
+
 ## Rules
 
 - If `ios/` and `android/` directories do not exist, they are generated (Continuous Native Generation). Never create or edit them by hand — configure native behavior in `app.json` and config plugins.
