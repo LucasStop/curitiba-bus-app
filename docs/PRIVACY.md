@@ -3,7 +3,7 @@
 > **Rascunho técnico, sem validade jurídica.** Precisa de revisão jurídica e de preenchimento dos campos `[PREENCHER]` antes de ser publicada e linkada nas lojas (App Store e Google Play exigem uma URL pública). Base: Lei Geral de Proteção de Dados (LGPD, Lei 13.709/2018). Detalhes técnicos em [SECURITY.md](SECURITY.md) e [SSD.md](SSD.md).
 
 ## 1. Quem somos
-Controlador: `[PREENCHER: nome ou razão social]`. Contato para assuntos de privacidade: `[PREENCHER: e-mail]`.
+Controlador: Lucas Stopinski da Silva, pessoa física (projeto acadêmico, sem CNPJ). Contato para assuntos de privacidade: lucasstopinskidasilva@gmail.com.
 
 ## 2. Modos de uso
 - **Visitante (sem conta):** mapa, linhas, previsão de chegada, planejador e favoritos funcionam sem cadastro. Nada é enviado a servidores nossos; os favoritos ficam só no aparelho.
@@ -25,19 +25,19 @@ Controlador: `[PREENCHER: nome ou razão social]`. Contato para assuntos de priv
 Execução do serviço pedido por você (conta e sincronização) e consentimento para o uso da localização, dado no aviso do sistema. `[REVISAR JURIDICAMENTE]`
 
 ## 6. Compartilhamento e operadores
-O Supabase atua como operador (hospedagem de autenticação e banco), no projeto criado na região São Paulo. Não vendemos nem compartilhamos dados para publicidade. `[PREENCHER: confirmar região e cláusulas contratuais do operador]`
+O Supabase atua como operador (hospedagem de autenticação e banco), no projeto criado na região São Paulo (`sa-east-1`, confirmado no painel do projeto). Não vendemos nem compartilhamos dados para publicidade.
 
 ## 7. Retenção e exclusão
 Mantemos e-mail e favoritos enquanto a conta existir. Você pode **excluir a conta dentro do app** (Favoritos, seção Conta); a exclusão remove o usuário e seus favoritos. Sem conta, apagar o app apaga os dados locais.
 
 ## 8. Seus direitos (LGPD art. 18)
-Confirmação e acesso aos dados, correção, anonimização ou eliminação, portabilidade, informação sobre compartilhamento e revogação do consentimento. Peça pelo contato do item 1; respondemos em até `[PREENCHER: prazo]`.
+Confirmação e acesso aos dados, correção, anonimização ou eliminação, portabilidade, informação sobre compartilhamento e revogação do consentimento. Peça pelo contato do item 1; respondemos em até 15 dias úteis.
 
 ## 9. Segurança
 Sessão cifrada no aparelho, controle de acesso por linha no banco (RLS), comunicação por HTTPS. Veja [SECURITY.md](SECURITY.md). Em caso de incidente relevante, avisaremos os afetados e a ANPD conforme a lei.
 
 ## 10. Crianças
-`[DECIDIR: idade mínima e tratamento de menores]`
+O app não é direcionado a menores de 18 anos e não coleta intencionalmente dados de crianças. Se identificarmos uma conta de menor de idade sem consentimento dos responsáveis, ela será encerrada.
 
 ## 11. Alterações
-Mudanças relevantes serão avisadas no app. Data desta versão: `[PREENCHER]`.
+Mudanças relevantes serão avisadas no app. Data desta versão: 22/09/2026.
