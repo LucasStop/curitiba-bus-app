@@ -1,4 +1,11 @@
 import { CURITIBA_LINES, CURITIBA_STOPS } from '@/data/curitibaDataset';
+import {
+  ConnectionStatus,
+  INITIAL_CONNECTION_STATUS,
+  NetworkError,
+  computeBackoffDelay,
+  nextConnectionStatus,
+} from '@/lib/resilience';
 import { ArrivalEstimate, BusLine, BusStop, BusVehicle, LatLng } from '@/types/transit';
 import { getBearing, getDistanceInMeters, interpolateLatLng } from '@/utils/geo';
 
@@ -10,14 +17,24 @@ interface VehicleSimState {
   direction: 'ida' | 'volta';
 }
 
+const BASE_INTERVAL_MS = 3000;
+// Teto do backoff: mesmo numa falha em loop, nunca espera mais que isso pra tentar de novo.
+const MAX_BACKOFF_MS = 60000;
+
 class TransitService {
   private vehicles: VehicleSimState[] = [];
   private listeners: ((vehicles: BusVehicle[]) => void)[] = [];
-  private timer: ReturnType<typeof setInterval> | null = null;
+  private statusListeners: ((status: ConnectionStatus) => void)[] = [];
+  private timer: ReturnType<typeof setTimeout> | null = null;
+  private connectionStatus: ConnectionStatus = INITIAL_CONNECTION_STATUS;
+  // Só pra QA/teste: número de próximos ticks que devem falhar de propósito. O provedor mock
+  // nunca falha sozinho, então é assim que se exercita e testa o caminho de erro/backoff.
+  private pendingFailures = 0;
+  private pendingFailureFactory: (() => Error) | null = null;
 
   constructor() {
     this.initSimulatedVehicles();
-    this.startSimulation();
+    this.scheduleTick(BASE_INTERVAL_MS);
   }
 
   private initSimulatedVehicles() {
@@ -68,12 +85,39 @@ class TransitService {
     });
   }
 
-  private startSimulation() {
-    if (this.timer) return;
+  private scheduleTick(delay: number) {
+    if (this.timer) clearTimeout(this.timer);
+    this.timer = setTimeout(() => this.runTick(), delay);
+  }
 
-    this.timer = setInterval(() => {
+  /**
+   * Roda uma atualização e trata falha: mantém o último dado bom (não mexe em `this.vehicles`),
+   * marca o status de conexão e agenda a próxima tentativa com backoff em vez do intervalo
+   * normal — é a guarda de rate-limit do cliente pra nunca martelar a fonte numa falha em loop.
+   */
+  private runTick() {
+    try {
+      if (this.pendingFailures > 0) {
+        this.pendingFailures--;
+        throw (this.pendingFailureFactory ?? (() => new NetworkError()))();
+      }
+
       this.tickSimulation();
-    }, 3000);
+      this.connectionStatus = nextConnectionStatus(this.connectionStatus, { ok: true }, Date.now());
+      this.scheduleTick(BASE_INTERVAL_MS);
+    } catch (error) {
+      this.connectionStatus = nextConnectionStatus(this.connectionStatus, { ok: false, error }, Date.now());
+      const delay = computeBackoffDelay(BASE_INTERVAL_MS, MAX_BACKOFF_MS, this.connectionStatus.consecutiveFailures);
+      this.scheduleTick(delay);
+    }
+
+    this.notify();
+  }
+
+  private notify() {
+    const activeList = this.getVehicles();
+    this.listeners.forEach((cb) => cb(activeList));
+    this.statusListeners.forEach((cb) => cb(this.connectionStatus));
   }
 
   private tickSimulation() {
@@ -119,13 +163,32 @@ class TransitService {
         direction: newDirection,
       };
     });
-
-    const activeList = this.getVehicles();
-    this.listeners.forEach((cb) => cb(activeList));
   }
 
   public getVehicles(): BusVehicle[] {
     return this.vehicles.map((v) => v.vehicle);
+  }
+
+  public getConnectionStatus(): ConnectionStatus {
+    return this.connectionStatus;
+  }
+
+  public subscribeConnectionStatus(cb: (status: ConnectionStatus) => void): () => void {
+    this.statusListeners.push(cb);
+    return () => {
+      this.statusListeners = this.statusListeners.filter((l) => l !== cb);
+    };
+  }
+
+  /**
+   * Só pra QA/teste: força as próximas `count` atualizações a falhar (por padrão, com
+   * `NetworkError`, o erro de "sem conexão"). O provedor mock nunca falha sozinho, então é
+   * assim que se exercita o caminho de erro/backoff — a chamada real da URBS lançará
+   * `NetworkError` de verdade no lugar disso.
+   */
+  public simulateFailures(count: number, makeError?: () => Error): void {
+    this.pendingFailures = count;
+    this.pendingFailureFactory = makeError ?? null;
   }
 
   public getLines(): BusLine[] {
