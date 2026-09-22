@@ -2,12 +2,20 @@
 
 Regra do projeto: teste primeiro em regra de negócio, cálculo, dinheiro, auth e parsing. **Os casos são definidos pelo Lucas; a implementação é feita depois de aprovados.** CSS, layout e CRUD sem regra não levam teste. Requisitos: [PRD.md](PRD.md). Design: [SSD.md](SSD.md).
 
-Estado: **os casos R1 a R6 (backend Supabase) estão implementados e passando**; o resto da camada A ainda não tem teste e `jest` não está instalado (PROPOSTO até aprovação). A coluna "Hoje" diz se o caso deve falhar (vermelho) contra o código atual, o que confirma o bug.
+Estado: `jest-expo` está instalado e o CI roda `yarn test --ci` a cada PR. Estão implementados e verdes os casos de contas **C1 a C5 e C7** (seção A6), o `AuthProvider` (mock do Supabase, sem rede) e, no backend Supabase, **R1 a R6** (RLS e a Edge Function `delete-account`, via pgTAP e Deno test, fora do jest). O restante (A1 a A5, C6, A7) segue PROPOSTO até aprovação. Nas seções A1 a A5, a coluna "Hoje" diz se o caso deve falhar (vermelho) contra o código atual, o que confirma o bug.
+
+### Como rodar
+```bash
+yarn test          # todos os testes (jest-expo)
+yarn test --ci     # como no CI
+yarn test src/lib  # só uma pasta
+```
+Testes ficam ao lado do código (`*.test.ts` / `*.test.tsx`). Nenhum teste faz chamada de rede: o cliente Supabase é sempre mockado, e o `LargeSecureStore` recebe armazenamentos em memória. O AsyncStorage usa o mock oficial, ligado em `jest.setup.js`.
 
 ## 1. Camadas
 | Camada | Ferramenta | Onde roda | Gate |
 |---|---|---|---|
-| A. Unitária | `jest-expo` (instalar com `npx expo install`) | local e CI | Sim, no CI |
+| A. Unitária | `jest-expo` (instalado) | local e CI | Sim, no CI (`yarn test --ci`) |
 | B. No app | `idb` + simulador iOS + Expo Go | local (macOS) | Não; roda antes de release e a cada mudança de tela |
 
 ## 2. Camada A: casos unitários propostos
@@ -61,16 +69,18 @@ Arquivos alvo: `src/utils/geo.ts`, `src/services/transitProvider.ts`, `src/servi
 ### A5. Parsers da URBS (E3)
 Casos definidos depois que o acesso à API for confirmado e houver respostas reais para usar como fixtures (sem chave nem dado pessoal nas fixtures, o repo é público). Mínimo: resposta vazia, campo ausente, categoria desconhecida, coordenada inválida.
 
-### A6. Contas (E9), PROPOSTO
-| # | Caso | Esperado | Hoje |
+### A6. Contas (E9)
+| # | Caso | Esperado | Estado |
 |---|---|---|---|
-| C1 | Validação de e-mail: vazio, sem "@", com espaços, válido | só o válido passa | não existe |
-| C2 | Validação de senha: menos de 8 caracteres, 8 exatos, com espaços | mínimo 8; mensagem em pt-BR | não existe |
-| C3 | Mapeamento de erros do Supabase (credenciais inválidas, e-mail já cadastrado, rede, limite de tentativas) | mensagem pt-BR amigável, genérica em login/recuperação (não revela se o e-mail existe) | não existe |
-| C4 | Merge de favoritos: local ∪ nuvem | união, sem duplicar, sem perder nenhum lado | não existe |
-| C5 | `LargeSecureStore`: gravar e ler valor maior que 2048 bytes | valor idêntico; o texto no AsyncStorage não é o original; remover apaga valor e chave | não existe |
-| C6 | Sair da conta | volta a visitante e mantém os favoritos locais | não existe |
-| C7 | Nenhum log contém token, e-mail ou coordenadas | verdadeiro (busca em `console.*`) | a verificar |
+| C1 | Validação de e-mail: vazio, sem "@", com espaços, válido | só o válido passa | **verde**: `src/lib/validation.test.ts` |
+| C2 | Validação de senha: menos de 8 caracteres, 8 exatos, com espaços | mínimo 8; mensagem em pt-BR | **verde**: `src/lib/validation.test.ts`. Decisão a confirmar: espaços no meio são aceitos (frase-senha); só senha feita só de espaços é recusada |
+| C3 | Mapeamento de erros do Supabase (credenciais inválidas, e-mail já cadastrado, rede, limite de tentativas) | mensagem pt-BR amigável, genérica em login/recuperação (não revela se o e-mail existe) | **verde**: `src/lib/authErrors.test.ts` |
+| C4 | Merge de favoritos: local ∪ nuvem | união, sem duplicar, sem perder nenhum lado | **verde** (função pura): `src/lib/favoritesMerge.test.ts`. O sync que a usa entra na próxima onda |
+| C5 | `LargeSecureStore`: gravar e ler valor maior que 2048 bytes | valor idêntico; o texto no AsyncStorage não é o original; remover apaga valor e chave | **verde**: `src/lib/largeSecureStore.test.ts` (armazenamentos em memória injetados). Não substitui o S14 no aparelho |
+| C6 | Sair da conta | volta a visitante e mantém os favoritos locais | **parcial**: `signOut` coberto em `src/providers/AuthProvider.test.tsx`; "mantém os favoritos locais" depende do sync (próxima onda) |
+| C7 | Nenhum log contém token, e-mail ou coordenadas | verdadeiro (busca em `console.*`) | **verde**: `src/lib/noSensitiveLogs.test.ts` varre `src/lib` e `src/providers` e falha se um arquivo de produção usar `console.*` |
+
+Também cobertos (sem número no plano): cliente Supabase criado sob demanda e sem quebrar o modo visitante quando faltam as variáveis (`src/lib/supabase.test.ts`); `AuthProvider` com sessão via `onAuthStateChange`, `AppState` ligando e desligando o refresh, e `deleteAccount` que só limpa a sessão local depois de a Edge Function confirmar (`src/providers/AuthProvider.test.tsx`).
 
 ### A7. RLS no banco e Edge Function, IMPLEMENTADO
 Casos R1 a R5 em `supabase/tests/favorites_rls.test.sql` (pgTAP, banco local do Docker, tudo em transação com rollback; o usuário é simulado com `set local role` + `set local request.jwt.claims`). Caso R6 em `supabase/functions/delete-account/handler_test.ts` (Deno, clientes falsos injetados no handler). Escritos antes da migration e da função, vistos falhar, depois verdes.

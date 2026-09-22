@@ -16,15 +16,20 @@ Sobre o mapa: no iOS o Expo Go usa Apple Maps. No Android o Google Maps exige ch
 
 ## Verificar
 ```bash
-npx tsc --noEmit  # typecheck
+yarn typecheck
 yarn lint
+yarn test         # testes unitários (jest-expo); nenhum faz chamada de rede
 ```
+
+Contas (login e sync de favoritos) são opcionais. Para ativar, defina `EXPO_PUBLIC_SUPABASE_URL` e `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` em `.env.local` (ignorado pelo git; só a chave publishable, nunca a `service_role`). Sem elas o app funciona normalmente como visitante.
 
 ## Estrutura
 ```
 src/app/(tabs)/   telas: Mapa, Linhas, Como Ir, Favoritos
 src/components/   mapa, painel deslizante, badges
 src/hooks/        useLiveVehicles, useUserLocation
+src/lib/          validação, erros do Auth, merge de favoritos, cliente Supabase, LargeSecureStore (com testes)
+src/providers/    AuthProvider e useAuth (sessão opcional)
 src/stores/       zustand: seleção do mapa e favoritos (persistidos)
 src/services/     transitProvider (posição e ETA), tripPlanner
 src/data/         dataset simulado
