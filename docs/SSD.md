@@ -105,7 +105,7 @@ favorites (
   primary key (user_id, kind, ref)
 )
 ```
-RLS ligada; políticas de select, insert e delete com `(select auth.uid()) = user_id`. Migrations em `supabase/migrations/`. Sem tabela de perfil (dados mínimos: e-mail do Auth e favoritos).
+RLS ligada; políticas de select, insert e delete com `(select auth.uid()) = user_id`. O projeto foi criado com "Automatically expose new tables" **desligado**, então cada tabela nova precisa de `GRANT` explícito (`select, insert, delete` para o papel `authenticated`, nenhum para `anon`) na própria migration. "Enable automatic RLS" está ligado como rede de segurança. Migrations em `supabase/migrations/`. Sem tabela de perfil (dados mínimos: e-mail do Auth e favoritos).
 
 ### 10.3 Fluxos
 - **Cadastro:** e-mail + senha, e-mail de confirmação com link para `curitibabusapp://`, só então a sessão fica ativa.
@@ -116,7 +116,7 @@ RLS ligada; políticas de select, insert e delete com `(select auth.uid()) = use
 - **Excluir conta:** confirmação, chamada à Edge Function, limpeza do estado de sessão, volta a visitante.
 
 ### 10.4 Configuração do projeto
-Região São Paulo, confirmação de e-mail ligada, senha mínima 8, provedores sociais desligados, allowlist de redirect só `curitibabusapp://**`, SMTP próprio antes do release. Projetos gratuitos pausam após ~7 dias sem uso: definir keep-alive ou plano pago antes do release.
+Projeto criado em 21/09/2026 (organização gratuita, região São Paulo, compute Nano). Configurado: confirmação de e-mail ligada, login anônimo e provedores sociais desligados, senha mínima 8, Site URL `curitibabusapp://` e allowlist de redirect só `curitibabusapp://**`. Pendente: SMTP próprio antes do release. Projetos gratuitos pausam após ~7 dias sem uso: definir keep-alive ou plano pago antes do release.
 
 ## 9. Qualidade e entrega
 - Typecheck (`yarn typecheck`), lint (`yarn lint`) e gitleaks no pre-commit (lefthook); CI no PR roda typecheck e lint (lint ainda não bloqueante).
