@@ -1,7 +1,9 @@
 import { CURITIBA_LINES, CURITIBA_STOPS } from '@/data/curitibaDataset';
 import { ArrivalEstimate, BusLine, BusStop, BusVehicle, LatLng } from '@/types/transit';
-import { getBearing, getDistanceInMeters, interpolateLatLng } from '@/utils/geo';
+import { calculateStepDistanceMeters, getBearing, getDistanceInMeters, interpolateLatLng } from '@/utils/geo';
 import { AppState, AppStateStatus } from 'react-native';
+
+const TICK_INTERVAL_MS = 3000;
 
 interface VehicleSimState {
   vehicle: BusVehicle;
@@ -11,7 +13,23 @@ interface VehicleSimState {
   direction: 'ida' | 'volta';
 }
 
-class TransitService {
+/**
+ * Contrato que qualquer fonte de dados de transporte deve implementar.
+ * Hoje só existe o mock (simulação em memória); quando a integração com a
+ * URBS estiver disponível, uma segunda implementação entra aqui e a troca
+ * acontece só em `createTransitProvider`, sem mexer em quem consome `transitService`.
+ */
+export interface TransitProvider {
+  getVehicles(): BusVehicle[];
+  getLines(): BusLine[];
+  getLineByCode(codigo: string): BusLine | undefined;
+  getStops(): BusStop[];
+  getStopById(id: string): BusStop | undefined;
+  getArrivalsForStop(stopId: string): ArrivalEstimate[];
+  subscribeVehicles(cb: (vehicles: BusVehicle[]) => void): () => void;
+}
+
+class MockTransitProvider implements TransitProvider {
   private vehicles: VehicleSimState[] = [];
   private listeners: ((vehicles: BusVehicle[]) => void)[] = [];
   private timer: ReturnType<typeof setInterval> | null = null;
@@ -88,7 +106,7 @@ class TransitService {
 
     this.timer = setInterval(() => {
       this.tickSimulation();
-    }, 3000);
+    }, TICK_INTERVAL_MS);
   }
 
   private stopSimulation() {
@@ -104,7 +122,16 @@ class TransitService {
       if (!line) return item;
 
       const trajeto = item.direction === 'ida' ? line.trajetoIda : line.trajetoVolta;
-      let newProgress = item.segmentProgress + 0.15;
+
+      // Passo proporcional à velocidade do veículo e ao intervalo do tick
+      // (distance = speed * deltaTime), não um incremento fixo de progresso.
+      const segStart = trajeto[item.segmentIndex];
+      const segEnd = trajeto[Math.min(item.segmentIndex + 1, trajeto.length - 1)];
+      const segmentDistanceMeters = getDistanceInMeters(segStart, segEnd);
+      const stepDistanceMeters = calculateStepDistanceMeters(item.vehicle.velocidadeKmH, TICK_INTERVAL_MS);
+      const progressStep = segmentDistanceMeters > 0 ? stepDistanceMeters / segmentDistanceMeters : 1;
+
+      let newProgress = item.segmentProgress + progressStep;
       let newSegment = item.segmentIndex;
       let newDirection = item.direction;
 
@@ -224,4 +251,10 @@ class TransitService {
   }
 }
 
-export const transitService = new TransitService();
+// ponytail: só o mock existe hoje; quando a URBS_CONFIG ganhar credenciais reais,
+// troca o retorno abaixo por `new UrbsTransitProvider(URBS_CONFIG)` sem tocar nos consumidores.
+function createTransitProvider(): TransitProvider {
+  return new MockTransitProvider();
+}
+
+export const transitService: TransitProvider = createTransitProvider();
