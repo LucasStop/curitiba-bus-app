@@ -268,7 +268,9 @@ export const TransitBottomSheet: React.FC = () => {
         </View>
 
         {/* Pílulas de Categorias RIT */}
-        <CategoryPills />
+        <View style={styles.categoryPillsContainer}>
+          <CategoryPills />
+        </View>
       </View>
 
       <ScrollView style={styles.listScroll} showsVerticalScrollIndicator={false}>
@@ -358,6 +360,12 @@ const styles = StyleSheet.create({
   sheetHeader: {
     alignItems: 'center',
     marginBottom: 8,
+    width: '100%',
+    alignSelf: 'stretch',
+  },
+  categoryPillsContainer: {
+    width: '100%',
+    alignSelf: 'stretch',
   },
   dragHandle: {
     width: 36,
