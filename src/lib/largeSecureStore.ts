@@ -22,11 +22,33 @@ export interface SecretStore {
 
 // THIS_DEVICE_ONLY: a chave não vai para backup nem para outro aparelho; sem ela a sessão cifrada
 // restaurada vira null e a pessoa entra de novo (em vez de ler lixo).
+//
+// Cada chamada é blindada com try/catch: em Expo Go (sem dev-client) o SecureStore lança
+// exceção nativa, e sem isso o boot do Supabase (`loadStorageData`) travava na splash. Falha
+// aqui vira "sessão não restaurada" — a pessoa cai como visitante e loga de novo, em vez do
+// app travar. Sem log (nem em dev): C7 proíbe console.* neste diretório (noSensitiveLogs.test.ts).
 const keychainStore: SecretStore = {
-  getItemAsync: (key) => SecureStore.getItemAsync(key),
-  setItemAsync: (key, value) =>
-    SecureStore.setItemAsync(key, value, { keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY }),
-  deleteItemAsync: (key) => SecureStore.deleteItemAsync(key),
+  getItemAsync: async (key) => {
+    try {
+      return await SecureStore.getItemAsync(key);
+    } catch {
+      return null;
+    }
+  },
+  setItemAsync: async (key, value) => {
+    try {
+      await SecureStore.setItemAsync(key, value, { keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY });
+    } catch {
+      // silencioso de propósito — ver comentário acima.
+    }
+  },
+  deleteItemAsync: async (key) => {
+    try {
+      await SecureStore.deleteItemAsync(key);
+    } catch {
+      // silencioso de propósito — ver comentário acima.
+    }
+  },
 };
 
 export class LargeSecureStore {
