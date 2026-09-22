@@ -82,9 +82,9 @@ Endpoint e formato de resposta ainda não estão confirmados (um teste com chave
 7. **Restos do template Expo** ainda no repo (animated-icon, hint-row, web-badge, external-link, collapsible, ícones e logos de exemplo).
 8. **Dados**: 100% simulados; trajetos aproximados, não o traçado real.
 9. **Lint**: 2 erros `react-hooks/set-state-in-effect` (`useUserLocation.ts` e `use-color-scheme.web.ts`) e 10 avisos de variável não usada/import duplicado.
-10. **Config nativa**: `app.json` não tem o plugin `expo-location`; sem `NSLocationWhenInUseUsageDescription` (iOS) e permissões (Android), o GPS só funciona no Expo Go.
-11. **Dependências**: `yarn audit` acusa 5 vulnerabilidades moderadas transitivas (ex.: `expo-router > query-string > decode-uri-component`).
-12. **Repositório**: `main` sem proteção de branch, Dependabot security updates desligado, workflow de CI sem `permissions` explícitas, sem `.env.example`.
+10. ~~**Config nativa**~~ **Resolvido**: `app.json` tem o plugin `expo-location` com texto em pt-BR (`NSLocationWhenInUseUsageDescription`) e permissões Android de localização em primeiro plano; sem localização em background. Em build nativo o GPS não depende mais do Expo Go.
+11. **Dependências**: 4 das 5 moderadas (`uuid` via `xcode`) resolvidas por `resolutions`. Resta 1: `expo-router > query-string > decode-uri-component` (só ESM nas versões corrigidas, quebraria o `query-string@7`); mitigação e plano em [SECURITY.md](SECURITY.md) T8. Dependabot version updates semanais e `yarn audit` (informativo) no CI.
+12. **Repositório**: `permissions: contents: read` no CI resolvido. Pendente: `.env.example` e, por decisão do dono no GitHub, proteção da `main` e Dependabot security updates.
 
 ## 10. Contas e backend (Supabase) — **Proposto**
 Decisões: login **opcional** (D6), e-mail e senha (D7), sessão em `LargeSecureStore` (D8). Ameaças e controles em [SECURITY.md](SECURITY.md); dados e direitos em [PRIVACY.md](PRIVACY.md).
