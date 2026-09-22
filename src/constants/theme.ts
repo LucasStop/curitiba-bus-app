@@ -83,5 +83,50 @@ export const Spacing = {
   six: 64,
 } as const;
 
+export const Typography = {
+  label: { fontSize: 12, lineHeight: 16 },
+  body: { fontSize: 14, lineHeight: 20 },
+  itemTitle: { fontSize: 16, lineHeight: 24 },
+  screenTitle: { fontSize: 20, lineHeight: 28 },
+  heroEta: {
+    fontSize: 32,
+    lineHeight: 36,
+    fontVariant: ['tabular-nums'] as ('tabular-nums')[],
+  },
+} as const;
+
+export const FontWeight = {
+  regular: '400',
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+  heavy: '800',
+  black: '900',
+} as const;
+
+export const Radius = {
+  sm: 8,
+  md: 12,
+  lg: 16,
+  pill: 999,
+} as const;
+
+export const Shadows = {
+  card: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  sheet: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 8,
+  },
+} as const;
+
 export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;
 export const MaxContentWidth = 800;
