@@ -7,15 +7,6 @@ interface BusMarkerProps {
   isSelected?: boolean;
 }
 
-// Rótulo de acessibilidade do marcador (DESIGN.md: "Linha 203, sentido Terminal Boa Vista, chegando em 4 min").
-// BusVehicle não carrega nome do terminal nem ETA para este ponto do mapa, então usa sentido ida/volta.
-export function getBusMarkerAccessibilityLabel(vehicle: BusVehicle, isSelected = false): string {
-  const sentido = vehicle.sentido === 'ida' ? 'ida' : 'volta';
-  return `Ônibus linha ${vehicle.codLinha}, ${vehicle.nomeLinha}, sentido ${sentido}${
-    isSelected ? ', selecionado' : ''
-  }`;
-}
-
 export const BusMarker: React.FC<BusMarkerProps> = ({ vehicle, isSelected = false }) => {
   return (
     <View style={[styles.container, isSelected && styles.selectedContainer]}>

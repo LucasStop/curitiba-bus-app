@@ -49,10 +49,7 @@ export const BusBadge: React.FC<BusBadgeProps> = ({
           paddingVertical: sizeStyles.paddingVertical,
           borderRadius: sizeStyles.borderRadius,
         },
-      ]}
-      testID={`line-badge-${codigo}`}
-      accessible
-      accessibilityLabel={`Linha ${codigo}`}>
+      ]}>
       <Text style={[styles.text, { fontSize: sizeStyles.fontSize }]}>{codigo}</Text>
     </View>
   );

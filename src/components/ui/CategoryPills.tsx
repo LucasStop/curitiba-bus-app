@@ -38,11 +38,7 @@ export const CategoryPills: React.FC = () => {
                 styles.pill,
                 isSelected ? styles.pillSelected : styles.pillUnselected,
               ]}
-              activeOpacity={0.7}
-              testID={`category-pill-${cat.key}`}
-              accessibilityRole="button"
-              accessibilityState={{ selected: isSelected }}
-              accessibilityLabel={`Filtrar por ${cat.label}`}>
+              activeOpacity={0.7}>
               {cat.dotColor && (
                 <View style={[styles.dot, { backgroundColor: cat.dotColor }]} />
               )}

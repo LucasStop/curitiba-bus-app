@@ -32,11 +32,7 @@ export default function MapScreen() {
             <Text style={styles.appTitle}>Curitiba Ônibus RIT</Text>
             <Text style={styles.appSubtitle}>Navegação e rastreamento ao vivo</Text>
           </View>
-          <View
-            style={styles.liveIndicator}
-            testID="map-live-indicator"
-            accessible
-            accessibilityLabel={`${totalActive} ônibus ao vivo agora`}>
+          <View style={styles.liveIndicator}>
             <View style={styles.pulseDot} />
             <Text style={styles.liveText}>{totalActive} ao vivo</Text>
           </View>

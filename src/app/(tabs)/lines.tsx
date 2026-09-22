@@ -47,15 +47,9 @@ export default function LinesScreen() {
             style={styles.searchInput}
             value={search}
             onChangeText={setSearch}
-            testID="lines-search-input"
-            accessibilityLabel="Buscar por número ou nome da linha"
           />
           {search.length > 0 && (
-            <TouchableOpacity
-              onPress={() => setSearch('')}
-              testID="lines-search-clear-button"
-              accessibilityRole="button"
-              accessibilityLabel="Limpar busca">
+            <TouchableOpacity onPress={() => setSearch('')}>
               <Text style={styles.clearText}>✕</Text>
             </TouchableOpacity>
           )}
@@ -65,11 +59,7 @@ export default function LinesScreen() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
           <TouchableOpacity
             onPress={() => setSelectedCategory('all')}
-            style={[styles.filterPill, selectedCategory === 'all' && styles.filterPillActive]}
-            testID="lines-filter-pill-all"
-            accessibilityRole="button"
-            accessibilityState={{ selected: selectedCategory === 'all' }}
-            accessibilityLabel={`Filtrar por Todas as linhas, ${CURITIBA_LINES.length} linhas`}>
+            style={[styles.filterPill, selectedCategory === 'all' && styles.filterPillActive]}>
             <Text style={[styles.filterText, selectedCategory === 'all' && styles.filterTextActive]}>
               Todas ({CURITIBA_LINES.length})
             </Text>
@@ -82,11 +72,7 @@ export default function LinesScreen() {
               <TouchableOpacity
                 key={cat}
                 onPress={() => setSelectedCategory(cat)}
-                style={[styles.filterPill, isActive && styles.filterPillActive]}
-                testID={`lines-filter-pill-${cat}`}
-                accessibilityRole="button"
-                accessibilityState={{ selected: isActive }}
-                accessibilityLabel={`Filtrar por ${config.label}`}>
+                style={[styles.filterPill, isActive && styles.filterPillActive]}>
                 <View style={[styles.dot, { backgroundColor: config.corHex }]} />
                 <Text style={[styles.filterText, isActive && styles.filterTextActive]}>
                   {config.label}
@@ -119,11 +105,7 @@ export default function LinesScreen() {
                 <TouchableOpacity
                   onPress={() => toggleFavoriteLine(line.codigo)}
                   style={styles.favButton}
-                  activeOpacity={0.7}
-                  testID={`lines-favorite-button-${line.codigo}`}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected: isFav }}
-                  accessibilityLabel={`${isFav ? 'Remover' : 'Adicionar'} linha ${line.codigo} dos favoritos`}>
+                  activeOpacity={0.7}>
                   <Bookmark
                     size={22}
                     color={isFav ? '#E11D48' : '#94A3B8'}
@@ -158,10 +140,7 @@ export default function LinesScreen() {
                 <TouchableOpacity
                   onPress={() => handleOpenOnMap(line)}
                   style={[styles.mapButton, { backgroundColor: line.corHex }]}
-                  activeOpacity={0.8}
-                  testID={`lines-open-map-button-${line.codigo}`}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Ver linha ${line.codigo} no mapa`}>
+                  activeOpacity={0.8}>
                   <Text style={styles.mapButtonText}>Ver no Mapa</Text>
                 </TouchableOpacity>
               </View>

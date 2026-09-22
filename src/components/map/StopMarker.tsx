@@ -7,13 +7,6 @@ interface StopMarkerProps {
   isSelected?: boolean;
 }
 
-export function getStopMarkerAccessibilityLabel(stop: BusStop, isSelected = false): string {
-  const tipo = stop.tipo === 'terminal' ? 'Terminal' : 'Estação-tubo';
-  return `${tipo} ${stop.nome}, bairro ${stop.bairro}${
-    isSelected ? ', selecionada' : ''
-  }`;
-}
-
 export const StopMarker: React.FC<StopMarkerProps> = ({ stop, isSelected = false }) => {
   const isTerminal = stop.tipo === 'terminal';
 

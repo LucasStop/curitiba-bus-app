@@ -8,8 +8,8 @@ import React, { useRef } from 'react';
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import { LIGHT_MAP_STYLE } from '../../constants/mapStyles';
-import { BusMarker, getBusMarkerAccessibilityLabel } from './BusMarker';
-import { StopMarker, getStopMarkerAccessibilityLabel } from './StopMarker';
+import { BusMarker } from './BusMarker';
+import { StopMarker } from './StopMarker';
 
 interface CuritibaMapProps {
   userLocation: LatLng;
@@ -85,10 +85,7 @@ export const CuritibaMap: React.FC<CuritibaMapProps> = ({
               <TouchableOpacity
                 key={v.id}
                 onPress={() => onSelectVehicle?.(v)}
-                style={[styles.webVehicleCard, { borderLeftColor: v.corHex }]}
-                testID={`bus-marker-${v.codLinha}-${v.id}`}
-                accessibilityRole="button"
-                accessibilityLabel={getBusMarkerAccessibilityLabel(v)}>
+                style={[styles.webVehicleCard, { borderLeftColor: v.corHex }]}>
                 <View style={styles.webCardRow}>
                   <View style={[styles.webBadge, { backgroundColor: v.corHex }]}>
                     <Text style={styles.webBadgeText}>{v.codLinha}</Text>
@@ -135,10 +132,7 @@ export const CuritibaMap: React.FC<CuritibaMapProps> = ({
             key={`stop-${stop.id}`}
             coordinate={{ latitude: stop.latitude, longitude: stop.longitude }}
             onPress={() => onSelectStop?.(stop)}
-            tracksViewChanges={false}
-            testID={`stop-marker-${stop.id}`}
-            accessibilityRole="button"
-            accessibilityLabel={getStopMarkerAccessibilityLabel(stop, selectedStop?.id === stop.id)}>
+            tracksViewChanges={false}>
             <StopMarker stop={stop} isSelected={selectedStop?.id === stop.id} />
           </Marker>
         ))}
@@ -150,10 +144,7 @@ export const CuritibaMap: React.FC<CuritibaMapProps> = ({
             coordinate={{ latitude: bus.latitude, longitude: bus.longitude }}
             onPress={() => onSelectVehicle?.(bus)}
             tracksViewChanges={false}
-            anchor={{ x: 0.5, y: 0.5 }}
-            testID={`bus-marker-${bus.codLinha}-${bus.id}`}
-            accessibilityRole="button"
-            accessibilityLabel={getBusMarkerAccessibilityLabel(bus, selectedVehicle?.id === bus.id)}>
+            anchor={{ x: 0.5, y: 0.5 }}>
             <BusMarker vehicle={bus} isSelected={selectedVehicle?.id === bus.id} />
           </Marker>
         ))}
@@ -165,10 +156,7 @@ export const CuritibaMap: React.FC<CuritibaMapProps> = ({
           <TouchableOpacity
             style={[styles.fabButton, styles.directionButton]}
             onPress={toggleActiveDirection}
-            activeOpacity={0.8}
-            testID="map-toggle-direction-button"
-            accessibilityRole="button"
-            accessibilityLabel={`Sentido ${activeDirection === 'ida' ? 'ida' : 'volta'}. Toque para inverter o sentido da linha ${selectedLine.codigo}`}>
+            activeOpacity={0.8}>
             <Navigation2 size={18} color="#FFFFFF" />
             <Text style={styles.directionText}>
               {activeDirection === 'ida' ? 'Ida' : 'Volta'}
@@ -179,20 +167,14 @@ export const CuritibaMap: React.FC<CuritibaMapProps> = ({
         <TouchableOpacity
           style={styles.fabButton}
           onPress={toggleMapTraffic}
-          activeOpacity={0.8}
-          testID="map-layers-button"
-          accessibilityRole="button"
-          accessibilityLabel={`${isMapTrafficVisible ? 'Ocultar' : 'Mostrar'} trânsito no mapa`}>
+          activeOpacity={0.8}>
           <Layers size={20} color={isMapTrafficVisible ? '#E11D48' : '#334155'} />
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.fabButton}
           onPress={centerOnUser}
-          activeOpacity={0.8}
-          testID="map-locate-button"
-          accessibilityRole="button"
-          accessibilityLabel="Centralizar mapa na minha localização">
+          activeOpacity={0.8}>
           <LocateFixed size={20} color="#0284C7" />
         </TouchableOpacity>
       </View>
@@ -201,15 +183,10 @@ export const CuritibaMap: React.FC<CuritibaMapProps> = ({
       {selectedLine && (
         <View style={styles.activeLineBanner}>
           <View style={[styles.lineDot, { backgroundColor: selectedLine.corHex }]} />
-          <Text style={styles.bannerTitle} numberOfLines={1} testID="map-active-line-banner-title">
+          <Text style={styles.bannerTitle} numberOfLines={1}>
             {selectedLine.codigo} - {selectedLine.nome} ({activeDirection.toUpperCase()})
           </Text>
-          <TouchableOpacity
-            onPress={clearSelection}
-            hitSlop={10}
-            testID="map-clear-selection-button"
-            accessibilityRole="button"
-            accessibilityLabel="Fechar detalhes da linha selecionada">
+          <TouchableOpacity onPress={clearSelection} hitSlop={10}>
             <Text style={styles.bannerClose}>✕</Text>
           </TouchableOpacity>
         </View>

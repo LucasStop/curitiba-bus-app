@@ -55,10 +55,7 @@ export default function RoutesScreen() {
 
           <View style={styles.fieldsCol}>
             {/* Origem */}
-            <TouchableOpacity
-              style={styles.inputField}
-              testID="routes-origin-field"
-              accessibilityLabel={`Origem: ${originStop.nome}`}>
+            <TouchableOpacity style={styles.inputField}>
               <Text style={styles.fieldLabel}>Origem</Text>
               <Text style={styles.fieldText} numberOfLines={1}>
                 {originStop.nome}
@@ -68,10 +65,7 @@ export default function RoutesScreen() {
             <View style={styles.fieldDivider} />
 
             {/* Destino */}
-            <TouchableOpacity
-              style={styles.inputField}
-              testID="routes-destination-field"
-              accessibilityLabel={`Destino: ${destStop.nome}`}>
+            <TouchableOpacity style={styles.inputField}>
               <Text style={styles.fieldLabel}>Destino</Text>
               <Text style={styles.fieldText} numberOfLines={1}>
                 {destStop.nome}
@@ -80,13 +74,7 @@ export default function RoutesScreen() {
           </View>
 
           {/* Botão de Inverter */}
-          <TouchableOpacity
-            onPress={handleSwap}
-            style={styles.swapButton}
-            activeOpacity={0.7}
-            testID="routes-swap-button"
-            accessibilityRole="button"
-            accessibilityLabel="Inverter origem e destino">
+          <TouchableOpacity onPress={handleSwap} style={styles.swapButton} activeOpacity={0.7}>
             <ArrowUpDown size={18} color="#0F172A" />
           </TouchableOpacity>
         </View>
@@ -95,30 +83,21 @@ export default function RoutesScreen() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.quickChips}>
           <TouchableOpacity
             onPress={() => handleSelectRoute(CURITIBA_STOPS[4], CURITIBA_STOPS[1])}
-            style={styles.chip}
-            testID="routes-quick-chip-0"
-            accessibilityRole="button"
-            accessibilityLabel="Rota rápida de Rui Barbosa até Cabral">
+            style={styles.chip}>
             <Sparkles size={12} color="#0284C7" />
             <Text style={styles.chipText}>Rui Barbosa ➔ Cabral</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={() => handleSelectRoute(CURITIBA_STOPS[5], CURITIBA_STOPS[12])}
-            style={styles.chip}
-            testID="routes-quick-chip-1"
-            accessibilityRole="button"
-            accessibilityLabel="Rota rápida de Carlos Gomes até Boqueirão">
+            style={styles.chip}>
             <Sparkles size={12} color="#0284C7" />
             <Text style={styles.chipText}>Carlos Gomes ➔ Boqueirão</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={() => handleSelectRoute(CURITIBA_STOPS[1], CURITIBA_STOPS[8])}
-            style={styles.chip}
-            testID="routes-quick-chip-2"
-            accessibilityRole="button"
-            accessibilityLabel="Rota rápida de Cabral até Portão">
+            style={styles.chip}>
             <Sparkles size={12} color="#0284C7" />
             <Text style={styles.chipText}>Cabral ➔ Portão</Text>
           </TouchableOpacity>
