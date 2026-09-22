@@ -1,0 +1,21 @@
+version: 2
+updates:
+  # O repo usa yarn.lock; o Dependabot cobre yarn v1 pelo ecossistema "npm".
+  # Majors do Expo SDK / React Native sobem juntos (npx expo install --fix), entao ficam fora do agrupamento.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      actions:
+        patterns: ["*"]
