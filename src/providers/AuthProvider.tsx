@@ -4,7 +4,9 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 import { AppState } from 'react-native';
 
 import { mapAuthError, type AuthErrorContext } from '@/lib/authErrors';
+import { pullAndMergeFavorites, startFavoritesSync, stopFavoritesSync } from '@/lib/favoritesSync';
 import { getSupabase, isSupabaseConfigured } from '@/lib/supabase';
+import { useFavoritesStore } from '@/stores/useFavoritesStore';
 
 // Contas são opcionais (SSD D6): nada aqui bloqueia rota. Sem sessão (ou sem Supabase configurado)
 // o app é o mesmo de sempre, como visitante. Nada é logado: token, e-mail e senha não saem daqui (C7).
@@ -30,6 +32,7 @@ export interface AuthContextValue {
   signIn: (email: string, password: string) => Promise<AuthResult>;
   signOut: () => Promise<AuthResult>;
   resetPassword: (email: string) => Promise<AuthResult>;
+  updatePassword: (password: string) => Promise<AuthResult>;
   deleteAccount: () => Promise<AuthResult>;
 }
 
@@ -81,6 +84,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
+  // RF-20/SSD 10.3: ao logar (ou restaurar sessão), une favoritos locais e da nuvem (C4) e depois
+  // espelha cada toggle local na nuvem. Sair só para o espelhamento; os favoritos locais ficam.
+  const userId = session?.user?.id;
+  useEffect(() => {
+    if (!userId) {
+      stopFavoritesSync();
+      return;
+    }
+    let active = true;
+    const supabase = getSupabase();
+    pullAndMergeFavorites(supabase, userId, useFavoritesStore.getState()).then((merged) => {
+      if (!active) return;
+      useFavoritesStore.setState(merged);
+      startFavoritesSync(supabase, userId);
+    });
+    return () => {
+      active = false;
+      stopFavoritesSync();
+    };
+  }, [userId]);
+
   const signUp = useCallback<AuthContextValue['signUp']>(
     (email, password) =>
       run('signUp', async () => {
@@ -124,6 +148,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [],
   );
 
+  // Usada na tela de nova senha (deep link de recuperação já deu uma sessão temporária).
+  const updatePassword = useCallback<AuthContextValue['updatePassword']>(
+    (password) =>
+      run('other', async () => {
+        const { error } = await getSupabase().auth.updateUser({ password });
+        return { error: error ? mapAuthError(error, 'other') : null };
+      }),
+    [],
+  );
+
   // A Edge Function apaga só o usuário do próprio JWT (T7). Só limpa a sessão local se ela confirmou;
   // escopo local porque o token já não vale no servidor.
   const deleteAccount = useCallback<AuthContextValue['deleteAccount']>(
@@ -148,9 +182,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signIn,
       signOut,
       resetPassword,
+      updatePassword,
       deleteAccount,
     }),
-    [session, loading, configured, signUp, signIn, signOut, resetPassword, deleteAccount],
+    [session, loading, configured, signUp, signIn, signOut, resetPassword, updatePassword, deleteAccount],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

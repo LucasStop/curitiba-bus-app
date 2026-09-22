@@ -1,13 +1,26 @@
 import { BusBadge } from '@/components/ui/BusBadge';
 import { CURITIBA_LINES, CURITIBA_STOPS, TRANSIT_ALERTS } from '@/data/curitibaDataset';
+import { useAuth } from '@/providers/AuthProvider';
 import { transitService } from '@/services/transitProvider';
 import { useFavoritesStore } from '@/stores/useFavoritesStore';
 import { useTransitStore } from '@/stores/useTransitStore';
 import { formatMinutes } from '@/utils/geo';
 import { useRouter } from 'expo-router';
-import { AlertTriangle, Bell, Bookmark, ChevronRight, Clock, Info, MapPin, Trash2 } from 'lucide-react-native';
+import {
+  AlertTriangle,
+  Bell,
+  Bookmark,
+  ChevronRight,
+  Clock,
+  Info,
+  LogIn,
+  LogOut,
+  MapPin,
+  Trash2,
+  User as UserIcon,
+} from 'lucide-react-native';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function FavoritesScreen() {
@@ -19,8 +32,41 @@ export default function FavoritesScreen() {
   const setSelectedLine = useTransitStore((s) => s.setSelectedLine);
   const setSelectedStop = useTransitStore((s) => s.setSelectedStop);
 
+  const { user, signOut, deleteAccount } = useAuth();
+  const [deleting, setDeleting] = useState(false);
+
   const lines = CURITIBA_LINES.filter((l) => favoriteLines.includes(l.codigo));
   const stops = CURITIBA_STOPS.filter((s) => favoriteStops.includes(s.id));
+
+  async function onSignOut() {
+    await signOut();
+  }
+
+  // Confirmação em duas etapas (SECURITY.md, ação destrutiva): só na segunda o usuário confirma de fato.
+  function onDeleteAccount() {
+    Alert.alert('Excluir conta', 'Isso apaga seu e-mail e o cadastro. Os favoritos ficam salvos neste aparelho.', [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Excluir',
+        style: 'destructive',
+        onPress: () => {
+          Alert.alert('Tem certeza?', 'Essa ação não pode ser desfeita.', [
+            { text: 'Cancelar', style: 'cancel' },
+            {
+              text: 'Excluir conta',
+              style: 'destructive',
+              onPress: async () => {
+                setDeleting(true);
+                const result = await deleteAccount();
+                setDeleting(false);
+                if (result.error) Alert.alert('Não foi possível excluir', result.error);
+              },
+            },
+          ]);
+        },
+      },
+    ]);
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
@@ -28,6 +74,69 @@ export default function FavoritesScreen() {
       <View style={styles.header}>
         <Text style={styles.title}>Meus Favoritos & Alertas</Text>
         <Text style={styles.subtitle}>Acesso rápido e comunicados da URBS</Text>
+
+        {/* Seção Conta (RF-17 a RF-21): visitante entra/cria conta, logado sai ou exclui a conta. */}
+        <View style={styles.accountSection} testID="account-section">
+          {user ? (
+            <>
+              <View style={styles.accountRow}>
+                <View style={styles.accountIconWrapper}>
+                  <UserIcon size={16} color="#0284C7" />
+                </View>
+                <Text style={styles.accountEmail} numberOfLines={1} testID="account-email">
+                  {user.email}
+                </Text>
+              </View>
+              <View style={styles.accountActions}>
+                <TouchableOpacity
+                  onPress={onSignOut}
+                  style={styles.accountButton}
+                  testID="account-sign-out"
+                  accessibilityRole="button"
+                  accessibilityLabel="Sair da conta">
+                  <LogOut size={15} color="#334155" />
+                  <Text style={styles.accountButtonText}>Sair</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={onDeleteAccount}
+                  style={styles.accountButton}
+                  disabled={deleting}
+                  testID="account-delete"
+                  accessibilityRole="button"
+                  accessibilityLabel="Excluir conta"
+                  accessibilityState={{ disabled: deleting, busy: deleting }}>
+                  <Trash2 size={15} color="#DC2626" />
+                  <Text style={[styles.accountButtonText, styles.accountButtonDangerText]}>
+                    {deleting ? 'Excluindo…' : 'Excluir conta'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          ) : (
+            <>
+              <Text style={styles.accountGuestText}>Entre para sincronizar seus favoritos entre aparelhos.</Text>
+              <View style={styles.accountActions}>
+                <TouchableOpacity
+                  onPress={() => router.push('/(auth)/sign-in')}
+                  style={styles.accountButton}
+                  testID="account-go-sign-in"
+                  accessibilityRole="button"
+                  accessibilityLabel="Entrar">
+                  <LogIn size={15} color="#0284C7" />
+                  <Text style={styles.accountButtonText}>Entrar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => router.push('/(auth)/sign-up')}
+                  style={[styles.accountButton, styles.accountButtonPrimary]}
+                  testID="account-go-sign-up"
+                  accessibilityRole="button"
+                  accessibilityLabel="Criar conta">
+                  <Text style={[styles.accountButtonText, styles.accountButtonPrimaryText]}>Criar conta</Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
+        </View>
 
         <View style={styles.tabToggle}>
           <TouchableOpacity
@@ -351,5 +460,67 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
     color: '#64748B',
+  },
+  accountSection: {
+    marginTop: 12,
+    backgroundColor: '#F8FAFC',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    padding: 12,
+    gap: 10,
+  },
+  accountRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  accountIconWrapper: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#E0F2FE',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  accountEmail: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#0F172A',
+  },
+  accountGuestText: {
+    fontSize: 12,
+    color: '#64748B',
+  },
+  accountActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  accountButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    backgroundColor: '#FFFFFF',
+  },
+  accountButtonPrimary: {
+    backgroundColor: '#0284C7',
+    borderColor: '#0284C7',
+  },
+  accountButtonText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#334155',
+  },
+  accountButtonPrimaryText: {
+    color: '#FFFFFF',
+  },
+  accountButtonDangerText: {
+    color: '#DC2626',
   },
 });

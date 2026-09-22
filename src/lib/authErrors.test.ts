@@ -31,10 +31,12 @@ describe('mapAuthError', () => {
     expect(mapAuthError({ ...alreadyExists, code: 'email_exists' }, 'signUp')).toBe(msg);
   });
 
-  it('cadastro: senha fraca', () => {
-    expect(mapAuthError({ status: 422, code: 'weak_password', message: 'x' }, 'signUp')).toBe(
-      'Senha fraca. Use pelo menos 8 caracteres.',
-    );
+  it('senha fraca: mesma mensagem em qualquer contexto (cadastro ou troca de senha)', () => {
+    for (const ctx of CONTEXTS) {
+      expect(mapAuthError({ status: 422, code: 'weak_password', message: 'x' }, ctx)).toBe(
+        'Senha fraca. Use pelo menos 8 caracteres.',
+      );
+    }
   });
 
   it('rede: falha de conexão em qualquer contexto', () => {
