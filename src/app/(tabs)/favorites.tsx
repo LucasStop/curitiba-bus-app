@@ -5,7 +5,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import { transitService } from '@/services/transitProvider';
 import { useFavoritesStore } from '@/stores/useFavoritesStore';
 import { useTransitStore } from '@/stores/useTransitStore';
-import { formatMinutes } from '@/utils/geo';
+import { formatEtaPhrase } from '@/utils/geo';
 import { useRouter } from 'expo-router';
 import {
   AlertTriangle,
@@ -251,7 +251,7 @@ export default function FavoritesScreen() {
                         <View style={styles.nextBusRow}>
                           <Clock size={12} color={Colors.light.success} />
                           <Text style={styles.nextBusText}>
-                            Próximo: {nextBus.codLinha} em {formatMinutes(nextBus.minutosAteChegada)}
+                            Próximo: {nextBus.codLinha} {formatEtaPhrase(nextBus.minutosAteChegada)}
                           </Text>
                         </View>
                       )}

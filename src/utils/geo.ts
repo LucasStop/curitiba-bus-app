@@ -1,4 +1,4 @@
-import { LatLng } from '@/types/transit';
+import { BusLine, BusStop, BusVehicle, LatLng } from '@/types/transit';
 
 /**
  * Calcula a distância em metros entre duas coordenadas usando a fórmula de Haversine
@@ -58,6 +58,57 @@ export function interpolateLatLng(start: LatLng, end: LatLng, t: number): LatLng
 }
 
 /**
+ * Projeta um ponto sobre um trajeto (polilinha) e retorna sua posição ao longo dele:
+ * índice do segmento + fração dentro do segmento (0 = início do trajeto).
+ * Usa lat/lng como plano cartesiano (aproximação suficiente para trechos urbanos curtos,
+ * mesma simplificação já usada em interpolateLatLng). Serve para comparar se um ponto
+ * está antes ou depois de outro no mesmo trajeto/sentido.
+ */
+export function getProgressAlongPath(path: LatLng[], point: LatLng): number {
+  if (path.length < 2) return 0;
+
+  let bestSegment = 0;
+  let bestT = 0;
+  let bestDist = Infinity;
+
+  for (let i = 0; i < path.length - 1; i++) {
+    const start = path[i];
+    const end = path[i + 1];
+    const dx = end.longitude - start.longitude;
+    const dy = end.latitude - start.latitude;
+    const lengthSq = dx * dx + dy * dy;
+    const t = lengthSq === 0 ? 0 : Math.max(0, Math.min(1,
+      ((point.longitude - start.longitude) * dx + (point.latitude - start.latitude) * dy) / lengthSq,
+    ));
+
+    const dist = getDistanceInMeters(point, interpolateLatLng(start, end, t));
+    if (dist < bestDist) {
+      bestDist = dist;
+      bestSegment = i;
+      bestT = t;
+    }
+  }
+
+  return bestSegment + bestT;
+}
+
+/**
+ * Um ônibus só entra na lista de chegadas de uma parada se ela pertencer ao seu
+ * sentido atual (ida/volta) e ainda estiver à frente dele no trajeto — senão o
+ * ônibus já passou (ou vai na direção oposta) e não vai mais chegar ali.
+ */
+export function isBusApproachingStop(line: BusLine, bus: BusVehicle, stop: BusStop): boolean {
+  const paradas = bus.sentido === 'ida' ? line.paradasIda : line.paradasVolta;
+  if (!paradas.includes(stop.id)) return false;
+
+  const trajeto = bus.sentido === 'ida' ? line.trajetoIda : line.trajetoVolta;
+  const busCoord: LatLng = { latitude: bus.latitude, longitude: bus.longitude };
+  const stopCoord: LatLng = { latitude: stop.latitude, longitude: stop.longitude };
+
+  return getProgressAlongPath(trajeto, busCoord) <= getProgressAlongPath(trajeto, stopCoord);
+}
+
+/**
  * Formata distância para exibição amigável (ex: "450 m" ou "1.8 km")
  */
 export function formatDistance(meters: number): string {
@@ -75,4 +126,16 @@ export function formatMinutes(minutes: number): string {
     return 'Chegando';
   }
   return `${Math.round(minutes)} min`;
+}
+
+/**
+ * Frase de chegada pronta para composição (ex: "em 4 min", "chegando agora").
+ * formatMinutes() sozinho quebra frases como "Próximo: X em {formatMinutes()}" quando
+ * o valor é "Chegando" (status, não minutos) — esta função já devolve a frase completa.
+ */
+export function formatEtaPhrase(minutes: number): string {
+  if (minutes <= 1) {
+    return 'chegando agora';
+  }
+  return `em ${Math.round(minutes)} min`;
 }
