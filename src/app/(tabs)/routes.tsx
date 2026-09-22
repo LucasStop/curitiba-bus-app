@@ -4,7 +4,8 @@ import { planTransitTrip } from '@/services/tripPlanner';
 import { LatLng, TripPlanOption } from '@/types/transit';
 import { ArrowUpDown, Footprints, MapPin, Navigation, Sparkles } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function RoutesScreen() {
   const [originStop, setOriginStop] = useState(CURITIBA_STOPS[4]); // Praça Rui Barbosa
@@ -39,7 +40,7 @@ export default function RoutesScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       {/* Header com Formulário de Viagem */}
       <View style={styles.header}>
         <Text style={styles.title}>Planejador de Viagens</Text>
