@@ -82,7 +82,7 @@ Login social (Google/Apple), 2FA, perfil com dados pessoais, login obrigatório,
 ## 8. Riscos e dependências abertas
 | Risco | Impacto | Ação |
 |---|---|---|
-| Acesso à API da URBS não confirmado (endpoint de teste devolveu resposta vazia; provável exigência de chave); o conjunto de dados não tem dicionário | Bloqueia RF-05, RF-15 | Task "Obter acesso ao WebService URBS e mapear endpoints" (E3) |
+| Acesso à API da URBS não confirmado (endpoint de teste devolveu resposta vazia; provável exigência de chave); o conjunto de dados não tem dicionário | Bloqueia RF-05, RF-15 | Task "Obter acesso ao WebService URBS e mapear endpoints" (E3) — investigado em 22/09/2026, achados em §8.1; segue bloqueado |
 | Chave da API não pode ir no bundle do app | Segurança | Avaliar proxy ou pré-processamento do GTFS |
 | Google Maps no Android exige chave e development build (não roda no Expo Go) | Bloqueia validação Android | Task "Chave Google Maps + development build EAS" (E1) |
 | Baldeação simulada no planner mostra rota inexistente | Perda de confiança do usuário | Bug de prioridade alta (E6); substituir por algoritmo sobre dados reais |
@@ -90,6 +90,25 @@ Login social (Google/Apple), 2FA, perfil com dados pessoais, login obrigatório,
 | Diretriz 5.1.1(v) da App Store: app sem função realmente dependente de conta não pode exigir login | Reprovação na App Store | Login **opcional**; visitante usa tudo (RF-16) |
 | Projeto gratuito do Supabase pausa após ~7 dias sem uso | Sincronização para; login e favoritos na nuvem indisponíveis | Visitante segue funcionando; definir keep-alive ou plano pago antes do release |
 | Entrega de e-mail de confirmação e recuperação (limite do SMTP padrão do Supabase) | Cadastro travado | Configurar SMTP próprio antes do release |
+
+## 8.1 Investigação E3: acesso a dados reais da URBS (22/09/2026)
+
+Investigação com testes reais de rede (`curl`), não só leitura de documentação. Resultado: **E3 continua bloqueado**, agora por motivo confirmado (credencial administrativa), não por endpoint desconhecido.
+
+**Testado:**
+- `GET https://transporteservico.urbs.curitiba.pr.gov.br/getLinhas.php` (e variações `getVeiculos.php`, com/sem parâmetro `linha`) → HTTP 200, corpo vazio. Reproduz exatamente o sintoma já registrado no risco acima.
+- Documentação oficial do WebService (PDF em `dadosabertos.c3sl.ufpr.br/curitiba/TransporteColetivo/Documentação_WEB-SERVICE...`, baixado e lido nesta investigação) confirma a causa: **acesso só é liberado mediante login e senha entregues pela URBS S/A**, por dois caminhos — Lei de Acesso à Informação (formulário em urbs.curitiba.pr.gov.br/fale-conosco) ou protocolo presencial na Av. Pres. Affonso Camargo, 330, Jardim Botânico. Não existe chave de API self-service. As funções documentadas (`getLinhas`, `getPontosLinha`, `getShapeLinha`, `getVeiculosLinha`, `getTabelaLinha`, `getTrechosItinerarios`, `getTabelaVeiculo`, `getPois`) todas GET, todas retornam JSON, e o próprio documento avisa: "o excesso de requisições será tratado como ataque DoS" — descarta qualquer tentativa de força bruta ou polling agressivo.
+- **Achado novo** (não estava documentado antes): existe um espelho não oficial, `http://dadosabertos.c3sl.ufpr.br/curitibaurbs/` (C3SL/UFPR), citado como "Base de Dados" no próprio [Portal de Dados Abertos de Curitiba](https://dadosabertos.curitiba.pr.gov.br/conjuntodado/detalhe?chave=ca40f13b-ef61-472b-810f-dd705f85fd2e) (CC BY 4.0). Publica arquivos diários `AAAA_MM_DD_{linhas,pontosLinha,shapeLinha,tabelaLinha,tabelaVeiculo,trechosItinerarios,veiculos,pois}.json.xz`, HTTPS, sem autenticação. Confirmado ao vivo: arquivo de 21/09/2026 (véspera) presente e com exatamente os campos do PDF oficial (`COD`/`NOME`/`CATEGORIA_SERVICO` em linhas; `LAT`/`LON` com vírgula decimal em pontos e shapes).
+
+**Por que esse achado não virou integração agora, mesmo sendo dado real:**
+1. Só existe em `.xz` (LZMA) — sem variante `.json`/`.gz` no diretório (testado, 404). RN/Expo não tem decoder nativo; adicionar lib wasm/lzma só pra isso é dependência desproporcional (contraria a checagem de skills/dependências do `AGENTS.md`).
+2. `veiculos.json.xz` é o log acumulado do dia inteiro (uma posição a cada poucos segundos por veículo), publicado só depois do dia fechar — não é posição em tempo real, não atende RF-05.
+3. Não é canal oficial da URBS nem tem termo de uso/retenção próprio (diferente do GTFS citado no PDF, que exige a mesma credencial); não é base confiável para depender em produção.
+4. Preencher os tipos ricos do app (`BusLine.tarifa`, `frequenciaPico`, `horarioFuncionamento`, `paradasIda`/`paradasVolta` ordenadas por sentido) com esses campos exigiria inventar o que a fonte não tem — seria fabricar dado, o que esta investigação foi instruída a não fazer.
+
+**O que desbloqueia:**
+- Pedir login/senha da URBS (processo administrativo, LAI ou protocolo presencial — não é tarefa de código).
+- Com credencial: script de pré-processamento fora do app (Node) chamando `getLinhas`/`getPontosLinha`/`getShapeLinha`/`getTrechosItinerarios` no máximo ~1x/dia, gerando o JSON estático que substitui `curitibaDataset.ts` (plano já descrito em [SSD.md](SSD.md) §6); posição de veículo via `getVeiculosLinha` (sem parâmetro `linha`, que já retorna todos) com polling comedido no app.
 
 ## 9. Fora deste documento
 Identidade visual e tokens: [DESIGN.md](../DESIGN.md). Arquitetura, modelo de dados e fluxos: [SSD.md](SSD.md). Testes: [TDD.md](TDD.md). Segurança: [SECURITY.md](SECURITY.md). Privacidade: [PRIVACY.md](PRIVACY.md).
