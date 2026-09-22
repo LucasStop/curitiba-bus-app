@@ -1,6 +1,6 @@
 import { FormField } from '@/components/auth/FormField';
-import { authScreenStyles as s } from '@/components/auth/authScreenStyles';
-import { Colors } from '@/constants/theme';
+import { useAuthScreenStyles } from '@/components/auth/authScreenStyles';
+import { useTheme } from '@/hooks/use-theme';
 import { RESET_SENT_MESSAGE } from '@/lib/authErrors';
 import { validateEmail } from '@/lib/validation';
 import { useAuth } from '@/providers/AuthProvider';
@@ -12,6 +12,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function ForgotPasswordScreen() {
   const router = useRouter();
   const { resetPassword } = useAuth();
+  const s = useAuthScreenStyles();
+  const theme = useTheme();
 
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -76,7 +78,7 @@ export default function ForgotPasswordScreen() {
                 accessibilityRole="button"
                 accessibilityLabel="Enviar link de recuperação"
                 accessibilityState={{ disabled: submitting, busy: submitting }}>
-                {submitting ? <ActivityIndicator color={Colors.light.onPrimary} /> : <Text style={s.primaryButtonText}>Enviar link</Text>}
+                {submitting ? <ActivityIndicator color={theme.onPrimary} /> : <Text style={s.primaryButtonText}>Enviar link</Text>}
               </TouchableOpacity>
             </>
           )}

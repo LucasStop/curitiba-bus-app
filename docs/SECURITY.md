@@ -17,20 +17,20 @@ Escopo: app Expo (iOS/Android), projeto Supabase (Auth + Postgres + Edge Functio
 ## 2. Ameaças e controles
 | # | Ameaça | Controle | Estado |
 |---|---|---|---|
-| T1 | Segredo vazado no repositório público | gitleaks no pre-commit (lefthook), secret scanning e push protection do GitHub, `.env*.local` ignorado, `.env.example` sem valores, segredos só em EAS secrets | Ativo (exceto `.env.example`, ainda a criar; secret scanning e push protection dependem de configuração do dono no GitHub) |
+| T1 | Segredo vazado no repositório público | gitleaks no pre-commit (lefthook), secret scanning e push protection do GitHub, `.env*.local` ignorado, `.env.example` sem valores, segredos só em EAS secrets | Ativo (exceto `.env.example`, ainda a criar); secret scanning e push protection confirmados habilitados no GitHub em 22/09/2026 |
 | T2 | Usuário A lê ou altera dados do usuário B | RLS ligada em toda tabela, políticas por `(select auth.uid()) = user_id`, testes de isolamento com duas contas (R1 a R5) | Backend feito e testado; falta o app |
 | T3 | `service_role` exposta no app | Nunca no bundle nem no repo; só na Edge Function, que a recebe do ambiente do Supabase | Proposto |
 | T4 | Roubo de sessão no aparelho | Sessão cifrada (AES-256) no AsyncStorage com a chave no `expo-secure-store` (Keychain/Keystore); tokens de vida curta com refresh | Proposto |
 | T5 | Força bruta e enumeração de contas | Rate limits do Supabase Auth, senha mínima de 8, mensagens genéricas em login e recuperação ("e-mail ou senha incorretos"), confirmação de e-mail | Proposto |
 | T6 | Phishing ou desvio no link de recuperação/confirmação | Allowlist de redirect só `curitibabusapp://**`, links de uso único com expiração | Proposto |
 | T7 | Abuso da função de excluir conta | A função valida o JWT e apaga apenas o usuário do próprio token, nunca um id vindo de parâmetro (teste R6) | Backend feito e testado; falta o deploy e o app |
-| T8 | Dependência vulnerável | `yarn audit` no CI (informativo), Dependabot version updates semanais (`.github/dependabot.yml`), `npx expo install --fix`, `resolutions` quando seguro | Parcial: 1 moderada sem correção segura (abaixo); Dependabot alerts/security updates dependem do dono |
+| T8 | Dependência vulnerável | `yarn audit` no CI (informativo), Dependabot version updates semanais (`.github/dependabot.yml`), Dependabot security updates (alerta de vulnerabilidade → PR automático, configuração de repositório, não do `dependabot.yml`), `npx expo install --fix`, `resolutions` quando seguro | Parcial: 1 moderada sem correção segura (abaixo); Dependabot security updates confirmado habilitado no GitHub em 22/09/2026 |
 | T9 | Vazamento de localização | Usada só no aparelho; proibido enviar ou registrar coordenadas | Ativo (não há rede hoje) |
 | T10 | Push malicioso ou histórico reescrito na `main` | Proteção da `main`: PR obrigatório com CI verde, sem force push | Proposto (hoje desprotegida) |
 | T11 | Permissões excessivas no CI | `permissions: contents: read` no workflow; ações fixadas por versão | Parcial: `permissions: contents: read` ativo; ações ainda por tag (`@v4`), não por SHA (o Dependabot `github-actions` mantém as versões em dia) |
 | T12 | Dado pessoal em issue, doc ou log | Repo é público: nada de e-mail, token ou coordenada real em docs, issues, screenshots ou logs | Regra |
 
-### Auditoria de dependências (T8), estado em 21/09/2026
+### Auditoria de dependências (T8), estado em 21/09/2026 (revalidado em 22/09/2026)
 `yarn audit` acusava 5 moderadas transitivas. São dois advisories:
 
 | Pacote | Advisory | Caminho | Estado |
@@ -41,6 +41,8 @@ Escopo: app Expo (iOS/Android), projeto Supabase (Auth + Postgres + Edge Functio
 Por que `decode-uri-component` não foi forçado: as versões corrigidas (0.3+) são só ESM (`"type": "module"`, `export default`) e o `query-string@7` faz `require('decode-uri-component')`. Testado: `require()` da 0.5.0 devolve `{ __esModule, default }` em vez da função, então o parse de query string do `expo-router` quebraria em runtime. `query-string` 8+ também é só ESM e é dependência fixada pelo `expo-router` (`^7.1.3`); trocar exige upgrade do `expo-router`, fora deste escopo.
 
 Mitigação: o pacote roda no cliente e só recebe query strings de deep links e rotas do próprio app (`curitibabusapp://`); o pior caso é travar o app do próprio usuário com um link malformado, sem vazar dado nem executar código. Não há servidor. Reavaliar quando o `expo-router` do SDK seguinte atualizar o `query-string`; o Dependabot abre o PR.
+
+Revalidado em 22/09/2026: `expo-router@57.0.22` (última do SDK 57) continua fixando `query-string@^7.1.3`; `decode-uri-component@0.5.0` continua `"type": "module"` sem export CJS. Nenhuma correção segura nova apareceu; `yarn audit` continua com exatamente essa 1 moderada.
 
 `yarn audit --level high` fecha sem altas/críticas, mas o `yarn` 1 mantém o exit code 4 (moderada) mesmo com `--level`; por isso o passo do CI segue com `continue-on-error`.
 
@@ -59,6 +61,5 @@ Não abra issue pública. Use "Report a vulnerability" na aba Security do reposi
 - Habilitar private vulnerability reporting e proteção da `main` no GitHub.
 - Criar `.env.example` (`EXPO_PUBLIC_SUPABASE_URL=` e `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=`, sem valores).
 - Resolver ou aceitar formalmente a moderada de `decode-uri-component` (T8) e então tornar o `yarn audit` bloqueante.
-- Habilitar Dependabot alerts/security updates e secret scanning com push protection no GitHub (decisão do dono).
 - Medir T2 e T7 com testes reais (docs/TDD.md, casos R1 a R6).
 - Revisão de segurança independente antes do release nas lojas.

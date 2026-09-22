@@ -1,3 +1,7 @@
+# Dependabot security updates (PR automatico a partir de um alerta de vulnerabilidade)
+# sao uma configuracao de repositorio (Settings > Code security), nao deste arquivo.
+# Confirmado habilitado em 22/09/2026 (docs/SECURITY.md T8). Este arquivo so cobre
+# version updates agendadas.
 version: 2
 updates:
   # O repo usa yarn.lock; o Dependabot cobre yarn v1 pelo ecossistema "npm".
