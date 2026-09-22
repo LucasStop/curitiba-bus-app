@@ -14,7 +14,7 @@ Cada seção tem **Hoje** (auditado no código em 21/09/2026) e **Decisão/Propo
   - **Waze:** contraste da rota contra água e verde (rota nunca parecida com água); seta de rumo no veículo.
 - Anti-referências: cara de template Expo, degradês genéricos, emoji decorativo, humor em erro ou atraso, personalização de veículo, anúncios, fonte paga.
 - Diferenciais frente aos apps atuais: sem anúncio; "dado de X min atrás" sempre visível (ataca a queixa de "ônibus previsto que não vem"); sem login obrigatório; filtro de rota acessível.
-- **Nome do produto (provisório): "Buser".** Decidido para uso interno até a publicação nas lojas. Colide com um app já publicado de passagens de ônibus interurbano ([buser.com.br](https://www.buser.com.br/), Google Play e App Store): mesma categoria, mesmas lojas. **Trocar antes de publicar** — colisão de nome é motivo comum de rejeição na revisão da loja e risco de marca. Candidatos alternativos da pesquisa: Tubo, Pinhão, Ligeiro. Evitar nome com "Curitiba" sozinho, "URBS", "CWBus" (site cwbus.com.br sobre mobilidade de Curitiba, mais apps homônimos na Coreia), "Ponto Certo" e "X no Ponto". Antes de fechar o nome definitivo: busca no Google Play, App Store e INPI (classes 9, 38 e 42); a pesquisa usou só busca web dos EUA e não prova ausência.
+- **Nome do produto: "Busier".** Decidido em 22/09/2026. Escolhido para diferenciar do app homônimo próximo "Buser" (buser.com.br, passagens interurbanas) e evitar a colisão direta identificada na pesquisa anterior. Como o app é um projeto acadêmico e não vai para publicação comercial nas lojas por ora, a busca formal de anterioridade (Google Play, App Store, INPI) fica dispensada — reavaliar apenas se o projeto migrar para publicação real.
 - **Não oficial:** o app não é da Prefeitura nem da URBS. A tela "Sobre" diz isso e cita a fonte dos dados.
 
 ## Cores (tokens)
@@ -89,11 +89,11 @@ Grade de 4 px. Raios: `sm=8`, `md=12`, `lg=16`, `pill=999` (cobre 16 dos usos e 
 - Excluir conta: ação destrutiva com confirmação em duas etapas e texto do que será apagado (e-mail e favoritos).
 
 ## Ativos de marca
-Hoje o ícone, o splash (fundo `#208AEF`) e os logos de exemplo são os do template Expo. Faltam: ícone do app (1024 px), splash, ícone adaptativo do Android, e remover os assets de exemplo (`react-logo*`, `expo-badge*`, `tutorial-web.png`, `tabIcons/explore.png`).
+**Aplicado em 22/09/2026.** Ícone, splash e ícone adaptativo do Android gerados na direção cápsula-tubo (ver abaixo) e aplicados em `app.json`. Removidos os assets de exemplo do template Expo (`react-logo*`, `expo-badge*`, `expo-logo.png`, `logo-glow.png`, `tutorial-web.png`, `tabIcons/`, `assets/expo.icon/`) e os componentes órfãos que só os usavam (`web-badge.tsx`, `animated-icon.tsx`/`.web.tsx`).
 
 **Decidido: direção do ícone = cápsula-tubo.** Pílula horizontal branca com um ponto e uma faixa, sobre fundo no azul primário `#0369A1`. Evoca a estação-tubo, legível a 29 pt, sem cor de linha. Formas geométricas próprias.
 - Não usar: brasão de Curitiba, logos da Prefeitura e da URBS, o pictograma oficial do tubo, o pin do Maps, o Wazer, o pin verde do Transit, o laranja do Moovit. Splash no mesmo primário.
-- O nome ainda é pendente (seção Brand); o ícone não leva texto até lá.
+- Sem texto no ícone (nome "Busier" já fechado, mas mantém a direção sem texto por legibilidade em tamanho pequeno).
 
 ## Tom e voz (microcopy)
 - Idioma: pt-BR. Tratamento: "você", informal e curto, acolhedor. Sem humor em erro ou atraso; instrução acionável.

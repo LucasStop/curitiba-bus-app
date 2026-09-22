@@ -2,6 +2,8 @@ import { Eye, EyeOff } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, type TextInputProps, TouchableOpacity, View } from 'react-native';
 
+import { Colors } from '@/constants/theme';
+
 interface FormFieldProps extends TextInputProps {
   label: string;
   /** Mensagem em pt-BR abaixo do campo. O erro nunca é indicado só por cor (DESIGN.md). */
@@ -22,7 +24,7 @@ export function FormField({ label, error, isPassword, testID, ...inputProps }: F
           {...inputProps}
           secureTextEntry={isPassword ? hidden : inputProps.secureTextEntry}
           style={[styles.input, isPassword && styles.inputWithIcon, error ? styles.inputError : null]}
-          placeholderTextColor="#94A3B8"
+          placeholderTextColor={Colors.light.textSubtle}
           testID={testID}
           accessibilityLabel={label}
         />
@@ -33,7 +35,11 @@ export function FormField({ label, error, isPassword, testID, ...inputProps }: F
             testID={`${testID}-toggle-visibility`}
             accessibilityRole="button"
             accessibilityLabel={hidden ? 'Mostrar senha' : 'Ocultar senha'}>
-            {hidden ? <Eye size={20} color="#64748B" /> : <EyeOff size={20} color="#64748B" />}
+            {hidden ? (
+              <Eye size={20} color={Colors.light.textMuted} />
+            ) : (
+              <EyeOff size={20} color={Colors.light.textMuted} />
+            )}
           </TouchableOpacity>
         )}
       </View>
@@ -53,7 +59,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#334155',
+    color: Colors.light.text,
     marginBottom: 6,
   },
   inputRow: {
@@ -62,19 +68,19 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: Colors.light.border,
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
-    color: '#0F172A',
-    backgroundColor: '#FFFFFF',
+    color: Colors.light.text,
+    backgroundColor: Colors.light.surface,
   },
   inputWithIcon: {
     paddingRight: 44,
   },
   inputError: {
-    borderColor: '#DC2626',
+    borderColor: Colors.light.danger,
   },
   eyeButton: {
     position: 'absolute',
@@ -84,6 +90,6 @@ const styles = StyleSheet.create({
   error: {
     marginTop: 6,
     fontSize: 12,
-    color: '#DC2626',
+    color: Colors.light.danger,
   },
 });

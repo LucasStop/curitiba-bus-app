@@ -1,12 +1,13 @@
 import { BusBadge } from '@/components/ui/BusBadge';
 import { CategoryPills } from '@/components/ui/CategoryPills';
+import { Colors } from '@/constants/theme';
 import { CURITIBA_LINES, CURITIBA_STOPS } from '@/data/curitibaDataset';
 import { transitService } from '@/services/transitProvider';
 import { useFavoritesStore } from '@/stores/useFavoritesStore';
 import { useTransitStore } from '@/stores/useTransitStore';
-import { BusLine, BusStop } from '@/types/transit';
+import { BusStop } from '@/types/transit';
 import { formatMinutes } from '@/utils/geo';
-import { ArrowLeftRight, Bookmark, CheckCircle2, ChevronRight, Clock, MapPin, Search } from 'lucide-react-native';
+import { ArrowLeftRight, Bookmark, ChevronRight, Clock, MapPin, Search } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
@@ -74,7 +75,7 @@ export const TransitBottomSheet: React.FC = () => {
               accessibilityRole="button"
               accessibilityState={{ selected: isFav }}
               accessibilityLabel={`${isFav ? 'Remover' : 'Adicionar'} ${selectedStop.nome} dos favoritos`}>
-              <Bookmark size={22} color={isFav ? '#E11D48' : '#94A3B8'} fill={isFav ? '#E11D48' : 'none'} />
+              <Bookmark size={22} color={isFav ? Colors.light.danger : Colors.light.textSubtle} fill={isFav ? Colors.light.danger : 'none'} />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -118,7 +119,7 @@ export const TransitBottomSheet: React.FC = () => {
                   </Text>
                 </View>
                 <View style={styles.etaBadge}>
-                  <Clock size={12} color="#16A34A" />
+                  <Clock size={12} color={Colors.light.success} />
                   <Text style={styles.etaText}>{formatMinutes(arr.minutosAteChegada)}</Text>
                 </View>
               </TouchableOpacity>
@@ -168,7 +169,7 @@ export const TransitBottomSheet: React.FC = () => {
               accessibilityRole="button"
               accessibilityState={{ selected: isFav }}
               accessibilityLabel={`${isFav ? 'Remover' : 'Adicionar'} linha ${selectedLine.codigo} dos favoritos`}>
-              <Bookmark size={22} color={isFav ? '#E11D48' : '#94A3B8'} fill={isFav ? '#E11D48' : 'none'} />
+              <Bookmark size={22} color={isFav ? Colors.light.danger : Colors.light.textSubtle} fill={isFav ? Colors.light.danger : 'none'} />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -189,7 +190,7 @@ export const TransitBottomSheet: React.FC = () => {
             testID="sheet-direction-toggle-button"
             accessibilityRole="button"
             accessibilityLabel={`Sentido atual: ${activeDirection === 'ida' ? 'ida' : 'volta'}. Toque para inverter`}>
-            <ArrowLeftRight size={16} color="#0F172A" />
+            <ArrowLeftRight size={16} color={Colors.light.text} />
             <Text style={styles.directionToggleText}>
               Sentido: {activeDirection === 'ida' ? 'Ida' : 'Volta'} (Inverter)
             </Text>
@@ -211,7 +212,7 @@ export const TransitBottomSheet: React.FC = () => {
                 <View
                   style={[
                     styles.timelineDot,
-                    { backgroundColor: idx === 0 || idx === lineStops.length - 1 ? selectedLine.corHex : '#94A3B8' },
+                    { backgroundColor: idx === 0 || idx === lineStops.length - 1 ? selectedLine.corHex : Colors.light.textSubtle },
                   ]}
                 />
                 {idx < lineStops.length - 1 && <View style={styles.timelineLine} />}
@@ -220,7 +221,7 @@ export const TransitBottomSheet: React.FC = () => {
                 <Text style={styles.timelineStopName}>{stop.nome}</Text>
                 <Text style={styles.timelineStopBairro}>Bairro {stop.bairro}</Text>
               </View>
-              <ChevronRight size={16} color="#CBD5E1" />
+              <ChevronRight size={16} color={Colors.light.borderStrong} />
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -245,10 +246,10 @@ export const TransitBottomSheet: React.FC = () => {
 
         {/* Barra de Pesquisa Flutuante */}
         <View style={styles.searchBar}>
-          <Search size={18} color="#64748B" />
+          <Search size={18} color={Colors.light.textMuted} />
           <TextInput
             placeholder="Buscar linha, terminal ou estação-tubo..."
-            placeholderTextColor="#94A3B8"
+            placeholderTextColor={Colors.light.textSubtle}
             style={styles.searchInput}
             value={localSearch}
             onChangeText={setLocalSearch}
@@ -289,7 +290,7 @@ export const TransitBottomSheet: React.FC = () => {
                     {line.terminalOrigem} ➔ {line.terminalDestino}
                   </Text>
                 </View>
-                <ChevronRight size={16} color="#94A3B8" />
+                <ChevronRight size={16} color={Colors.light.textSubtle} />
               </TouchableOpacity>
             ))}
 
@@ -302,12 +303,12 @@ export const TransitBottomSheet: React.FC = () => {
                 testID={`sheet-stop-result-${stop.id}`}
                 accessibilityRole="button"
                 accessibilityLabel={`Parada ${stop.nome}, bairro ${stop.bairro}`}>
-                <MapPin size={18} color="#0284C7" />
+                <MapPin size={18} color={Colors.light.primary} />
                 <View style={{ flex: 1, marginLeft: 10 }}>
                   <Text style={styles.stopCardName}>{stop.nome}</Text>
                   <Text style={styles.stopCardMeta}>Bairro {stop.bairro}</Text>
                 </View>
-                <ChevronRight size={16} color="#CBD5E1" />
+                <ChevronRight size={16} color={Colors.light.borderStrong} />
               </TouchableOpacity>
             ))}
           </>
@@ -322,7 +323,7 @@ export const TransitBottomSheet: React.FC = () => {
                 testID={`sheet-stop-featured-${stop.id}`}
                 accessibilityRole="button"
                 accessibilityLabel={`${stop.tipo === 'terminal' ? 'Terminal' : 'Estação-tubo'} ${stop.nome}, linhas ${stop.linhas.join(', ')}`}>
-                <MapPin size={18} color={stop.tipo === 'terminal' ? '#F59E0B' : '#0284C7'} />
+                <MapPin size={18} color={stop.tipo === 'terminal' ? Colors.light.warning : Colors.light.primary} />
                 <View style={{ flex: 1, marginLeft: 10 }}>
                   <Text style={styles.stopCardName}>{stop.nome}</Text>
                   <Text style={styles.stopCardMeta}>
@@ -330,7 +331,7 @@ export const TransitBottomSheet: React.FC = () => {
                     {stop.linhas.join(', ')}
                   </Text>
                 </View>
-                <ChevronRight size={16} color="#CBD5E1" />
+                <ChevronRight size={16} color={Colors.light.borderStrong} />
               </TouchableOpacity>
             ))}
           </>
@@ -342,7 +343,7 @@ export const TransitBottomSheet: React.FC = () => {
 
 const styles = StyleSheet.create({
   sheetContainer: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.light.surface,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingHorizontal: 16,
@@ -362,7 +363,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 4,
     borderRadius: 2,
-    backgroundColor: '#CBD5E1',
+    backgroundColor: Colors.light.borderStrong,
     marginBottom: 10,
   },
   headerRow: {
@@ -373,16 +374,16 @@ const styles = StyleSheet.create({
   sheetTitle: {
     fontSize: 16,
     fontWeight: '800',
-    color: '#0F172A',
+    color: Colors.light.text,
   },
   sheetSubtitle: {
     fontSize: 12,
-    color: '#64748B',
+    color: Colors.light.textMuted,
     marginTop: 2,
   },
   typeBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: '#E0F2FE',
+    backgroundColor: Colors.light.primaryMuted,
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
@@ -391,7 +392,7 @@ const styles = StyleSheet.create({
   typeBadgeText: {
     fontSize: 9,
     fontWeight: '800',
-    color: '#0369A1',
+    color: Colors.light.primary,
   },
   iconButton: {
     padding: 8,
@@ -400,14 +401,14 @@ const styles = StyleSheet.create({
   closeText: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#64748B',
+    color: Colors.light.textMuted,
   },
   directionToggle: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     alignSelf: 'stretch',
-    backgroundColor: '#F1F5F9',
+    backgroundColor: Colors.light.surfaceMuted,
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 8,
@@ -416,12 +417,12 @@ const styles = StyleSheet.create({
   directionToggleText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#0F172A',
+    color: Colors.light.text,
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F1F5F9',
+    backgroundColor: Colors.light.surfaceMuted,
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -431,18 +432,18 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 14,
-    color: '#0F172A',
+    color: Colors.light.text,
     padding: 0,
   },
   clearSearchText: {
     fontSize: 14,
-    color: '#94A3B8',
+    color: Colors.light.textSubtle,
     fontWeight: '700',
   },
   sectionHeader: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#64748B',
+    color: Colors.light.textMuted,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginVertical: 10,
@@ -455,22 +456,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
+    borderBottomColor: Colors.light.surfaceMuted,
   },
   arrivalLineName: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#0F172A',
+    color: Colors.light.text,
   },
   arrivalMeta: {
     fontSize: 11,
-    color: '#64748B',
+    color: Colors.light.textMuted,
     marginTop: 2,
   },
   etaBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#DCFCE7',
+    backgroundColor: Colors.light.successMuted,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
@@ -479,7 +480,7 @@ const styles = StyleSheet.create({
   etaText: {
     fontSize: 12,
     fontWeight: '800',
-    color: '#16A34A',
+    color: Colors.light.success,
   },
   timelineItem: {
     flexDirection: 'row',
@@ -500,7 +501,7 @@ const styles = StyleSheet.create({
     top: 10,
     bottom: -16,
     width: 2,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: Colors.light.border,
   },
   timelineContent: {
     flex: 1,
@@ -509,27 +510,27 @@ const styles = StyleSheet.create({
   timelineStopName: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#0F172A',
+    color: Colors.light.text,
   },
   timelineStopBairro: {
     fontSize: 11,
-    color: '#64748B',
+    color: Colors.light.textMuted,
   },
   lineSearchCard: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
+    borderBottomColor: Colors.light.surfaceMuted,
   },
   lineCardTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#0F172A',
+    color: Colors.light.text,
   },
   lineCardMeta: {
     fontSize: 11,
-    color: '#64748B',
+    color: Colors.light.textMuted,
     marginTop: 2,
   },
   stopCard: {
@@ -537,16 +538,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
+    borderBottomColor: Colors.light.surfaceMuted,
   },
   stopCardName: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#0F172A',
+    color: Colors.light.text,
   },
   stopCardMeta: {
     fontSize: 11,
-    color: '#64748B',
+    color: Colors.light.textMuted,
     marginTop: 2,
   },
   emptyState: {
@@ -554,7 +555,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    color: '#94A3B8',
+    color: Colors.light.textSubtle,
     fontSize: 13,
   },
 });

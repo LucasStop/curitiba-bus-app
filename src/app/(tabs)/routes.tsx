@@ -1,8 +1,9 @@
 import { BusBadge } from '@/components/ui/BusBadge';
+import { Colors } from '@/constants/theme';
 import { CURITIBA_STOPS } from '@/data/curitibaDataset';
 import { planTransitTrip } from '@/services/tripPlanner';
-import { LatLng, TripPlanOption } from '@/types/transit';
-import { ArrowUpDown, Footprints, MapPin, Navigation, Sparkles } from 'lucide-react-native';
+import { TripPlanOption } from '@/types/transit';
+import { ArrowUpDown, Footprints, Sparkles } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -87,7 +88,7 @@ export default function RoutesScreen() {
             testID="routes-swap-button"
             accessibilityRole="button"
             accessibilityLabel="Inverter origem e destino">
-            <ArrowUpDown size={18} color="#0F172A" />
+            <ArrowUpDown size={18} color={Colors.light.text} />
           </TouchableOpacity>
         </View>
 
@@ -99,7 +100,7 @@ export default function RoutesScreen() {
             testID="routes-quick-chip-0"
             accessibilityRole="button"
             accessibilityLabel="Rota rápida de Rui Barbosa até Cabral">
-            <Sparkles size={12} color="#0284C7" />
+            <Sparkles size={12} color={Colors.light.primary} />
             <Text style={styles.chipText}>Rui Barbosa ➔ Cabral</Text>
           </TouchableOpacity>
 
@@ -109,7 +110,7 @@ export default function RoutesScreen() {
             testID="routes-quick-chip-1"
             accessibilityRole="button"
             accessibilityLabel="Rota rápida de Carlos Gomes até Boqueirão">
-            <Sparkles size={12} color="#0284C7" />
+            <Sparkles size={12} color={Colors.light.primary} />
             <Text style={styles.chipText}>Carlos Gomes ➔ Boqueirão</Text>
           </TouchableOpacity>
 
@@ -119,7 +120,7 @@ export default function RoutesScreen() {
             testID="routes-quick-chip-2"
             accessibilityRole="button"
             accessibilityLabel="Rota rápida de Cabral até Portão">
-            <Sparkles size={12} color="#0284C7" />
+            <Sparkles size={12} color={Colors.light.primary} />
             <Text style={styles.chipText}>Cabral ➔ Portão</Text>
           </TouchableOpacity>
         </ScrollView>
@@ -147,7 +148,7 @@ export default function RoutesScreen() {
               </View>
 
               <View style={styles.walkMeta}>
-                <Footprints size={14} color="#64748B" />
+                <Footprints size={14} color={Colors.light.textMuted} />
                 <Text style={styles.walkText}>{opt.caminhadaTotalMetros}m a pé</Text>
               </View>
             </View>
@@ -160,7 +161,7 @@ export default function RoutesScreen() {
                 <View key={legIdx} style={styles.legRow}>
                   {leg.tipo === 'walk' ? (
                     <View style={styles.walkIconContainer}>
-                      <Footprints size={16} color="#64748B" />
+                      <Footprints size={16} color={Colors.light.textMuted} />
                     </View>
                   ) : (
                     <BusBadge
@@ -193,31 +194,31 @@ export default function RoutesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: Colors.light.background,
   },
   header: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.light.surface,
     paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: Colors.light.border,
   },
   title: {
     fontSize: 22,
     fontWeight: '900',
-    color: '#0F172A',
+    color: Colors.light.text,
   },
   subtitle: {
     fontSize: 13,
-    color: '#64748B',
+    color: Colors.light.textMuted,
     marginTop: 2,
     marginBottom: 12,
   },
   inputsCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F1F5F9',
+    backgroundColor: Colors.light.surfaceMuted,
     borderRadius: 16,
     padding: 12,
   },
@@ -230,19 +231,19 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: '#16A34A',
+    backgroundColor: Colors.light.success,
   },
   vertLine: {
     width: 2,
     height: 32,
-    backgroundColor: '#CBD5E1',
+    backgroundColor: Colors.light.borderStrong,
     marginVertical: 4,
   },
   redDot: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: '#E11D48',
+    backgroundColor: Colors.light.danger,
   },
   fieldsCol: {
     flex: 1,
@@ -254,24 +255,24 @@ const styles = StyleSheet.create({
   fieldLabel: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#94A3B8',
+    color: Colors.light.textSubtle,
     textTransform: 'uppercase',
   },
   fieldText: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#0F172A',
+    color: Colors.light.text,
   },
   fieldDivider: {
     height: 1,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: Colors.light.border,
     marginVertical: 2,
   },
   swapButton: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.light.surface,
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 8,
@@ -287,7 +288,7 @@ const styles = StyleSheet.create({
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#E0F2FE',
+    backgroundColor: Colors.light.primaryMuted,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
@@ -296,7 +297,7 @@ const styles = StyleSheet.create({
   chipText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#0369A1',
+    color: Colors.light.primary,
   },
   resultsList: {
     flex: 1,
@@ -308,12 +309,12 @@ const styles = StyleSheet.create({
   resultsHeader: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#64748B',
+    color: Colors.light.textMuted,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   optionCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.light.surface,
     borderRadius: 16,
     padding: 16,
     shadowColor: '#000',
@@ -335,10 +336,10 @@ const styles = StyleSheet.create({
   durationMinutes: {
     fontSize: 22,
     fontWeight: '900',
-    color: '#0F172A',
+    color: Colors.light.text,
   },
   bestBadge: {
-    backgroundColor: '#DCFCE7',
+    backgroundColor: Colors.light.successMuted,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 6,
@@ -346,18 +347,18 @@ const styles = StyleSheet.create({
   bestBadgeText: {
     fontSize: 10,
     fontWeight: '800',
-    color: '#16A34A',
+    color: Colors.light.success,
   },
   scheduleText: {
     fontSize: 12,
-    color: '#64748B',
+    color: Colors.light.textMuted,
     marginTop: 2,
   },
   walkMeta: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: Colors.light.surfaceMuted,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,
@@ -365,11 +366,11 @@ const styles = StyleSheet.create({
   walkText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#475569',
+    color: Colors.light.textMuted,
   },
   legsDivider: {
     height: 1,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: Colors.light.surfaceMuted,
     marginVertical: 14,
   },
   legsContainer: {
@@ -386,16 +387,16 @@ const styles = StyleSheet.create({
   legInstruction: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#1E293B',
+    color: Colors.light.text,
   },
   legSubtext: {
     fontSize: 11,
-    color: '#64748B',
+    color: Colors.light.textMuted,
     marginTop: 2,
   },
   legDuration: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#64748B',
+    color: Colors.light.textMuted,
   },
 });

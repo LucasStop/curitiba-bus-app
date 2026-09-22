@@ -1,5 +1,6 @@
 import { FormField } from '@/components/auth/FormField';
 import { authScreenStyles as s } from '@/components/auth/authScreenStyles';
+import { Colors } from '@/constants/theme';
 import { validateEmail, validatePassword } from '@/lib/validation';
 import { useAuth } from '@/providers/AuthProvider';
 import { Link, useRouter } from 'expo-router';
@@ -113,7 +114,7 @@ export default function SignUpScreen() {
             accessibilityRole="button"
             accessibilityLabel="Criar conta"
             accessibilityState={{ disabled: submitting, busy: submitting }}>
-            {submitting ? <ActivityIndicator color="#FFFFFF" /> : <Text style={s.primaryButtonText}>Criar conta</Text>}
+            {submitting ? <ActivityIndicator color={Colors.light.onPrimary} /> : <Text style={s.primaryButtonText}>Criar conta</Text>}
           </TouchableOpacity>
 
           <Link href="/(auth)/sign-in" asChild>

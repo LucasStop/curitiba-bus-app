@@ -1,5 +1,5 @@
 import { CURITIBA_LINES, CURITIBA_STOPS } from '@/data/curitibaDataset';
-import { BusLine, BusStop, LatLng, TripLeg, TripPlanOption } from '@/types/transit';
+import { BusStop, LatLng, TripLeg, TripPlanOption } from '@/types/transit';
 import { getDistanceInMeters } from '@/utils/geo';
 
 export function planTransitTrip(origin: LatLng, destination: LatLng): TripPlanOption[] {

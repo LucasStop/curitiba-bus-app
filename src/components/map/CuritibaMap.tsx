@@ -1,9 +1,10 @@
 import { CURITIBA_COORDINATES } from '@/constants/rit';
+import { Colors } from '@/constants/theme';
 import { CURITIBA_STOPS } from '@/data/curitibaDataset';
 import { useLiveVehicles } from '@/hooks/useLiveVehicles';
 import { useTransitStore } from '@/stores/useTransitStore';
 import { BusStop, BusVehicle, LatLng } from '@/types/transit';
-import { Compass, Layers, LocateFixed, Navigation2 } from 'lucide-react-native';
+import { Layers, LocateFixed, Navigation2 } from 'lucide-react-native';
 import React, { useRef } from 'react';
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
@@ -169,7 +170,7 @@ export const CuritibaMap: React.FC<CuritibaMapProps> = ({
             testID="map-toggle-direction-button"
             accessibilityRole="button"
             accessibilityLabel={`Sentido ${activeDirection === 'ida' ? 'ida' : 'volta'}. Toque para inverter o sentido da linha ${selectedLine.codigo}`}>
-            <Navigation2 size={18} color="#FFFFFF" />
+            <Navigation2 size={18} color={Colors.light.surface} />
             <Text style={styles.directionText}>
               {activeDirection === 'ida' ? 'Ida' : 'Volta'}
             </Text>
@@ -183,7 +184,7 @@ export const CuritibaMap: React.FC<CuritibaMapProps> = ({
           testID="map-layers-button"
           accessibilityRole="button"
           accessibilityLabel={`${isMapTrafficVisible ? 'Ocultar' : 'Mostrar'} trânsito no mapa`}>
-          <Layers size={20} color={isMapTrafficVisible ? '#E11D48' : '#334155'} />
+          <Layers size={20} color={isMapTrafficVisible ? Colors.light.primary : Colors.light.text} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -193,7 +194,7 @@ export const CuritibaMap: React.FC<CuritibaMapProps> = ({
           testID="map-locate-button"
           accessibilityRole="button"
           accessibilityLabel="Centralizar mapa na minha localização">
-          <LocateFixed size={20} color="#0284C7" />
+          <LocateFixed size={20} color={Colors.light.primary} />
         </TouchableOpacity>
       </View>
 
@@ -233,7 +234,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.light.surface,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
@@ -246,11 +247,11 @@ const styles = StyleSheet.create({
     width: 'auto',
     flexDirection: 'row',
     paddingHorizontal: 12,
-    backgroundColor: '#0F172A',
+    backgroundColor: Colors.light.text,
     gap: 6,
   },
   directionText: {
-    color: '#FFFFFF',
+    color: Colors.light.surface,
     fontWeight: '700',
     fontSize: 12,
   },
@@ -279,12 +280,12 @@ const styles = StyleSheet.create({
   },
   bannerTitle: {
     flex: 1,
-    color: '#FFFFFF',
+    color: Colors.light.surface,
     fontSize: 13,
     fontWeight: '700',
   },
   bannerClose: {
-    color: '#94A3B8',
+    color: Colors.light.textSubtle,
     fontSize: 16,
     fontWeight: '700',
     paddingHorizontal: 4,
@@ -292,7 +293,7 @@ const styles = StyleSheet.create({
   // Estilos Web Fallback
   webFallbackContainer: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: Colors.light.background,
     padding: 20,
   },
   webHeader: {
@@ -301,24 +302,24 @@ const styles = StyleSheet.create({
   webTitle: {
     fontSize: 20,
     fontWeight: '800',
-    color: '#0F172A',
+    color: Colors.light.text,
   },
   webSubtitle: {
     fontSize: 14,
-    color: '#16A34A',
+    color: Colors.light.success,
     fontWeight: '600',
     marginTop: 4,
   },
   webMapSimulation: {
     flex: 1,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: Colors.light.border,
     borderRadius: 16,
     padding: 16,
     justifyContent: 'space-between',
   },
   webCenterPin: {
     alignSelf: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.light.surface,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
@@ -328,14 +329,14 @@ const styles = StyleSheet.create({
   },
   webCenterText: {
     fontWeight: '700',
-    color: '#0F172A',
+    color: Colors.light.text,
     fontSize: 12,
   },
   webVehicleGrid: {
     gap: 10,
   },
   webVehicleCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.light.surface,
     borderRadius: 10,
     padding: 12,
     borderLeftWidth: 5,
@@ -354,18 +355,18 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   webBadgeText: {
-    color: '#FFFFFF',
+    color: Colors.light.surface,
     fontSize: 11,
     fontWeight: '800',
   },
   webLineName: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#0F172A',
+    color: Colors.light.text,
   },
   webVehicleMeta: {
     fontSize: 11,
-    color: '#64748B',
+    color: Colors.light.textMuted,
     marginTop: 4,
   },
 });
