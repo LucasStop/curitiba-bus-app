@@ -5,7 +5,8 @@ import { useUserLocation } from '@/hooks/useUserLocation';
 import { useTransitStore } from '@/stores/useTransitStore';
 import { BusStop, BusVehicle } from '@/types/transit';
 import React from 'react';
-import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function MapScreen() {
   const { location } = useUserLocation();
@@ -25,7 +26,7 @@ export default function MapScreen() {
   return (
     <View style={styles.container}>
       {/* Barra de Status Superior */}
-      <SafeAreaView style={styles.topSafeArea}>
+      <SafeAreaView style={styles.topSafeArea} edges={['top', 'left', 'right']}>
         <View style={styles.topBar}>
           <View>
             <Text style={styles.appTitle}>Curitiba Ônibus RIT</Text>
