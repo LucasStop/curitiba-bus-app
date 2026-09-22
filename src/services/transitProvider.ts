@@ -1,6 +1,6 @@
 import { CURITIBA_LINES, CURITIBA_STOPS } from '@/data/curitibaDataset';
 import { ArrivalEstimate, BusLine, BusStop, BusVehicle, LatLng } from '@/types/transit';
-import { getBearing, getDistanceInMeters, interpolateLatLng } from '@/utils/geo';
+import { getBearing, getDistanceInMeters, interpolateLatLng, isBusApproachingStop } from '@/utils/geo';
 
 interface VehicleSimState {
   vehicle: BusVehicle;
@@ -164,6 +164,8 @@ class TransitService {
         .filter((b) => b.codLinha === codLinha);
 
       busesOnLine.forEach((bus) => {
+        if (!isBusApproachingStop(line, bus, stop)) return;
+
         const busCoord: LatLng = { latitude: bus.latitude, longitude: bus.longitude };
         const dist = getDistanceInMeters(busCoord, stopCoord);
 
