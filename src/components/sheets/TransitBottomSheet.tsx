@@ -1,6 +1,6 @@
 import { BusBadge } from '@/components/ui/BusBadge';
 import { CategoryPills } from '@/components/ui/CategoryPills';
-import { Colors } from '@/constants/theme';
+import { Colors, Radius, Shadows } from '@/constants/theme';
 import { CURITIBA_LINES, CURITIBA_STOPS } from '@/data/curitibaDataset';
 import { transitService } from '@/services/transitProvider';
 import { useFavoritesStore } from '@/stores/useFavoritesStore';
@@ -351,16 +351,12 @@ export const TransitBottomSheet: React.FC = () => {
 const styles = StyleSheet.create({
   sheetContainer: {
     backgroundColor: Colors.light.surface,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderTopLeftRadius: Radius.lg,
+    borderTopRightRadius: Radius.lg,
     paddingHorizontal: 16,
     paddingTop: 8,
     maxHeight: 380,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 8,
+    ...Shadows.sheet,
   },
   sheetHeader: {
     alignItems: 'center',
@@ -375,7 +371,7 @@ const styles = StyleSheet.create({
   dragHandle: {
     width: 36,
     height: 4,
-    borderRadius: 2,
+    borderRadius: Radius.pill,
     backgroundColor: Colors.light.borderStrong,
     marginBottom: 10,
   },
@@ -399,7 +395,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light.primaryMuted,
     paddingHorizontal: 6,
     paddingVertical: 2,
-    borderRadius: 4,
+    borderRadius: Radius.sm,
     marginBottom: 4,
   },
   typeBadgeText: {
@@ -424,7 +420,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light.surfaceMuted,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 8,
+    borderRadius: Radius.sm,
     marginTop: 10,
   },
   directionToggleText: {
@@ -436,7 +432,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.light.surfaceMuted,
-    borderRadius: 12,
+    borderRadius: Radius.md,
     paddingHorizontal: 12,
     paddingVertical: 8,
     width: '100%',
@@ -487,7 +483,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light.successMuted,
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 6,
+    borderRadius: Radius.sm,
     gap: 4,
   },
   etaText: {
@@ -508,7 +504,7 @@ const styles = StyleSheet.create({
   timelineDot: {
     width: 10,
     height: 10,
-    borderRadius: 5,
+    borderRadius: Radius.pill,
   },
   timelineLine: {
     position: 'absolute',
