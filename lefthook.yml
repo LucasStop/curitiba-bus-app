@@ -9,3 +9,8 @@ pre-commit:
       # ponytail: sem prettier de proposito (formatar o repo todo geraria diff enorme); eslint cobre o basico.
       glob: "*.{js,jsx,ts,tsx}"
       run: npx eslint {staged_files}
+
+commit-msg:
+  commands:
+    titulo:
+      run: bash scripts/check-commit-msg.sh {1}
