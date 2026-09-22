@@ -1,3 +1,4 @@
+import { ConnectionStatus, formatConnectionMessage } from '@/lib/resilience';
 import { transitService } from '@/services/transitProvider';
 import { useTransitStore } from '@/stores/useTransitStore';
 import { BusVehicle } from '@/types/transit';
@@ -5,17 +6,20 @@ import { useEffect, useMemo, useState } from 'react';
 
 export function useLiveVehicles() {
   const [vehicles, setVehicles] = useState<BusVehicle[]>(() => transitService.getVehicles());
+  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(() => transitService.getConnectionStatus());
   const selectedLine = useTransitStore((s) => s.selectedLine);
   const activeCategory = useTransitStore((s) => s.activeCategory);
 
   useEffect(() => {
     // Escuta atualizações periódicas da simulação/API
-    const unsubscribe = transitService.subscribeVehicles((updatedList) => {
+    const unsubscribeVehicles = transitService.subscribeVehicles((updatedList) => {
       setVehicles(updatedList);
     });
+    const unsubscribeStatus = transitService.subscribeConnectionStatus(setConnectionStatus);
 
     return () => {
-      unsubscribe();
+      unsubscribeVehicles();
+      unsubscribeStatus();
     };
   }, []);
 
@@ -37,5 +41,7 @@ export function useLiveVehicles() {
   return {
     vehicles: filteredVehicles,
     totalActive: vehicles.length,
+    isOffline: connectionStatus.state !== 'online',
+    connectionMessage: formatConnectionMessage(connectionStatus),
   };
 }
