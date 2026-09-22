@@ -44,3 +44,6 @@ example
 
 # graphify
 graphify-out/
+
+# screenshots de teste manual (idb, QA) - nunca versionar, pode ter dado de sessão/conta de teste
+docs/qa-prints/
