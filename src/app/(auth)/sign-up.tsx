@@ -1,6 +1,6 @@
 import { FormField } from '@/components/auth/FormField';
-import { authScreenStyles as s } from '@/components/auth/authScreenStyles';
-import { Colors } from '@/constants/theme';
+import { useAuthScreenStyles } from '@/components/auth/authScreenStyles';
+import { useTheme } from '@/hooks/use-theme';
 import { validateEmail, validatePassword } from '@/lib/validation';
 import { useAuth } from '@/providers/AuthProvider';
 import { Link, useRouter } from 'expo-router';
@@ -11,6 +11,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function SignUpScreen() {
   const router = useRouter();
   const { signUp } = useAuth();
+  const s = useAuthScreenStyles();
+  const theme = useTheme();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -114,7 +116,7 @@ export default function SignUpScreen() {
             accessibilityRole="button"
             accessibilityLabel="Criar conta"
             accessibilityState={{ disabled: submitting, busy: submitting }}>
-            {submitting ? <ActivityIndicator color={Colors.light.onPrimary} /> : <Text style={s.primaryButtonText}>Criar conta</Text>}
+            {submitting ? <ActivityIndicator color={theme.onPrimary} /> : <Text style={s.primaryButtonText}>Criar conta</Text>}
           </TouchableOpacity>
 
           <Link href="/(auth)/sign-in" asChild>
