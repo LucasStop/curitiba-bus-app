@@ -1,8 +1,8 @@
 import { Eye, EyeOff } from 'lucide-react-native';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { StyleSheet, Text, TextInput, type TextInputProps, TouchableOpacity, View } from 'react-native';
 
-import { Colors } from '@/constants/theme';
+import { useTheme } from '@/hooks/use-theme';
 
 interface FormFieldProps extends TextInputProps {
   label: string;
@@ -15,6 +15,53 @@ interface FormFieldProps extends TextInputProps {
 
 export function FormField({ label, error, isPassword, testID, ...inputProps }: FormFieldProps) {
   const [hidden, setHidden] = useState(true);
+  const theme = useTheme();
+
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        wrapper: {
+          marginBottom: 16,
+        },
+        label: {
+          fontSize: 13,
+          fontWeight: '700',
+          color: theme.text,
+          marginBottom: 6,
+        },
+        inputRow: {
+          position: 'relative',
+          justifyContent: 'center',
+        },
+        input: {
+          borderWidth: 1,
+          borderColor: theme.border,
+          borderRadius: 12,
+          paddingHorizontal: 14,
+          paddingVertical: 12,
+          fontSize: 15,
+          color: theme.text,
+          backgroundColor: theme.surface,
+        },
+        inputWithIcon: {
+          paddingRight: 44,
+        },
+        inputError: {
+          borderColor: theme.danger,
+        },
+        eyeButton: {
+          position: 'absolute',
+          right: 8,
+          padding: 8,
+        },
+        error: {
+          marginTop: 6,
+          fontSize: 12,
+          color: theme.danger,
+        },
+      }),
+    [theme],
+  );
 
   return (
     <View style={styles.wrapper}>
@@ -24,7 +71,7 @@ export function FormField({ label, error, isPassword, testID, ...inputProps }: F
           {...inputProps}
           secureTextEntry={isPassword ? hidden : inputProps.secureTextEntry}
           style={[styles.input, isPassword && styles.inputWithIcon, error ? styles.inputError : null]}
-          placeholderTextColor={Colors.light.textSubtle}
+          placeholderTextColor={theme.textSubtle}
           testID={testID}
           accessibilityLabel={label}
         />
@@ -36,9 +83,9 @@ export function FormField({ label, error, isPassword, testID, ...inputProps }: F
             accessibilityRole="button"
             accessibilityLabel={hidden ? 'Mostrar senha' : 'Ocultar senha'}>
             {hidden ? (
-              <Eye size={20} color={Colors.light.textMuted} />
+              <Eye size={20} color={theme.textMuted} />
             ) : (
-              <EyeOff size={20} color={Colors.light.textMuted} />
+              <EyeOff size={20} color={theme.textMuted} />
             )}
           </TouchableOpacity>
         )}
@@ -51,45 +98,3 @@ export function FormField({ label, error, isPassword, testID, ...inputProps }: F
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  wrapper: {
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: Colors.light.text,
-    marginBottom: 6,
-  },
-  inputRow: {
-    position: 'relative',
-    justifyContent: 'center',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: Colors.light.border,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 15,
-    color: Colors.light.text,
-    backgroundColor: Colors.light.surface,
-  },
-  inputWithIcon: {
-    paddingRight: 44,
-  },
-  inputError: {
-    borderColor: Colors.light.danger,
-  },
-  eyeButton: {
-    position: 'absolute',
-    right: 8,
-    padding: 8,
-  },
-  error: {
-    marginTop: 6,
-    fontSize: 12,
-    color: Colors.light.danger,
-  },
-});
