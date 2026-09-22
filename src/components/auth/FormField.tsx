@@ -71,7 +71,7 @@ export function FormField({ label, error, isPassword, testID, ...inputProps }: F
           {...inputProps}
           secureTextEntry={isPassword ? hidden : inputProps.secureTextEntry}
           style={[styles.input, isPassword && styles.inputWithIcon, error ? styles.inputError : null]}
-          placeholderTextColor={theme.textSubtle}
+          placeholderTextColor={theme.textMuted}
           testID={testID}
           accessibilityLabel={label}
         />
@@ -79,6 +79,7 @@ export function FormField({ label, error, isPassword, testID, ...inputProps }: F
           <TouchableOpacity
             onPress={() => setHidden((h) => !h)}
             style={styles.eyeButton}
+            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
             testID={`${testID}-toggle-visibility`}
             accessibilityRole="button"
             accessibilityLabel={hidden ? 'Mostrar senha' : 'Ocultar senha'}>

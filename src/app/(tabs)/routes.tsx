@@ -135,6 +135,7 @@ export default function RoutesScreen() {
           <TouchableOpacity
             onPress={handleSwap}
             style={styles.swapButton}
+            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
             activeOpacity={0.7}
             testID="routes-swap-button"
             accessibilityRole="button"
@@ -380,7 +381,8 @@ const styles = StyleSheet.create({
   fieldLabel: {
     fontSize: 10,
     fontWeight: '700',
-    color: Colors.light.textSubtle,
+    // ponytail: textMuted on surfaceMuted is 4.34:1, just under AA 4.5:1 for 10pt text.
+    color: Colors.light.text,
     textTransform: 'uppercase',
   },
   fieldText: {
@@ -472,7 +474,8 @@ const styles = StyleSheet.create({
   bestBadgeText: {
     fontSize: 10,
     fontWeight: '800',
-    color: Colors.light.success,
+    // ponytail: success on successMuted is 3:1, fails AA 4.5:1 for 10pt text.
+    color: Colors.light.text,
   },
   scheduleText: {
     fontSize: 12,
@@ -491,7 +494,8 @@ const styles = StyleSheet.create({
   walkText: {
     fontSize: 11,
     fontWeight: '600',
-    color: Colors.light.textMuted,
+    // ponytail: textMuted on surfaceMuted is 4.34:1, just under AA 4.5:1 for 11pt text.
+    color: Colors.light.text,
   },
   legsDivider: {
     height: 1,
