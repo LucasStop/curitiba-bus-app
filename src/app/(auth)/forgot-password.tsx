@@ -21,7 +21,7 @@ export default function ForgotPasswordScreen() {
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
 
-  async function onSubmit() {
+  async function handleSubmit() {
     const eErr = validateEmail(email);
     setEmailError(eErr);
     setFormError(null);
@@ -72,7 +72,7 @@ export default function ForgotPasswordScreen() {
 
               <TouchableOpacity
                 style={[s.primaryButton, submitting && s.buttonDisabled]}
-                onPress={onSubmit}
+                onPress={handleSubmit}
                 disabled={submitting}
                 testID="forgot-password-submit"
                 accessibilityRole="button"
