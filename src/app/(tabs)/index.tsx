@@ -1,20 +1,58 @@
-import { CuritibaMap } from '@/components/map/CuritibaMap';
-import { TransitBottomSheet } from '@/components/sheets/TransitBottomSheet';
-import { Colors, Radius, Typography } from '@/constants/theme';
-import { useLiveVehicles } from '@/hooks/useLiveVehicles';
-import { useUserLocation } from '@/hooks/useUserLocation';
-import { useTransitStore } from '@/stores/useTransitStore';
-import { BusStop, BusVehicle } from '@/types/transit';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { CuritibaMap } from "@/components/map/CuritibaMap";
+import { TransitBottomSheet } from "@/components/sheets/TransitBottomSheet";
+import { Spacing, Typography } from "@/constants/theme";
+import { useTheme } from "@/hooks/use-theme";
+import { useLiveVehicles } from "@/hooks/useLiveVehicles";
+import { useUserLocation } from "@/hooks/useUserLocation";
+import { useTransitStore } from "@/stores/useTransitStore";
+import { BusStop, BusVehicle } from "@/types/transit";
+import { useMemo } from "react";
+import { StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function MapScreen() {
   const { location } = useUserLocation();
-  const { totalActive, connectionMessage } = useLiveVehicles();
+  const { connectionMessage } = useLiveVehicles();
+  const theme = useTheme();
 
   const setSelectedStop = useTransitStore((s) => s.setSelectedStop);
   const setSelectedVehicle = useTransitStore((s) => s.setSelectedVehicle);
+
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        container: {
+          flex: 1,
+          backgroundColor: theme.background,
+        },
+        // Mapa ocupa a tela inteira, inclusive atrás do status bar (DESIGN.md: fim da faixa de título).
+        mapWrapper: StyleSheet.absoluteFill,
+        topSafeArea: {
+          zIndex: 10,
+        },
+        connectionBanner: {
+          backgroundColor: theme.warningMuted,
+          paddingHorizontal: Spacing.three,
+          paddingVertical: Spacing.two,
+        },
+        connectionBannerText: {
+          fontSize: Typography.label.fontSize,
+          lineHeight: Typography.label.lineHeight,
+          fontWeight: "600",
+          color: theme.text,
+        },
+
+        // Sai do fluxo flex: fica ancorado no rodapé independente da altura do mapa/topo.
+        sheetPositioner: {
+          position: "absolute",
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 20,
+        },
+      }),
+    [theme],
+  );
 
   const handleSelectVehicle = (vehicle: BusVehicle) => {
     setSelectedVehicle(vehicle);
@@ -26,35 +64,7 @@ export default function MapScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Barra de Status Superior */}
-      <SafeAreaView style={styles.topSafeArea} edges={['top', 'left', 'right']}>
-        <View style={styles.topBar}>
-          <View>
-            <Text style={styles.appTitle}>Curitiba Ônibus RIT</Text>
-            <Text style={styles.appSubtitle}>Navegação e rastreamento ao vivo</Text>
-          </View>
-          <View
-            style={styles.liveIndicator}
-            testID="map-live-indicator"
-            accessible
-            accessibilityLabel={`${totalActive} ônibus ao vivo agora`}>
-            <View style={styles.pulseDot} />
-            <Text style={styles.liveText}>{totalActive} ao vivo</Text>
-          </View>
-        </View>
-        {connectionMessage && (
-          <View
-            style={styles.connectionBanner}
-            testID="map-connection-banner"
-            accessible
-            accessibilityLiveRegion="polite"
-            accessibilityLabel={connectionMessage}>
-            <Text style={styles.connectionBannerText}>{connectionMessage}</Text>
-          </View>
-        )}
-      </SafeAreaView>
-
-      {/* Mapa Principal Interativo */}
+      {/* Mapa Principal Interativo, full-bleed */}
       <View style={styles.mapWrapper}>
         <CuritibaMap
           userLocation={location}
@@ -63,82 +73,25 @@ export default function MapScreen() {
         />
       </View>
 
+      {/* Camada transparente no topo: erro ancorado + pílulas flutuantes de busca/status */}
+      <SafeAreaView style={styles.topSafeArea} edges={["top", "left", "right"]}>
+        {connectionMessage && (
+          <View
+            style={styles.connectionBanner}
+            testID="map-connection-banner"
+            accessible
+            accessibilityLiveRegion="polite"
+            accessibilityLabel={connectionMessage}
+          >
+            <Text style={styles.connectionBannerText}>{connectionMessage}</Text>
+          </View>
+        )}
+      </SafeAreaView>
+
       {/* Gaveta de Informações Deslizante */}
-      <TransitBottomSheet />
+      <View style={styles.sheetPositioner}>
+        <TransitBottomSheet />
+      </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.light.text,
-  },
-  topSafeArea: {
-    backgroundColor: Colors.light.surface,
-    zIndex: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 4,
-  },
-  topBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    backgroundColor: Colors.light.surface,
-  },
-  appTitle: {
-    fontSize: Typography.screenTitle.fontSize,
-    lineHeight: Typography.screenTitle.lineHeight,
-    fontWeight: '900',
-    color: Colors.light.text,
-    letterSpacing: -0.5,
-  },
-  appSubtitle: {
-    fontSize: Typography.label.fontSize,
-    lineHeight: Typography.label.lineHeight,
-    color: Colors.light.textMuted,
-    fontWeight: '500',
-  },
-  liveIndicator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.light.successMuted,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: Radius.pill,
-    gap: 6,
-  },
-  pulseDot: {
-    width: 8,
-    height: 8,
-    borderRadius: Radius.pill,
-    backgroundColor: Colors.light.success,
-  },
-  liveText: {
-    fontSize: Typography.label.fontSize,
-    lineHeight: Typography.label.lineHeight,
-    fontVariant: ['tabular-nums'],
-    fontWeight: '700',
-    // ponytail: Colors.light.success on successMuted is ~3:1, fails AA 4.5:1 for text this size.
-    // text passes easily; green meaning stays carried by the dot + badge background.
-    color: Colors.light.text,
-  },
-  connectionBanner: {
-    backgroundColor: Colors.light.warningMuted,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  connectionBannerText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: Colors.light.text,
-  },
-  mapWrapper: {
-    flex: 1,
-  },
-});
