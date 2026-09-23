@@ -113,5 +113,9 @@ Grade de 4 px. Raios: `sm=8`, `md=12`, `lg=16`, `pill=999` (cobre 16 dos usos e 
 2. Aprovar a escala tipográfica (com o ETA em 32) e a de raios.
 3. Aprovar a tabela de categorias RIT e a fusão Troncal/Convencional.
 4. Busca de anterioridade do nome (Play, App Store, INPI) antes do release.
+5. **Busca sem acesso direto no mapa** — Google Maps, Waze e Moovit têm busca fixa e visível no topo da tela de mapa; a nossa vive dentro do `TransitBottomSheet` e exige puxar o sheet. Decidir se vale um atalho de busca sempre visível sobre o mapa (ver `docs/MAPEAMENTO_TELAS.md` §1 e §6).
+6. **Planejador sem preview de trajeto no mapa** — Google Maps e Moovit desenham a rota antes/durante a escolha do itinerário; `routes.tsx` só lista em texto. Decidir se justifica a complexidade de integrar mapa + lista no mesmo fluxo (ver `docs/MAPEAMENTO_TELAS.md` §3 e §6).
+7. **Sem atalho de "destino frequente" na home** — Moovit resolve a viagem mais comum do usuário sem abrir o planejador. Avaliar se cabe no escopo do MVP (ver `docs/MAPEAMENTO_TELAS.md` §6).
+8. **Onboarding não comunica "zero anúncio/zero login obrigatório"** — Curitiba App usa um splash de marketing pra isso; nosso app vai direto ao formulário de login. Decidir se um passo de apresentação vale o atrito extra (ver `docs/MAPEAMENTO_TELAS.md` §5 e §6).
 
 Fontes da pesquisa (21/09/2026): Transit (blog.transitapp.com, help.transitapp.com), Moovit (moovit.com/features/accessibility), Google Maps e Waze (developers.google.com/maps, Pentagram), Material 3 e Apple HIG (sheets, tab bars, maps, accessibility), Wikipédia pt (Rede Integrada de Transporte), Bandab e Gazeta do Povo (cores dos ônibus), Manual de Identidade Visual v1.2 da Prefeitura de Curitiba.
