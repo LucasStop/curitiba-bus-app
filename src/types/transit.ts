@@ -21,7 +21,7 @@ export interface BusVehicle {
   lotacao?: 'baixa' | 'media' | 'alta';
   arCondicionado: boolean;
   acessivelPCD: boolean;
-  ultimaAtualizacao: string;
+  ultimaAtualizacaoTs: number;
 }
 
 export interface BusStop {
@@ -45,6 +45,7 @@ export interface BusLine {
   tarifa: number;
   horarioFuncionamento: string;
   frequenciaMinutosPico: number;
+  temTempoReal: boolean;
   trajetoIda: LatLng[];
   trajetoVolta: LatLng[];
   paradasIda: string[]; // IDs das paradas
@@ -61,6 +62,9 @@ export interface ArrivalEstimate {
   veiculoPrefixo: string;
   acessivelPCD: boolean;
   lotacao?: 'baixa' | 'media' | 'alta';
+  isRealtime: boolean;
+  geradoEmTs: number;
+  previstoParaTs: number;
 }
 
 export interface TransitAlert {

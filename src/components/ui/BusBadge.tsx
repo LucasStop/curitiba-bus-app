@@ -1,5 +1,6 @@
 import { RIT_CATEGORIES } from '@/constants/rit';
 import { Radius, Shadows } from '@/constants/theme';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { BusCategory } from '@/types/transit';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
@@ -17,8 +18,10 @@ export const BusBadge: React.FC<BusBadgeProps> = ({
   corHex,
   size = 'medium',
 }) => {
+  const isDark = useColorScheme() === 'dark';
   const categoryConfig = RIT_CATEGORIES[categoria];
-  const bg = corHex || categoryConfig?.corHex || RIT_CATEGORIES.expresso.corHex;
+  const fallback = isDark ? RIT_CATEGORIES.expresso.corHexDark : RIT_CATEGORIES.expresso.corHex;
+  const bg = corHex || (isDark ? categoryConfig?.corHexDark : categoryConfig?.corHex) || fallback;
   const textColor = categoryConfig?.textColor || '#FFFFFF';
   const borderHex = categoryConfig?.borderHex;
 

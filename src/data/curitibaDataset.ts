@@ -141,6 +141,9 @@ export const CURITIBA_LINES: BusLine[] = [
     tarifa: 6.0,
     horarioFuncionamento: '05:00 - 00:30',
     frequenciaMinutosPico: 3,
+    // AVL embarcado chega primeiro no eixo estrutural (canaleta): Expresso e Ligeirão. Ligeirinho,
+    // interbairros e alimentador rodam em pista comum e ficam sem previsão em tempo real por ora.
+    temTempoReal: true,
     trajetoIda: [
       { latitude: -25.3780, longitude: -49.2290 }, // Santa Cândida
       { latitude: -25.3900, longitude: -49.2400 },
@@ -201,6 +204,7 @@ export const CURITIBA_LINES: BusLine[] = [
     tarifa: 6.0,
     horarioFuncionamento: '05:30 - 23:50',
     frequenciaMinutosPico: 4,
+    temTempoReal: true,
     trajetoIda: [
       { latitude: -25.4330, longitude: -49.2708 }, // Carlos Gomes
       { latitude: -25.4370, longitude: -49.2680 }, // Eufrásio Correia
@@ -245,6 +249,7 @@ export const CURITIBA_LINES: BusLine[] = [
     tarifa: 6.0,
     horarioFuncionamento: '05:15 - 23:45',
     frequenciaMinutosPico: 5,
+    temTempoReal: false,
     trajetoIda: [
       { latitude: -25.4380, longitude: -49.3080 }, // Campina do Siqueira
       { latitude: -25.4360, longitude: -49.2900 },
@@ -283,6 +288,7 @@ export const CURITIBA_LINES: BusLine[] = [
     tarifa: 6.0,
     horarioFuncionamento: '05:00 - 00:00',
     frequenciaMinutosPico: 6,
+    temTempoReal: false,
     trajetoIda: [
       { latitude: -25.4055, longitude: -49.2520 }, // Cabral
       { latitude: -25.4300, longitude: -49.2300 }, // Tarumã
@@ -327,6 +333,7 @@ export const CURITIBA_LINES: BusLine[] = [
     tarifa: 6.0,
     horarioFuncionamento: '05:40 - 23:30',
     frequenciaMinutosPico: 8,
+    temTempoReal: false,
     trajetoIda: [
       { latitude: -25.4055, longitude: -49.2520 },
       { latitude: -25.4200, longitude: -49.2600 },
