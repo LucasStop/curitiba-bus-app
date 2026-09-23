@@ -15,7 +15,7 @@ function walkMinutes(distanceMeters: number): number {
 // caminhada curta, sem sair do terminal.
 const TRANSFER_MINUTES = 3;
 
-export interface ItinerarioTrecho {
+export interface TransferLeg {
   sentido: 'ida' | 'volta';
   quantidadeParadas: number;
 }
@@ -24,21 +24,21 @@ export interface ItinerarioTrecho {
 // Retorna null quando o embarque vem depois do desembarque nos dois
 // sentidos — nesse caso a linha não serve para o par de paradas.
 // Caso degenerado (mesma parada): trecho zero, sentido ida.
-export function itinerarioEntre(
+export function buildItineraryBetween(
   line: BusLine,
-  embarqueId: string,
-  desembarqueId: string
-): ItinerarioTrecho | null {
-  if (embarqueId === desembarqueId) {
+  boardingStopId: string,
+  alightingStopId: string
+): TransferLeg | null {
+  if (boardingStopId === alightingStopId) {
     return { sentido: 'ida', quantidadeParadas: 0 };
   }
   const sentidos: ('ida' | 'volta')[] = ['ida', 'volta'];
   for (const sentido of sentidos) {
     const paradas = sentido === 'ida' ? line.paradasIda : line.paradasVolta;
-    const embarqueIdx = paradas.indexOf(embarqueId);
-    const desembarqueIdx = paradas.indexOf(desembarqueId);
-    if (embarqueIdx >= 0 && desembarqueIdx > embarqueIdx) {
-      return { sentido, quantidadeParadas: desembarqueIdx - embarqueIdx };
+    const boardingIdx = paradas.indexOf(boardingStopId);
+    const alightingIdx = paradas.indexOf(alightingStopId);
+    if (boardingIdx >= 0 && alightingIdx > boardingIdx) {
+      return { sentido, quantidadeParadas: alightingIdx - boardingIdx };
     }
   }
   return null;
@@ -81,7 +81,7 @@ export function planTransitTrip(origin: LatLng, destination: LatLng): TripPlanOp
         // P8: a linha só serve se o embarque vier antes do desembarque
         // no itinerário real (ida ou volta). P7: a contagem de paradas
         // vem desse trecho, nunca de número fixo.
-        const trecho = itinerarioEntre(line, oStop.id, dStop.id);
+        const trecho = buildItineraryBetween(line, oStop.id, dStop.id);
         if (!trecho) return;
 
         const walkToStopMeters = getDistanceInMeters(origin, {
@@ -166,8 +166,8 @@ export function planTransitTrip(origin: LatLng, destination: LatLng): TripPlanOp
             // P8: os dois trechos precisam respeitar o sentido dos
             // itinerários (embarque antes do desembarque). P7: as
             // contagens vêm desses trechos.
-            const trecho1 = itinerarioEntre(line1, oStop.id, transferStop.id);
-            const trecho2 = itinerarioEntre(line2, transferStop.id, dStop.id);
+            const trecho1 = buildItineraryBetween(line1, oStop.id, transferStop.id);
+            const trecho2 = buildItineraryBetween(line2, transferStop.id, dStop.id);
             if (!trecho1 || !trecho2) {
               continue;
             }
@@ -216,8 +216,8 @@ function buildTransferOption(
   line1: BusLine,
   line2: BusLine,
   transferStop: BusStop,
-  trecho1: ItinerarioTrecho,
-  trecho2: ItinerarioTrecho
+  trecho1: TransferLeg,
+  trecho2: TransferLeg
 ): TripPlanOption {
   const walkToStopMeters = getDistanceInMeters(origin, {
     latitude: oStop.latitude,

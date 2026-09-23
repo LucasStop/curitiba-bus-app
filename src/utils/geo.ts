@@ -139,3 +139,22 @@ export function formatEtaPhrase(minutes: number): string {
   }
   return `em ${Math.round(minutes)} min`;
 }
+
+/**
+ * Rótulo de fonte da chegada: ao vivo (veículo rastreado) ou programado (tabela de horário).
+ * O horário exibido é `previstoParaTs`, congelado na geração da estimativa — nunca recalculado
+ * com o relógio atual, senão o horário absoluto na tela mudaria a cada re-render.
+ */
+export function formatArrivalSource(isRealtime: boolean, previstoParaTs: number): string {
+  const hora = new Date(previstoParaTs).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  return isRealtime ? `Ao vivo · ${hora}` : `Programado · ${hora}`;
+}
+
+/**
+ * Idade do dado em minutos, ou null abaixo de 60s pra não poluir a tela com "há 0 min".
+ */
+export function formatDataAge(geradoEmTs: number, nowTs: number): string | null {
+  const diffMs = nowTs - geradoEmTs;
+  if (diffMs < 60000) return null;
+  return `há ${Math.floor(diffMs / 60000)} min`;
+}

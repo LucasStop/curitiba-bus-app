@@ -22,7 +22,7 @@ export default function SignUpScreen() {
   const [submitting, setSubmitting] = useState(false);
   const [sentConfirmation, setSentConfirmation] = useState(false);
 
-  async function onSubmit() {
+  async function handleSubmit() {
     const eErr = validateEmail(email);
     const pErr = validatePassword(password);
     setEmailError(eErr);
@@ -110,7 +110,7 @@ export default function SignUpScreen() {
 
           <TouchableOpacity
             style={[s.primaryButton, submitting && s.buttonDisabled]}
-            onPress={onSubmit}
+            onPress={handleSubmit}
             disabled={submitting}
             testID="sign-up-submit"
             accessibilityRole="button"

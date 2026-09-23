@@ -72,9 +72,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data } = auth.onAuthStateChange((_event, next) => setSession(next));
 
     // No RN o refresh automático só deve rodar em primeiro plano (doc do Supabase).
-    const onAppState = (state: string) => (state === 'active' ? auth.startAutoRefresh() : auth.stopAutoRefresh());
+    const handleAppState = (state: string) => (state === 'active' ? auth.startAutoRefresh() : auth.stopAutoRefresh());
     if (AppState.currentState === 'active') auth.startAutoRefresh();
-    const appStateSub = AppState.addEventListener('change', onAppState);
+    const appStateSub = AppState.addEventListener('change', handleAppState);
 
     return () => {
       active = false;

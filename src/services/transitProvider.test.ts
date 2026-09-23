@@ -126,6 +126,36 @@ describe('transitService — resiliência contra o provedor mock (RNF-02)', () =
 
     expect(transitService.getConnectionStatus().state).toBe('error');
   });
+
+  it('geradoEmTs das chegadas é o carimbo do tick e não muda em chamadas repetidas sem tick no meio', () => {
+    transitService.subscribeVehicles(() => {});
+    jest.advanceTimersByTime(3000); // 1 tick bem-sucedido fixa o carimbo
+
+    const tickTs = Date.now();
+    const first = transitService.getArrivalsForStop('tubo-bento-viana');
+    const second = transitService.getArrivalsForStop('tubo-bento-viana');
+
+    expect(first.length).toBeGreaterThan(0);
+    expect(first.every((e: { geradoEmTs: number }) => e.geradoEmTs === tickTs)).toBe(true);
+    expect(second.map((e: { geradoEmTs: number }) => e.geradoEmTs)).toEqual(
+      first.map((e: { geradoEmTs: number }) => e.geradoEmTs),
+    );
+  });
+
+  it('com o feed offline, a chegada carrega o carimbo do último tick bom, não do momento da chamada', () => {
+    transitService.subscribeVehicles(() => {});
+    jest.advanceTimersByTime(3000); // tick bom: fixa lastTickTs
+    const goodTickTs = Date.now();
+
+    transitService.simulateFailures(1, () => new NetworkError());
+    jest.advanceTimersByTime(3000); // este tick falha, dado congelado
+    jest.advanceTimersByTime(5000); // tempo passa sem nenhum tick bom novo
+
+    const arrivals = transitService.getArrivalsForStop('tubo-bento-viana');
+    expect(arrivals.length).toBeGreaterThan(0);
+    expect(arrivals.every((e: { geradoEmTs: number }) => e.geradoEmTs === goodTickTs)).toBe(true);
+    expect(Date.now()).toBeGreaterThan(goodTickTs);
+  });
 });
 
 describe('calculateEtaMinutes', () => {

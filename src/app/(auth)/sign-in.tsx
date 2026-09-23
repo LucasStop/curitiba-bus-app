@@ -21,7 +21,7 @@ export default function SignInScreen() {
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  async function onSubmit() {
+  async function handleSubmit() {
     const eErr = validateEmail(email);
     const pErr = validatePassword(password);
     setEmailError(eErr);
@@ -76,7 +76,7 @@ export default function SignInScreen() {
 
           <TouchableOpacity
             style={[s.primaryButton, submitting && s.buttonDisabled]}
-            onPress={onSubmit}
+            onPress={handleSubmit}
             disabled={submitting}
             testID="sign-in-submit"
             accessibilityRole="button"
