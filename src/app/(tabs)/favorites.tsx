@@ -30,8 +30,10 @@ export default function FavoritesScreen() {
   const styles = useMemo(() => createStyles(theme), [theme]);
   const [activeTab, setActiveTab] = useState<'favorites' | 'alerts'>('favorites');
 
-  const { favoriteLines, favoriteStops, toggleFavoriteLine, toggleFavoriteStop } =
-    useFavoritesStore();
+  const favoriteLines = useFavoritesStore((s) => s.favoriteLines);
+  const favoriteStops = useFavoritesStore((s) => s.favoriteStops);
+  const toggleFavoriteLine = useFavoritesStore((s) => s.toggleFavoriteLine);
+  const toggleFavoriteStop = useFavoritesStore((s) => s.toggleFavoriteStop);
   const setSelectedLine = useTransitStore((s) => s.setSelectedLine);
   const setSelectedStop = useTransitStore((s) => s.setSelectedStop);
 
