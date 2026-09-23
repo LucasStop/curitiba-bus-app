@@ -1,5 +1,7 @@
 import {
   calculateStepDistanceMeters,
+  formatArrivalSource,
+  formatDataAge,
   formatDistance,
   formatEtaPhrase,
   formatMinutes,
@@ -124,6 +126,36 @@ describe('formatEtaPhrase', () => {
   });
 });
 
+describe('formatArrivalSource', () => {
+  it('ao vivo usa o prefixo "Ao vivo" e o horário previsto', () => {
+    const previstoParaTs = new Date('2026-01-01T17:19:00').getTime();
+    const hora = new Date(previstoParaTs).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    expect(formatArrivalSource(true, previstoParaTs)).toBe(`Ao vivo · ${hora}`);
+  });
+
+  it('programado usa o prefixo "Programado", distinto de ao vivo', () => {
+    const previstoParaTs = new Date('2026-01-01T17:22:00').getTime();
+    const hora = new Date(previstoParaTs).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    expect(formatArrivalSource(false, previstoParaTs)).toBe(`Programado · ${hora}`);
+  });
+});
+
+describe('formatDataAge', () => {
+  it('abaixo de 60s não polui a tela com "há 0 min" (null)', () => {
+    const geradoEmTs = 1_000;
+    expect(formatDataAge(geradoEmTs, geradoEmTs + 59_000)).toBeNull();
+  });
+
+  it('no limite de 60s já mostra "há 1 min"', () => {
+    const geradoEmTs = 1_000;
+    expect(formatDataAge(geradoEmTs, geradoEmTs + 60_000)).toBe('há 1 min');
+  });
+
+  it('minutos maiores formatam "há N min"', () => {
+    expect(formatDataAge(0, 2 * 60_000)).toBe('há 2 min');
+  });
+});
+
 // C4 — Bug: ônibus que já passou da parada no seu sentido ainda entrava na lista de chegadas.
 describe('isBusApproachingStop', () => {
   const line: BusLine = {
@@ -137,6 +169,7 @@ describe('isBusApproachingStop', () => {
     tarifa: 6.0,
     horarioFuncionamento: '05:00 - 00:00',
     frequenciaMinutosPico: 5,
+    temTempoReal: false,
     trajetoIda: [
       { latitude: 0, longitude: 0 },
       { latitude: 0, longitude: 1 },
@@ -176,7 +209,7 @@ describe('isBusApproachingStop', () => {
       sentido,
       arCondicionado: true,
       acessivelPCD: true,
-      ultimaAtualizacao: '',
+      ultimaAtualizacaoTs: 0,
     };
   }
 

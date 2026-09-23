@@ -69,7 +69,7 @@ export default function ResetPasswordScreen() {
     };
   }, [url]);
 
-  async function onSubmit() {
+  async function handleSubmit() {
     const pErr = validatePassword(password);
     setPasswordError(pErr);
     setFormError(null);
@@ -143,7 +143,7 @@ export default function ResetPasswordScreen() {
 
               <TouchableOpacity
                 style={[s.primaryButton, submitting && s.buttonDisabled]}
-                onPress={onSubmit}
+                onPress={handleSubmit}
                 disabled={submitting}
                 testID="reset-password-submit"
                 accessibilityRole="button"
