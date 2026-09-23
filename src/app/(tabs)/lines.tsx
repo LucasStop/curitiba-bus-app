@@ -17,7 +17,8 @@ export default function LinesScreen() {
   const [selectedCategory, setSelectedCategory] = useState<'all' | BusCategory>('all');
 
   const setSelectedLine = useTransitStore((s) => s.setSelectedLine);
-  const { isFavoriteLine, toggleFavoriteLine } = useFavoritesStore();
+  const favoriteLines = useFavoritesStore((s) => s.favoriteLines);
+  const toggleFavoriteLine = useFavoritesStore((s) => s.toggleFavoriteLine);
 
   const filteredLines = CURITIBA_LINES.filter((line) => {
     const matchesSearch =
@@ -104,7 +105,7 @@ export default function LinesScreen() {
       {/* Lista de Linhas */}
       <ScrollView style={styles.list} contentContainerStyle={styles.listContent}>
         {filteredLines.map((line) => {
-          const isFav = isFavoriteLine(line.codigo);
+          const isFav = favoriteLines.includes(line.codigo);
 
           return (
             <View key={line.id} style={styles.card}>

@@ -49,8 +49,10 @@ export const TransitBottomSheet: React.FC = () => {
   const setSheetSnapIndex = useTransitStore((s) => s.setSheetSnapIndex);
   const cycleSheetSnap = useTransitStore((s) => s.cycleSheetSnap);
 
-  const { isFavoriteLine, toggleFavoriteLine, isFavoriteStop, toggleFavoriteStop } =
-    useFavoritesStore();
+  const favoriteLines = useFavoritesStore((s) => s.favoriteLines);
+  const favoriteStops = useFavoritesStore((s) => s.favoriteStops);
+  const toggleFavoriteLine = useFavoritesStore((s) => s.toggleFavoriteLine);
+  const toggleFavoriteStop = useFavoritesStore((s) => s.toggleFavoriteStop);
 
   const styles = useMemo(
     () =>
@@ -504,7 +506,7 @@ export const TransitBottomSheet: React.FC = () => {
   // 1. Visão de Detalhes da Parada Selecionada
   if (selectedStop) {
     const arrivals = transitService.getArrivalsForStop(selectedStop.id);
-    const isFav = isFavoriteStop(selectedStop.id);
+    const isFav = favoriteStops.includes(selectedStop.id);
 
     return (
       <Animated.View style={[styles.sheetContainer, { height: animatedHeight }]}>
@@ -625,7 +627,7 @@ export const TransitBottomSheet: React.FC = () => {
 
   // 2. Visão de Detalhes da Linha Selecionada
   if (selectedLine) {
-    const isFav = isFavoriteLine(selectedLine.codigo);
+    const isFav = favoriteLines.includes(selectedLine.codigo);
     const stopIds = activeDirection === 'ida' ? selectedLine.paradasIda : selectedLine.paradasVolta;
     const lineStops = stopIds
       .map((id) => CURITIBA_STOPS.find((s) => s.id === id))
