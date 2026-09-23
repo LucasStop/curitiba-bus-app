@@ -65,6 +65,9 @@ class MockTransitProvider implements TransitProvider {
   private timer: ReturnType<typeof setTimeout> | null = null;
   private connectionStatus: ConnectionStatus = INITIAL_CONNECTION_STATUS;
   private appState: AppStateStatus = AppState.currentState;
+  // Único carimbo de tempo por tick: usado tanto em ultimaAtualizacaoTs (veículos) quanto em
+  // geradoEmTs (chegadas), pra nunca derivar a cada leitura — sempre o momento do último tick bom.
+  private lastTickTs: number = Date.now();
   // Só pra QA/teste: número de próximos ticks que devem falhar de propósito. O provedor mock
   // nunca falha sozinho, então é assim que se exercita e testa o caminho de erro/backoff.
   private pendingFailures = 0;
@@ -118,7 +121,7 @@ class MockTransitProvider implements TransitProvider {
           arCondicionado: true,
           acessivelPCD: true,
           lotacao: i === 0 ? 'media' : i === 1 ? 'alta' : 'baixa',
-          ultimaAtualizacao: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+          ultimaAtualizacaoTs: this.lastTickTs,
         };
 
         this.vehicles.push({
@@ -164,8 +167,10 @@ class MockTransitProvider implements TransitProvider {
         throw (this.pendingFailureFactory ?? (() => new NetworkError()))();
       }
 
-      this.tickSimulation();
-      this.connectionStatus = nextConnectionStatus(this.connectionStatus, { ok: true }, Date.now());
+      const now = Date.now();
+      this.lastTickTs = now;
+      this.tickSimulation(now);
+      this.connectionStatus = nextConnectionStatus(this.connectionStatus, { ok: true }, now);
       this.scheduleTick(TICK_INTERVAL_MS);
     } catch (error) {
       this.connectionStatus = nextConnectionStatus(this.connectionStatus, { ok: false, error }, Date.now());
@@ -189,7 +194,7 @@ class MockTransitProvider implements TransitProvider {
     }
   }
 
-  private tickSimulation() {
+  private tickSimulation(now: number) {
     this.vehicles = this.vehicles.map((item) => {
       const line = CURITIBA_LINES.find((l) => l.id === item.lineId);
       if (!line) return item;
@@ -230,7 +235,7 @@ class MockTransitProvider implements TransitProvider {
         longitude: currentPos.longitude,
         bearing: bearing || item.vehicle.bearing,
         sentido: newDirection,
-        ultimaAtualizacao: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        ultimaAtualizacaoTs: now,
       };
 
       return {
@@ -327,6 +332,9 @@ class MockTransitProvider implements TransitProvider {
             veiculoPrefixo: bus.prefixo,
             acessivelPCD: bus.acessivelPCD,
             lotacao: bus.lotacao,
+            isRealtime: line.temTempoReal,
+            geradoEmTs: this.lastTickTs,
+            previstoParaTs: this.lastTickTs + minutos * 60000,
           });
         }
       });
