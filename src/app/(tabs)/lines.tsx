@@ -109,6 +109,7 @@ export default function LinesScreen() {
         data={filteredLines}
         keyExtractor={(line) => line.id}
         initialNumToRender={8}
+        keyboardShouldPersistTaps="handled"
         extraData={favoriteLines}
         renderItem={({ item: line }) => {
           const isFav = favoriteLines.includes(line.codigo);
