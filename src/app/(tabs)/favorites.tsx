@@ -206,7 +206,9 @@ export default function FavoritesScreen() {
                   activeOpacity={0.8}
                   testID={`favorites-line-card-${line.codigo}`}
                   accessibilityRole="button"
-                  accessibilityLabel={`Ver linha ${line.codigo}, ${line.nome} no mapa`}>
+                  accessibilityLabel={`Ver linha ${line.codigo}, ${line.nome} no mapa`}
+                  accessibilityActions={[{ name: 'delete', label: 'Remover dos favoritos' }]}
+                  onAccessibilityAction={(e) => e.nativeEvent.actionName === 'delete' && toggleFavoriteLine(line.codigo)}>
                   <View style={styles.favoriteCardRow}>
                     <BusBadge codigo={line.codigo} corHex={line.corHex} size="large" />
                     <View style={{ flex: 1, marginLeft: 12 }}>
@@ -265,7 +267,9 @@ export default function FavoritesScreen() {
                     activeOpacity={0.8}
                     testID={`favorites-stop-card-${stop.id}`}
                     accessibilityRole="button"
-                    accessibilityLabel={`Ver parada ${stop.nome}, bairro ${stop.bairro} no mapa`}>
+                    accessibilityLabel={`Ver parada ${stop.nome}, bairro ${stop.bairro} no mapa`}
+                    accessibilityActions={[{ name: 'delete', label: 'Remover dos favoritos' }]}
+                    onAccessibilityAction={(e) => e.nativeEvent.actionName === 'delete' && toggleFavoriteStop(stop.id)}>
                     <View style={styles.favoriteCardRow}>
                       <View style={styles.stopIconWrapper}>
                         <MapPin size={20} color={theme.primary} />
