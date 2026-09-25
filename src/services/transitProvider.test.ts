@@ -179,9 +179,7 @@ describe('calculateEtaMinutes', () => {
   });
 
   it('bem no limite de previsão (MAX_ETA_DISTANCE_METERS) ainda calcula minutos', () => {
-    expect(calculateEtaMinutes(MAX_ETA_DISTANCE_METERS)).toBe(
-      Math.round(MAX_ETA_DISTANCE_METERS / 360),
-    );
+    expect(calculateEtaMinutes(MAX_ETA_DISTANCE_METERS)).toBe(Math.round(MAX_ETA_DISTANCE_METERS / 360));
   });
 
   it('distância muito além do limite continua crescendo linearmente', () => {

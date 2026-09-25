@@ -80,11 +80,7 @@ export const BusMarker: React.FC<BusMarkerProps> = React.memo(({ vehicle, isSele
   return (
     <View style={[styles.container, isSelected && styles.selectedContainer]}>
       {/* Indicador direcional com rotação baseada no bearing */}
-      <View
-        style={[
-          styles.headingIndicator,
-          { transform: [{ rotate: `${vehicle.bearing}deg` }] },
-        ]}>
+      <View style={[styles.headingIndicator, { transform: [{ rotate: `${vehicle.bearing}deg` }] }]}>
         <View style={[styles.arrowHead, { borderBottomColor: vehicle.corHex }]} />
       </View>
 

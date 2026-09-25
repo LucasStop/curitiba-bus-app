@@ -84,11 +84,7 @@ export function FormField({ label, error, isPassword, testID, ...inputProps }: F
             testID={`${testID}-toggle-visibility`}
             accessibilityRole="button"
             accessibilityLabel={hidden ? 'Mostrar senha' : 'Ocultar senha'}>
-            {hidden ? (
-              <Eye size={20} color={theme.textMuted} />
-            ) : (
-              <EyeOff size={20} color={theme.textMuted} />
-            )}
+            {hidden ? <Eye size={20} color={theme.textMuted} /> : <EyeOff size={20} color={theme.textMuted} />}
           </TouchableOpacity>
         )}
       </View>
