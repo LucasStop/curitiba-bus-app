@@ -1,11 +1,12 @@
+import { useTheme } from '@/hooks/use-theme';
 import { BusBadge } from '@/components/ui/BusBadge';
-import { Colors, Radius, Shadows, Typography } from '@/constants/theme';
+import { Radius, Shadows, Typography } from '@/constants/theme';
 import { CURITIBA_STOPS, STOPS_BY_ID } from '@/data/curitibaDataset';
 import { useUserLocation } from '@/hooks/useUserLocation';
 import { planTransitTrip } from '@/services/tripPlanner';
 import { TripPlanOption } from '@/types/transit';
 import { ArrowUpDown, ChevronRight, Footprints, LocateFixed, Search, Sparkles, X } from 'lucide-react-native';
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Alert, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -22,6 +23,8 @@ const TERMINAL_BOQUEIRAO = stopById('terminal-boqueirao');
 const TERMINAL_PORTAO = stopById('terminal-portao');
 
 export default function RoutesScreen() {
+  const theme = useTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const [originStop, setOriginStop] = useState<RoutePoint>(RUI_BARBOSA);
   const [destStop, setDestStop] = useState<RoutePoint>(TERMINAL_CABRAL);
   const [results, setResults] = useState<TripPlanOption[]>(() =>
@@ -139,7 +142,7 @@ export default function RoutesScreen() {
             testID="routes-swap-button"
             accessibilityRole="button"
             accessibilityLabel="Inverter origem e destino">
-            <ArrowUpDown size={18} color={Colors.light.text} />
+            <ArrowUpDown size={18} color={theme.text} />
           </TouchableOpacity>
         </View>
 
@@ -152,7 +155,7 @@ export default function RoutesScreen() {
             testID="routes-quick-chip-0"
             accessibilityRole="button"
             accessibilityLabel="Rota rápida de Rui Barbosa até Cabral">
-            <Sparkles size={12} color={Colors.light.primary} />
+            <Sparkles size={12} color={theme.primary} />
             <Text style={styles.chipText}>Rui Barbosa ➔ Cabral</Text>
           </TouchableOpacity>
 
@@ -163,7 +166,7 @@ export default function RoutesScreen() {
             testID="routes-quick-chip-1"
             accessibilityRole="button"
             accessibilityLabel="Rota rápida de Carlos Gomes até Boqueirão">
-            <Sparkles size={12} color={Colors.light.primary} />
+            <Sparkles size={12} color={theme.primary} />
             <Text style={styles.chipText}>Carlos Gomes ➔ Boqueirão</Text>
           </TouchableOpacity>
 
@@ -174,7 +177,7 @@ export default function RoutesScreen() {
             testID="routes-quick-chip-2"
             accessibilityRole="button"
             accessibilityLabel="Rota rápida de Cabral até Portão">
-            <Sparkles size={12} color={Colors.light.primary} />
+            <Sparkles size={12} color={theme.primary} />
             <Text style={styles.chipText}>Cabral ➔ Portão</Text>
           </TouchableOpacity>
         </ScrollView>
@@ -212,7 +215,7 @@ export default function RoutesScreen() {
 
               {opt.caminhadaTotalMetros > 0 && (
                 <View style={styles.walkMeta}>
-                  <Footprints size={14} color={Colors.light.textMuted} />
+                  <Footprints size={14} color={theme.textMuted} />
                   <Text style={styles.walkText}>{opt.caminhadaTotalMetros}m a pé</Text>
                 </View>
               )}
@@ -226,7 +229,7 @@ export default function RoutesScreen() {
                 <View key={legIdx} style={styles.legRow}>
                   {leg.tipo === 'walk' ? (
                     <View style={styles.walkIconContainer}>
-                      <Footprints size={16} color={Colors.light.textMuted} />
+                      <Footprints size={16} color={theme.textMuted} />
                     </View>
                   ) : (
                     <BusBadge codigo={leg.linha?.codigo || ''} corHex={leg.linha?.corHex} size="small" />
@@ -266,7 +269,7 @@ export default function RoutesScreen() {
                 testID="routes-picker-close-button"
                 accessibilityRole="button"
                 accessibilityLabel="Fechar seletor">
-                <X size={20} color={Colors.light.textMuted} />
+                <X size={20} color={theme.textMuted} />
               </TouchableOpacity>
             </View>
 
@@ -277,17 +280,17 @@ export default function RoutesScreen() {
               testID="routes-picker-use-location"
               accessibilityRole="button"
               accessibilityLabel="Usar minha localização atual">
-              <LocateFixed size={18} color={Colors.light.primary} />
+              <LocateFixed size={18} color={theme.primary} />
               <Text style={styles.useLocationText}>
                 {locationLoading ? 'Obtendo localização...' : 'Usar minha localização'}
               </Text>
             </TouchableOpacity>
 
             <View style={styles.pickerSearchBar}>
-              <Search size={18} color={Colors.light.textMuted} />
+              <Search size={18} color={theme.textMuted} />
               <TextInput
                 placeholder="Buscar parada por nome..."
-                placeholderTextColor={Colors.light.textSubtle}
+                placeholderTextColor={theme.textSubtle}
                 style={styles.pickerSearchInput}
                 value={pickerQuery}
                 onChangeText={setPickerQuery}
@@ -309,7 +312,7 @@ export default function RoutesScreen() {
                     <Text style={styles.pickerStopName}>{stop.nome}</Text>
                     {stop.bairro && <Text style={styles.pickerStopMeta}>Bairro {stop.bairro}</Text>}
                   </View>
-                  <ChevronRight size={16} color={Colors.light.borderStrong} />
+                  <ChevronRight size={16} color={theme.borderStrong} />
                 </TouchableOpacity>
               ))}
               {filteredStops.length === 0 && <Text style={styles.pickerEmptyText}>Nenhuma parada encontrada</Text>}
@@ -321,315 +324,317 @@ export default function RoutesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.light.background,
-  },
-  header: {
-    backgroundColor: Colors.light.surface,
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.light.border,
-  },
-  title: {
-    fontSize: Typography.screenTitle.fontSize,
-    lineHeight: Typography.screenTitle.lineHeight,
-    fontWeight: '900',
-    color: Colors.light.text,
-  },
-  subtitle: {
-    fontSize: Typography.label.fontSize,
-    lineHeight: Typography.label.lineHeight,
-    color: Colors.light.textMuted,
-    marginTop: 2,
-    marginBottom: 12,
-  },
-  inputsCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.light.surfaceMuted,
-    borderRadius: Radius.lg,
-    padding: 12,
-  },
-  dotLineCol: {
-    alignItems: 'center',
-    width: 20,
-    marginRight: 8,
-  },
-  greenDot: {
-    width: 10,
-    height: 10,
-    borderRadius: Radius.pill,
-    backgroundColor: Colors.light.success,
-  },
-  vertLine: {
-    width: 2,
-    height: 32,
-    backgroundColor: Colors.light.borderStrong,
-    marginVertical: 4,
-  },
-  redDot: {
-    width: 10,
-    height: 10,
-    borderRadius: Radius.pill,
-    backgroundColor: Colors.light.danger,
-  },
-  fieldsCol: {
-    flex: 1,
-    gap: 4,
-  },
-  inputField: {
-    paddingVertical: 4,
-  },
-  fieldLabel: {
-    fontSize: Typography.label.fontSize,
-    lineHeight: Typography.label.lineHeight,
-    fontWeight: '700',
-    // ponytail: textMuted on surfaceMuted is 4.34:1, just under AA 4.5:1 for 10pt text.
-    color: Colors.light.text,
-    textTransform: 'uppercase',
-  },
-  fieldText: {
-    fontSize: Typography.body.fontSize,
-    lineHeight: Typography.body.lineHeight,
-    fontWeight: '700',
-    color: Colors.light.text,
-  },
-  fieldDivider: {
-    height: 1,
-    backgroundColor: Colors.light.border,
-    marginVertical: 2,
-  },
-  swapButton: {
-    width: 36,
-    height: 36,
-    borderRadius: Radius.pill,
-    backgroundColor: Colors.light.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 8,
-    ...Shadows.card,
-  },
-  quickChips: {
-    gap: 8,
-    marginTop: 12,
-  },
-  chip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.light.primaryMuted,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: Radius.pill,
-    gap: 6,
-  },
-  chipText: {
-    fontSize: Typography.label.fontSize,
-    lineHeight: Typography.label.lineHeight,
-    fontWeight: '700',
-    color: Colors.light.primary,
-  },
-  resultsList: {
-    flex: 1,
-  },
-  resultsContent: {
-    padding: 16,
-    gap: 14,
-  },
-  resultsHeader: {
-    fontSize: Typography.label.fontSize,
-    lineHeight: Typography.label.lineHeight,
-    fontWeight: '700',
-    color: Colors.light.textMuted,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  optionCard: {
-    backgroundColor: Colors.light.surface,
-    borderRadius: Radius.lg,
-    padding: 16,
-    ...Shadows.card,
-  },
-  optionTop: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-  },
-  durationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  durationMinutes: {
-    fontSize: Typography.heroEta.fontSize,
-    lineHeight: Typography.heroEta.lineHeight,
-    fontVariant: ['tabular-nums'],
-    fontWeight: '900',
-    color: Colors.light.text,
-  },
-  bestBadge: {
-    backgroundColor: Colors.light.successMuted,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: Radius.sm,
-  },
-  bestBadgeText: {
-    fontSize: Typography.label.fontSize,
-    fontWeight: '800',
-    // ponytail: success on successMuted is 3:1, fails AA 4.5:1 for 10pt text.
-    color: Colors.light.text,
-  },
-  scheduleText: {
-    fontSize: Typography.label.fontSize,
-    lineHeight: Typography.label.lineHeight,
-    color: Colors.light.textMuted,
-    marginTop: 2,
-  },
-  walkMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: Colors.light.surfaceMuted,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: Radius.sm,
-  },
-  walkText: {
-    fontSize: Typography.label.fontSize,
-    fontWeight: '600',
-    // ponytail: textMuted on surfaceMuted is 4.34:1, just under AA 4.5:1 for 11pt text.
-    color: Colors.light.text,
-  },
-  legsDivider: {
-    height: 1,
-    backgroundColor: Colors.light.surfaceMuted,
-    marginVertical: 14,
-  },
-  legsContainer: {
-    gap: 10,
-  },
-  legRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  walkIconContainer: {
-    width: 32,
-    alignItems: 'center',
-  },
-  legInstruction: {
-    fontSize: Typography.body.fontSize,
-    lineHeight: Typography.body.lineHeight,
-    fontWeight: '600',
-    color: Colors.light.text,
-  },
-  legSubtext: {
-    fontSize: Typography.label.fontSize,
-    lineHeight: Typography.label.lineHeight,
-    color: Colors.light.textMuted,
-    marginTop: 2,
-  },
-  legDuration: {
-    fontSize: Typography.label.fontSize,
-    lineHeight: Typography.label.lineHeight,
-    fontVariant: ['tabular-nums'],
-    fontWeight: '700',
-    color: Colors.light.textMuted,
-  },
-  pickerOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'flex-end',
-  },
-  pickerSheet: {
-    backgroundColor: Colors.light.surface,
-    borderTopLeftRadius: Radius.lg,
-    borderTopRightRadius: Radius.lg,
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 24,
-    maxHeight: '80%',
-  },
-  pickerHandle: {
-    width: 36,
-    height: 4,
-    borderRadius: Radius.pill,
-    backgroundColor: Colors.light.borderStrong,
-    alignSelf: 'center',
-    marginBottom: 10,
-  },
-  pickerHeaderRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-  pickerTitle: {
-    fontSize: Typography.itemTitle.fontSize,
-    lineHeight: Typography.itemTitle.lineHeight,
-    fontWeight: '800',
-    color: Colors.light.text,
-  },
-  pickerCloseButton: {
-    padding: 4,
-  },
-  useLocationButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: Colors.light.primaryMuted,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    borderRadius: Radius.md,
-    marginBottom: 12,
-  },
-  useLocationText: {
-    fontSize: Typography.body.fontSize,
-    fontWeight: '700',
-    color: Colors.light.primary,
-  },
-  pickerSearchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.light.surfaceMuted,
-    borderRadius: Radius.md,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    gap: 8,
-    marginBottom: 8,
-  },
-  pickerSearchInput: {
-    flex: 1,
-    fontSize: Typography.body.fontSize,
-    color: Colors.light.text,
-    padding: 0,
-  },
-  pickerList: {
-    maxHeight: 320,
-  },
-  pickerStopRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.light.surfaceMuted,
-  },
-  pickerStopName: {
-    fontSize: Typography.body.fontSize,
-    fontWeight: '600',
-    color: Colors.light.text,
-  },
-  pickerStopMeta: {
-    fontSize: Typography.label.fontSize,
-    color: Colors.light.textMuted,
-    marginTop: 2,
-  },
-  pickerEmptyText: {
-    textAlign: 'center',
-    color: Colors.light.textSubtle,
-    fontSize: Typography.body.fontSize,
-    paddingVertical: 20,
-  },
-});
+function createStyles(theme: ReturnType<typeof useTheme>) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+    },
+    header: {
+      backgroundColor: theme.surface,
+      paddingHorizontal: 16,
+      paddingTop: 12,
+      paddingBottom: 14,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.border,
+    },
+    title: {
+      fontSize: Typography.screenTitle.fontSize,
+      lineHeight: Typography.screenTitle.lineHeight,
+      fontWeight: '900',
+      color: theme.text,
+    },
+    subtitle: {
+      fontSize: Typography.label.fontSize,
+      lineHeight: Typography.label.lineHeight,
+      color: theme.textMuted,
+      marginTop: 2,
+      marginBottom: 12,
+    },
+    inputsCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.surfaceMuted,
+      borderRadius: Radius.lg,
+      padding: 12,
+    },
+    dotLineCol: {
+      alignItems: 'center',
+      width: 20,
+      marginRight: 8,
+    },
+    greenDot: {
+      width: 10,
+      height: 10,
+      borderRadius: Radius.pill,
+      backgroundColor: theme.success,
+    },
+    vertLine: {
+      width: 2,
+      height: 32,
+      backgroundColor: theme.borderStrong,
+      marginVertical: 4,
+    },
+    redDot: {
+      width: 10,
+      height: 10,
+      borderRadius: Radius.pill,
+      backgroundColor: theme.danger,
+    },
+    fieldsCol: {
+      flex: 1,
+      gap: 4,
+    },
+    inputField: {
+      paddingVertical: 4,
+    },
+    fieldLabel: {
+      fontSize: Typography.label.fontSize,
+      lineHeight: Typography.label.lineHeight,
+      fontWeight: '700',
+      // ponytail: textMuted on surfaceMuted is 4.34:1, just under AA 4.5:1 for 10pt text.
+      color: theme.text,
+      textTransform: 'uppercase',
+    },
+    fieldText: {
+      fontSize: Typography.body.fontSize,
+      lineHeight: Typography.body.lineHeight,
+      fontWeight: '700',
+      color: theme.text,
+    },
+    fieldDivider: {
+      height: 1,
+      backgroundColor: theme.border,
+      marginVertical: 2,
+    },
+    swapButton: {
+      width: 36,
+      height: 36,
+      borderRadius: Radius.pill,
+      backgroundColor: theme.surface,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginLeft: 8,
+      ...Shadows.card,
+    },
+    quickChips: {
+      gap: 8,
+      marginTop: 12,
+    },
+    chip: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.primaryMuted,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: Radius.pill,
+      gap: 6,
+    },
+    chipText: {
+      fontSize: Typography.label.fontSize,
+      lineHeight: Typography.label.lineHeight,
+      fontWeight: '700',
+      color: theme.primary,
+    },
+    resultsList: {
+      flex: 1,
+    },
+    resultsContent: {
+      padding: 16,
+      gap: 14,
+    },
+    resultsHeader: {
+      fontSize: Typography.label.fontSize,
+      lineHeight: Typography.label.lineHeight,
+      fontWeight: '700',
+      color: theme.textMuted,
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+    },
+    optionCard: {
+      backgroundColor: theme.surface,
+      borderRadius: Radius.lg,
+      padding: 16,
+      ...Shadows.card,
+    },
+    optionTop: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      justifyContent: 'space-between',
+    },
+    durationRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
+    durationMinutes: {
+      fontSize: Typography.heroEta.fontSize,
+      lineHeight: Typography.heroEta.lineHeight,
+      fontVariant: ['tabular-nums'],
+      fontWeight: '900',
+      color: theme.text,
+    },
+    bestBadge: {
+      backgroundColor: theme.successMuted,
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+      borderRadius: Radius.sm,
+    },
+    bestBadgeText: {
+      fontSize: Typography.label.fontSize,
+      fontWeight: '800',
+      // ponytail: success on successMuted is 3:1, fails AA 4.5:1 for 10pt text.
+      color: theme.text,
+    },
+    scheduleText: {
+      fontSize: Typography.label.fontSize,
+      lineHeight: Typography.label.lineHeight,
+      color: theme.textMuted,
+      marginTop: 2,
+    },
+    walkMeta: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+      backgroundColor: theme.surfaceMuted,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: Radius.sm,
+    },
+    walkText: {
+      fontSize: Typography.label.fontSize,
+      fontWeight: '600',
+      // ponytail: textMuted on surfaceMuted is 4.34:1, just under AA 4.5:1 for 11pt text.
+      color: theme.text,
+    },
+    legsDivider: {
+      height: 1,
+      backgroundColor: theme.surfaceMuted,
+      marginVertical: 14,
+    },
+    legsContainer: {
+      gap: 10,
+    },
+    legRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    walkIconContainer: {
+      width: 32,
+      alignItems: 'center',
+    },
+    legInstruction: {
+      fontSize: Typography.body.fontSize,
+      lineHeight: Typography.body.lineHeight,
+      fontWeight: '600',
+      color: theme.text,
+    },
+    legSubtext: {
+      fontSize: Typography.label.fontSize,
+      lineHeight: Typography.label.lineHeight,
+      color: theme.textMuted,
+      marginTop: 2,
+    },
+    legDuration: {
+      fontSize: Typography.label.fontSize,
+      lineHeight: Typography.label.lineHeight,
+      fontVariant: ['tabular-nums'],
+      fontWeight: '700',
+      color: theme.textMuted,
+    },
+    pickerOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.4)',
+      justifyContent: 'flex-end',
+    },
+    pickerSheet: {
+      backgroundColor: theme.surface,
+      borderTopLeftRadius: Radius.lg,
+      borderTopRightRadius: Radius.lg,
+      paddingHorizontal: 16,
+      paddingTop: 8,
+      paddingBottom: 24,
+      maxHeight: '80%',
+    },
+    pickerHandle: {
+      width: 36,
+      height: 4,
+      borderRadius: Radius.pill,
+      backgroundColor: theme.borderStrong,
+      alignSelf: 'center',
+      marginBottom: 10,
+    },
+    pickerHeaderRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: 12,
+    },
+    pickerTitle: {
+      fontSize: Typography.itemTitle.fontSize,
+      lineHeight: Typography.itemTitle.lineHeight,
+      fontWeight: '800',
+      color: theme.text,
+    },
+    pickerCloseButton: {
+      padding: 4,
+    },
+    useLocationButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      backgroundColor: theme.primaryMuted,
+      paddingHorizontal: 12,
+      paddingVertical: 12,
+      borderRadius: Radius.md,
+      marginBottom: 12,
+    },
+    useLocationText: {
+      fontSize: Typography.body.fontSize,
+      fontWeight: '700',
+      color: theme.primary,
+    },
+    pickerSearchBar: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.surfaceMuted,
+      borderRadius: Radius.md,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      gap: 8,
+      marginBottom: 8,
+    },
+    pickerSearchInput: {
+      flex: 1,
+      fontSize: Typography.body.fontSize,
+      color: theme.text,
+      padding: 0,
+    },
+    pickerList: {
+      maxHeight: 320,
+    },
+    pickerStopRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.surfaceMuted,
+    },
+    pickerStopName: {
+      fontSize: Typography.body.fontSize,
+      fontWeight: '600',
+      color: theme.text,
+    },
+    pickerStopMeta: {
+      fontSize: Typography.label.fontSize,
+      color: theme.textMuted,
+      marginTop: 2,
+    },
+    pickerEmptyText: {
+      textAlign: 'center',
+      color: theme.textSubtle,
+      fontSize: Typography.body.fontSize,
+      paddingVertical: 20,
+    },
+  });
+}
