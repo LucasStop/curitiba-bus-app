@@ -38,9 +38,8 @@ export default function AboutScreen() {
 
         <Text style={styles.sectionTitle}>Fonte dos dados</Text>
         <Text style={styles.body}>
-          Linhas, paradas e trajetos: URBS e IPPUC (GeoCuritiba). Posições dos ônibus e previsões de chegada ainda são
-          simuladas enquanto a integração com o WebService da URBS é concluída. Algumas linhas podem estar
-          desatualizadas.
+          Linhas, paradas e trajetos: URBS e IPPUC (GeoCuritiba). Posições dos ônibus: URBS, atualizadas a cada 2
+          minutos. Previsões de chegada são estimativas pela distância. Algumas linhas podem estar desatualizadas.
         </Text>
 
         <Text style={styles.sectionTitle}>Privacidade</Text>

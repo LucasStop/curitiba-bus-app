@@ -8,7 +8,7 @@ import { transitService } from '@/services/transitProvider';
 import { useFavoritesStore } from '@/stores/useFavoritesStore';
 import { useTransitStore } from '@/stores/useTransitStore';
 import { BusStop } from '@/types/transit';
-import { formatArrivalSource, formatDataAge, formatEtaPhrase } from '@/utils/geo';
+import { formatArrivalSource, formatDataAge, formatEtaPhrase, formatSituation } from '@/utils/geo';
 import { Accessibility, ArrowLeftRight, Bookmark, ChevronRight, MapPin, Search, X } from 'lucide-react-native';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -579,6 +579,13 @@ export const TransitBottomSheet: React.FC = () => {
               const etaPhrase = formatEtaPhrase(arr.minutosAteChegada);
               const isArriving = etaPhrase === 'chegando agora';
               const dataAge = formatDataAge(arr.geradoEmTs, nowTs);
+              const situationLabel = formatSituation(arr.situacao);
+              const situationColor =
+                arr.situacao === 'atrasado'
+                  ? theme.danger
+                  : arr.situacao === 'adiantado'
+                    ? theme.warning
+                    : theme.success;
 
               return (
                 <TouchableOpacity
@@ -590,7 +597,7 @@ export const TransitBottomSheet: React.FC = () => {
                   style={styles.arrivalCard}
                   testID={`sheet-arrival-card-${arr.codLinha}-${idx}`}
                   accessibilityRole="button"
-                  accessibilityLabel={`Linha ${arr.codLinha}, ${arr.nomeLinha}, ${etaPhrase}${arr.acessivelPCD ? ', acessível' : ''}`}>
+                  accessibilityLabel={`Linha ${arr.codLinha}, ${arr.nomeLinha}, ${etaPhrase}${situationLabel ? `, ${situationLabel.toLowerCase()}` : ''}${arr.acessivelPCD ? ', acessível' : ''}`}>
                   <BusBadge codigo={arr.codLinha} corHex={arr.corHex} size="medium" />
                   <View style={styles.arrivalInfo}>
                     <Text style={styles.arrivalLineName} numberOfLines={1}>
@@ -609,6 +616,11 @@ export const TransitBottomSheet: React.FC = () => {
                       <Text style={styles.arrivalVehicleText} numberOfLines={1}>
                         Veículo {arr.veiculoPrefixo}
                       </Text>
+                      {situationLabel && (
+                        <Text style={[styles.arrivalVehicleText, { color: situationColor, fontWeight: '700' }]}>
+                          · {situationLabel}
+                        </Text>
+                      )}
                       {arr.acessivelPCD && <Accessibility size={12} color={theme.textSubtle} />}
                     </View>
                   </View>
