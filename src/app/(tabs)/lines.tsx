@@ -129,7 +129,7 @@ export default function LinesScreen() {
                   testID={`lines-favorite-button-${line.codigo}`}
                   accessibilityRole="button"
                   accessibilityState={{ selected: isFav }}
-                  accessibilityLabel={`${isFav ? 'Remover' : 'Adicionar'} linha ${line.codigo} dos favoritos`}>
+                  accessibilityLabel={`${isFav ? 'Remover' : 'Adicionar'} linha ${line.codigo} ${isFav ? 'dos' : 'aos'} favoritos`}>
                   <Bookmark
                     size={22}
                     color={isFav ? Colors.light.danger : Colors.light.textMuted}

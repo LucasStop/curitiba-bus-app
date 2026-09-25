@@ -544,7 +544,7 @@ export const TransitBottomSheet: React.FC = () => {
               testID="sheet-stop-favorite-button"
               accessibilityRole="button"
               accessibilityState={{ selected: isFav }}
-              accessibilityLabel={`${isFav ? 'Remover' : 'Adicionar'} ${selectedStop.nome} dos favoritos`}>
+              accessibilityLabel={`${isFav ? 'Remover' : 'Adicionar'} ${selectedStop.nome} ${isFav ? 'dos' : 'aos'} favoritos`}>
               <Bookmark size={22} color={isFav ? theme.danger : theme.textMuted} fill={isFav ? theme.danger : 'none'} />
             </TouchableOpacity>
 
@@ -668,7 +668,7 @@ export const TransitBottomSheet: React.FC = () => {
               testID="sheet-line-favorite-button"
               accessibilityRole="button"
               accessibilityState={{ selected: isFav }}
-              accessibilityLabel={`${isFav ? 'Remover' : 'Adicionar'} linha ${selectedLine.codigo} dos favoritos`}>
+              accessibilityLabel={`${isFav ? 'Remover' : 'Adicionar'} linha ${selectedLine.codigo} ${isFav ? 'dos' : 'aos'} favoritos`}>
               <Bookmark size={22} color={isFav ? theme.danger : theme.textMuted} fill={isFav ? theme.danger : 'none'} />
             </TouchableOpacity>
 
@@ -831,7 +831,7 @@ export const TransitBottomSheet: React.FC = () => {
                 style={styles.stopCard}
                 testID={`sheet-stop-featured-${stop.id}`}
                 accessibilityRole="button"
-                accessibilityLabel={`${stop.tipo === 'terminal' ? 'Terminal' : 'Estação-tubo'} ${stop.nome}, linhas ${stop.linhas.join(', ')}`}>
+                accessibilityLabel={`${/^(Terminal|Estação)/.test(stop.nome) ? '' : stop.tipo === 'terminal' ? 'Terminal ' : 'Estação-tubo '}${stop.nome}, linhas ${stop.linhas.join(', ')}`}>
                 <MapPin size={18} color={stop.tipo === 'terminal' ? theme.warning : theme.primary} />
                 <View style={{ flex: 1, marginLeft: 10 }}>
                   <Text style={styles.stopCardName}>{stop.nome}</Text>
