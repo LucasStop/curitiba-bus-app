@@ -6,15 +6,14 @@ import {
   computeBackoffDelay,
   nextConnectionStatus,
 } from '@/lib/resilience';
-import { ArrivalEstimate, BusCategory, BusLine, BusStop, BusVehicle, LatLng } from '@/types/transit';
-import {
-  calculateStepDistanceMeters,
-  getBearing,
-  getDistanceInMeters,
-  interpolateLatLng,
-  isBusApproachingStop,
-} from '@/utils/geo';
+import { isSupabaseConfigured } from '@/lib/supabase';
+import { SupabaseTransitProvider } from '@/services/realtime/supabaseTransitProvider';
+import { computeArrivals } from '@/services/arrivals';
+import { ArrivalEstimate, BusCategory, BusLine, BusStop, BusVehicle } from '@/types/transit';
+import { calculateStepDistanceMeters, getBearing, getDistanceInMeters, interpolateLatLng } from '@/utils/geo';
 import { AppState, AppStateStatus } from 'react-native';
+
+export { MAX_ETA_DISTANCE_METERS, calculateEtaMinutes } from '@/services/arrivals';
 
 const SIMULATED_CATEGORIES: BusCategory[] = ['expresso', 'ligeirao', 'ligeirinho', 'interbairros', 'troncal'];
 
@@ -31,22 +30,10 @@ interface VehicleSimState {
 // Teto do backoff: mesmo numa falha em loop, nunca espera mais que isso pra tentar de novo.
 const MAX_BACKOFF_MS = 60000;
 
-// Distância máxima (m) para um ônibus aparecer nas previsões de chegada de uma parada
-export const MAX_ETA_DISTANCE_METERS = 8000;
-
-/**
- * Converte distância (m) até a parada em estimativa de minutos até a chegada.
- * Velocidade média urbana com paradas em canaletas/trânsito ~22 km/h = ~360 m/min.
- */
-export function calculateEtaMinutes(distanceMeters: number): number {
-  return Math.max(1, Math.round(distanceMeters / 360));
-}
-
 /**
  * Contrato que qualquer fonte de dados de transporte deve implementar.
- * Hoje só existe o mock (simulação em memória); quando a integração com a
- * URBS estiver disponível, uma segunda implementação entra aqui e a troca
- * acontece só em `createTransitProvider`, sem mexer em quem consome `transitService`.
+ * Duas implementações: o mock (simulação em memória) e o SupabaseTransitProvider (posições
+ * reais da URBS gravadas pelo servidor). A troca acontece só em `createTransitProvider`.
  */
 export interface TransitProvider {
   getVehicles(): BusVehicle[];
@@ -296,52 +283,10 @@ class MockTransitProvider implements TransitProvider {
     return STOPS_BY_ID.get(id);
   }
 
-  /**
-   * Calcula estimativa de chegada (ETA) dos ônibus em uma determinada parada
-   */
   public getArrivalsForStop(stopId: string): ArrivalEstimate[] {
     const stop = this.getStopById(stopId);
     if (!stop) return [];
-
-    const stopCoord: LatLng = { latitude: stop.latitude, longitude: stop.longitude };
-    const estimates: ArrivalEstimate[] = [];
-
-    stop.linhas.forEach((codLinha) => {
-      const line = this.getLineByCode(codLinha);
-      if (!line) return;
-
-      // Encontra os ônibus ativos dessa linha
-      const busesOnLine = this.vehicles.map((v) => v.vehicle).filter((b) => b.codLinha === codLinha);
-
-      busesOnLine.forEach((bus) => {
-        if (!isBusApproachingStop(line, bus, stop)) return;
-
-        const busCoord: LatLng = { latitude: bus.latitude, longitude: bus.longitude };
-        const dist = getDistanceInMeters(busCoord, stopCoord);
-
-        // Se o ônibus estiver dentro de 8km
-        if (dist <= MAX_ETA_DISTANCE_METERS) {
-          const minutos = calculateEtaMinutes(dist);
-
-          estimates.push({
-            codLinha: line.codigo,
-            nomeLinha: line.nome,
-            categoria: line.categoria,
-            corHex: line.corHex,
-            minutosAteChegada: minutos,
-            distanciaMetros: dist,
-            veiculoPrefixo: bus.prefixo,
-            acessivelPCD: bus.acessivelPCD,
-            lotacao: bus.lotacao,
-            isRealtime: line.temTempoReal,
-            geradoEmTs: this.lastTickTs,
-            previstoParaTs: this.lastTickTs + minutos * 60000,
-          });
-        }
-      });
-    });
-
-    return estimates.sort((a, b) => a.minutosAteChegada - b.minutosAteChegada);
+    return computeArrivals(stop, this.getVehicles(), { generatedTs: this.lastTickTs });
   }
 
   public subscribeVehicles(cb: (vehicles: BusVehicle[]) => void): () => void {
@@ -356,10 +301,10 @@ class MockTransitProvider implements TransitProvider {
   }
 }
 
-// ponytail: só o mock existe hoje; quando a URBS_CONFIG ganhar credenciais reais,
-// troca o retorno abaixo por `new UrbsTransitProvider(URBS_CONFIG)` sem tocar nos consumidores.
+// Com Supabase configurado, o app lê as posições reais que o servidor grava (nunca chama a URBS).
+// Sem as variáveis (Jest, dev sem .env.local) segue a simulação.
 function createTransitProvider(): TransitProvider {
-  return new MockTransitProvider();
+  return isSupabaseConfigured() ? new SupabaseTransitProvider() : new MockTransitProvider();
 }
 
 export const transitService: TransitProvider = createTransitProvider();

@@ -218,3 +218,37 @@ afterAll(() => {
     (transitService as { stopSimulation: () => void }).stopSimulation();
   }
 });
+
+describe('computeArrivals', () => {
+  it('ignora ônibus de sentido desconhecido e repassa a situação dos demais', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { computeArrivals } = require('./arrivals') as typeof import('./arrivals');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { STOPS_BY_ID, LINES_BY_CODE } = require('@/data/curitibaDataset') as typeof import('@/data/curitibaDataset');
+    const stop = STOPS_BY_ID.get('tubo-central')!;
+    const line = LINES_BY_CODE.get('203')!;
+    const first = line.trajetoIda[0];
+    const bus = {
+      id: 'b',
+      prefixo: 'AA001',
+      codLinha: '203',
+      nomeLinha: line.nome,
+      categoria: line.categoria,
+      corHex: line.corHex,
+      latitude: first.latitude,
+      longitude: first.longitude,
+      bearing: 0,
+      velocidadeKmH: 0,
+      sentido: 'ida' as const,
+      situacao: 'atrasado' as const,
+      arCondicionado: false,
+      acessivelPCD: false,
+      ultimaAtualizacaoTs: 0,
+    };
+    const opts = { generatedTs: 1000, isRealtime: true };
+    const withDirection = computeArrivals(stop, [bus], opts);
+    expect(withDirection.length).toBeGreaterThan(0);
+    expect(withDirection.every((a) => a.situacao === 'atrasado' && a.isRealtime)).toBe(true);
+    expect(computeArrivals(stop, [{ ...bus, sentido: null }], opts)).toEqual([]);
+  });
+});
