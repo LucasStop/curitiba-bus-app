@@ -272,7 +272,7 @@ export const CuritibaMap: React.FC<CuritibaMapProps> = ({ userLocation, onSelect
                   </Text>
                 </View>
                 <Text style={styles.webVehicleMeta}>
-                  Prefixo: {v.prefixo} • Sentido: {v.sentido.toUpperCase()} • {v.velocidadeKmH} km/h
+                  Prefixo: {v.prefixo} • Sentido: {v.sentido?.toUpperCase() ?? '—'} • {v.velocidadeKmH} km/h
                 </Text>
               </TouchableOpacity>
             ))}

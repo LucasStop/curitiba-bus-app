@@ -10,6 +10,8 @@ export type BusCategory =
   | 'turismo'
   | 'operacional';
 
+export type BusSituation = 'no_horario' | 'atrasado' | 'adiantado' | 'nao_conformidade';
+
 export interface LatLng {
   latitude: number;
   longitude: number;
@@ -26,7 +28,10 @@ export interface BusVehicle {
   longitude: number;
   bearing: number; // Ângulo de rotação (0-360)
   velocidadeKmH: number;
-  sentido: 'ida' | 'volta';
+  // null = não deu para inferir (ônibus parado ou sem posição anterior): fora das previsões de chegada.
+  sentido: 'ida' | 'volta' | null;
+  situacao?: BusSituation;
+  foraDaRota?: boolean;
   proximaParadaId?: string;
   lotacao?: 'baixa' | 'media' | 'alta';
   arCondicionado: boolean;
@@ -74,6 +79,7 @@ export interface ArrivalEstimate {
   acessivelPCD: boolean;
   lotacao?: 'baixa' | 'media' | 'alta';
   isRealtime: boolean;
+  situacao?: BusSituation;
   geradoEmTs: number;
   previstoParaTs: number;
 }

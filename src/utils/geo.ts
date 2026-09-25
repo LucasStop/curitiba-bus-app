@@ -1,4 +1,4 @@
-import { BusLine, BusStop, BusVehicle, LatLng } from '@/types/transit';
+import { BusLine, BusSituation, BusStop, BusVehicle, LatLng } from '@/types/transit';
 
 /**
  * Calcula a distância em metros entre duas coordenadas usando a fórmula de Haversine
@@ -100,6 +100,7 @@ export function getProgressAlongPath(path: LatLng[], point: LatLng): number {
  * ônibus já passou (ou vai na direção oposta) e não vai mais chegar ali.
  */
 export function isBusApproachingStop(line: BusLine, bus: BusVehicle, stop: BusStop): boolean {
+  if (!bus.sentido) return false; // sentido desconhecido: melhor não prever do que errar
   const paradas = bus.sentido === 'ida' ? line.paradasIda : line.paradasVolta;
   if (!paradas.includes(stop.id)) return false;
 
@@ -159,4 +160,12 @@ export function formatDataAge(geradoEmTs: number, nowTs: number): string | null 
   const diffMs = nowTs - geradoEmTs;
   if (diffMs < 60000) return null;
   return `há ${Math.floor(diffMs / 60000)} min`;
+}
+
+/** Texto curto da situação do ônibus, ou null quando não vale mostrar (não conformidade, ausente). */
+export function formatSituation(situacao?: BusSituation): string | null {
+  if (situacao === 'no_horario') return 'No horário';
+  if (situacao === 'atrasado') return 'Atrasado';
+  if (situacao === 'adiantado') return 'Adiantado';
+  return null;
 }
