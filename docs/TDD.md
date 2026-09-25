@@ -103,6 +103,8 @@ supabase test db               # R1 a R5
 supabase stop
 deno test --config supabase/functions/delete-account/deno.json supabase/functions/delete-account/handler_test.ts   # R6
 deno check --config supabase/functions/delete-account/deno.json supabase/functions/delete-account/*.ts
+deno test --allow-read=supabase/functions/urbs-vehicles/fixtures --config supabase/functions/urbs-vehicles/deno.json supabase/functions/urbs-vehicles/   # urbs-vehicles (fixture, sem chamada real)
+deno check --config supabase/functions/urbs-vehicles/deno.json supabase/functions/urbs-vehicles/*.ts
 ```
 O R6 acima cobre a lógica com clientes falsos. A integração de ponta a ponta (função real, Auth real, dois usuários) foi conferida à mão com `supabase functions serve`; não há teste automatizado dela.
 
