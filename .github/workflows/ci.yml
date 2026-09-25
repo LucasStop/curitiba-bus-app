@@ -37,6 +37,9 @@ jobs:
       - name: Lint
         run: yarn lint
 
+      - name: Formatação
+        run: yarn format:check
+
       # Falta para virar bloqueante: o yarn 1 filtra so a saida com --level; o exit code
       # continua contando todas as severidades (moderada = 4). Revalidado em 22/09/2026,
       # resta a mesma 1 moderada sem correcao segura (expo-router > query-string >
