@@ -419,3 +419,9 @@ enabled = true
 # Gateway tambem exige JWT valido; a funcao valida de novo com getUser (defesa em profundidade).
 verify_jwt = true
 entrypoint = "./functions/delete-account/index.ts"
+
+[functions.urbs-vehicles]
+enabled = true
+# Chamada so pelo pg_cron com o header x-cron-secret; nao ha JWT de usuario.
+verify_jwt = false
+entrypoint = "./functions/urbs-vehicles/index.ts"

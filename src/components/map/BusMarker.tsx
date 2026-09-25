@@ -1,6 +1,7 @@
 import { Radius } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { BusVehicle } from '@/types/transit';
+import { formatSituation } from '@/utils/geo';
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
@@ -12,10 +13,11 @@ interface BusMarkerProps {
 // Rótulo de acessibilidade do marcador (DESIGN.md: "Linha 203, sentido Terminal Boa Vista, chegando em 4 min").
 // BusVehicle não carrega nome do terminal nem ETA para este ponto do mapa, então usa sentido ida/volta.
 export function getBusMarkerAccessibilityLabel(vehicle: BusVehicle, isSelected = false): string {
-  const sentido = vehicle.sentido === 'ida' ? 'ida' : 'volta';
-  return `Ônibus linha ${vehicle.codLinha}, ${vehicle.nomeLinha}, sentido ${sentido}${
-    isSelected ? ', selecionado' : ''
-  }`;
+  const sentido = vehicle.sentido ? `, sentido ${vehicle.sentido}` : '';
+  const situacao = formatSituation(vehicle.situacao);
+  return `Ônibus linha ${vehicle.codLinha}, ${vehicle.nomeLinha}${sentido}${
+    situacao ? `, ${situacao.toLowerCase()}` : ''
+  }${vehicle.foraDaRota ? ', fora da rota' : ''}${isSelected ? ', selecionado' : ''}`;
 }
 
 // Memoizado: sem isso, cada tick de simulação (3s) recria todos os veículos e força
