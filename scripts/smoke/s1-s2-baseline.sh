@@ -50,10 +50,10 @@ echo "-- S1: abertura --"
 idb ui describe-all --udid "$UDID" > "$OUT_DIR/s1-tree.json"
 xcrun simctl io "$UDID" screenshot "$OUT_DIR/s1-abertura.png"
 if grep -q '"AXUniqueId":"tab-bar-map"' "$OUT_DIR/s1-tree.json" \
-   && grep -q '"AXUniqueId":"map-live-indicator"' "$OUT_DIR/s1-tree.json"; then
-  echo "  [OK] aba Mapa visivel e indicador de onibus ao vivo presente"
+   && grep -q '"AXUniqueId":"sheet-search-input"' "$OUT_DIR/s1-tree.json"; then
+  echo "  [OK] aba Mapa visivel e busca do painel presente"
 else
-  echo "  [FALHA] aba Mapa ou indicador de onibus ao vivo ausente — ver $OUT_DIR/s1-tree.json" >&2
+  echo "  [FALHA] aba Mapa ou busca do painel ausente — ver $OUT_DIR/s1-tree.json" >&2
 fi
 
 echo "-- S2: abas (Mapa, Linhas, Como Ir, Favoritos) --"
