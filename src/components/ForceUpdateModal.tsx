@@ -29,8 +29,7 @@ export default function ForceUpdateModal({ visible, iosUrl, androidUrl }: ForceU
             accessibilityRole="button"
             disabled={!storeUrl}
             onPress={() => storeUrl && Linking.openURL(storeUrl)}
-            style={[styles.button, { backgroundColor: theme.primary, opacity: storeUrl ? 1 : 0.5 }]}
-          >
+            style={[styles.button, { backgroundColor: theme.primary, opacity: storeUrl ? 1 : 0.5 }]}>
             <Text style={[Typography.itemTitle, { color: theme.onPrimary }]}>Atualizar agora</Text>
           </Pressable>
         </View>

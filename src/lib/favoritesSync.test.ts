@@ -5,11 +5,13 @@ import { useFavoritesStore } from '@/stores/useFavoritesStore';
 import { pullAndMergeFavorites, startFavoritesSync, stopFavoritesSync } from './favoritesSync';
 
 // Sem rede: o cliente Supabase inteiro é falso, com o encadeamento mínimo que o módulo usa.
-function fakeSupabase(opts: {
-  selectResult?: { data: unknown; error: unknown };
-  insertResult?: { data: unknown; error: unknown };
-  deleteResult?: { data: unknown; error: unknown };
-} = {}) {
+function fakeSupabase(
+  opts: {
+    selectResult?: { data: unknown; error: unknown };
+    insertResult?: { data: unknown; error: unknown };
+    deleteResult?: { data: unknown; error: unknown };
+  } = {},
+) {
   const select = jest.fn().mockResolvedValue(opts.selectResult ?? { data: [], error: null });
   const insert = jest.fn().mockResolvedValue(opts.insertResult ?? { data: null, error: null });
   const eq2 = jest.fn().mockResolvedValue(opts.deleteResult ?? { data: null, error: null });
@@ -57,7 +59,11 @@ describe('pullAndMergeFavorites (RF-20, C4 aplicado à nuvem)', () => {
   });
 
   it('exceção de rede cai pro cache local, sem travar (S17)', async () => {
-    const client = { from: () => { throw new TypeError('Network request failed'); } } as unknown as SupabaseClient;
+    const client = {
+      from: () => {
+        throw new TypeError('Network request failed');
+      },
+    } as unknown as SupabaseClient;
     const local = { favoriteLines: ['203'], favoriteStops: ['a'] };
 
     expect(await pullAndMergeFavorites(client, 'u1', local)).toEqual(local);
@@ -92,7 +98,11 @@ describe('startFavoritesSync / stopFavoritesSync', () => {
   });
 
   it('falha de rede no toggle não trava a UI: o estado local já mudou (S17)', async () => {
-    const client = { from: () => { throw new TypeError('Network request failed'); } } as unknown as SupabaseClient;
+    const client = {
+      from: () => {
+        throw new TypeError('Network request failed');
+      },
+    } as unknown as SupabaseClient;
     startFavoritesSync(client, 'u1');
 
     expect(() => useFavoritesStore.getState().toggleFavoriteLine('500')).not.toThrow();

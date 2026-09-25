@@ -52,8 +52,8 @@ export const useFavoritesStore = create<FavoritesState>()(
       // v1: dataset real do GeoCuritiba. Ids de parada do mock (tubo-*) deixam de existir.
       version: 1,
       migrate: (persisted) => migrateFavorites(persisted as Partial<FavoritesState>),
-    }
-  )
+    },
+  ),
 );
 
 export function migrateFavorites(state: Partial<FavoritesState>) {

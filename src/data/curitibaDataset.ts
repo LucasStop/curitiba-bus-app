@@ -52,7 +52,8 @@ export const TRANSIT_ALERTS: TransitAlert[] = [
   {
     id: 'alert-1',
     titulo: 'Obras na Avenida Marechal Floriano Peixoto',
-    descricao: 'Desvio temporário para as linhas 500 Ligeirão Boqueirão entre as estações Hauer e Carmo devido a recapeamento asfáltico.',
+    descricao:
+      'Desvio temporário para as linhas 500 Ligeirão Boqueirão entre as estações Hauer e Carmo devido a recapeamento asfáltico.',
     data: 'Hoje, 08:30',
     tipo: 'obra',
     linhasAfetadas: ['500'],
@@ -68,7 +69,8 @@ export const TRANSIT_ALERTS: TransitAlert[] = [
   {
     id: 'alert-3',
     titulo: 'Novo tubo implantado na Linha Verde',
-    descricao: 'Estação-tubo inaugurada atendendo à linha Interbairros II com acessibilidade plena e catracas biométricas.',
+    descricao:
+      'Estação-tubo inaugurada atendendo à linha Interbairros II com acessibilidade plena e catracas biométricas.',
     data: 'Ontem',
     tipo: 'informativo',
     linhasAfetadas: ['020'],

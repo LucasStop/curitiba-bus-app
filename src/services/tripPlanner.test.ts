@@ -33,7 +33,7 @@ describe('planTransitTrip — baldeação', () => {
 
     const options = planTransitTrip(
       { latitude: origin.latitude, longitude: origin.longitude },
-      { latitude: destination.latitude, longitude: destination.longitude }
+      { latitude: destination.latitude, longitude: destination.longitude },
     );
 
     // Nenhuma perna pode citar "Terminal Cabral": nem a 500 nem a 303 passam
@@ -43,8 +43,8 @@ describe('planTransitTrip — baldeação', () => {
         (leg) =>
           leg.instrucao.includes('Terminal Cabral') ||
           leg.linha?.embarqueParada === 'Terminal Cabral' ||
-          leg.linha?.desembarqueParada === 'Terminal Cabral'
-      )
+          leg.linha?.desembarqueParada === 'Terminal Cabral',
+      ),
     );
     expect(mentionsCabral).toBe(false);
 
@@ -66,9 +66,7 @@ const TERMINAL_CABRAL = { latitude: -25.4055, longitude: -49.252 };
 describe('planTransitTrip — P7/P8 itinerário e sentido', () => {
   it('P7: quantidade de paradas da direta vem do itinerário (203 Santa Cândida→Cabral = 1)', () => {
     const options = planTransitTrip(TERMINAL_SANTA_CANDIDA, TERMINAL_CABRAL);
-    const option = options.find(
-      (o) => o.id === 'direct-203-terminal-santa-candida-terminal-cabral'
-    );
+    const option = options.find((o) => o.id === 'direct-203-terminal-santa-candida-terminal-cabral');
 
     expect(option).toBeDefined();
     const busLeg = option!.pernas.find((leg) => leg.tipo === 'bus');
@@ -82,11 +80,9 @@ describe('planTransitTrip — P7/P8 itinerário e sentido', () => {
 
     const options = planTransitTrip(
       { latitude: boqueirao.latitude, longitude: boqueirao.longitude },
-      { latitude: hauer.latitude, longitude: hauer.longitude }
+      { latitude: hauer.latitude, longitude: hauer.longitude },
     );
-    const option = options.find(
-      (o) => o.id === 'direct-500-terminal-boqueirao-terminal-hauer'
-    );
+    const option = options.find((o) => o.id === 'direct-500-terminal-boqueirao-terminal-hauer');
 
     // Na ida a 500 vai Carlos Gomes→Boqueirão (embarque depois do
     // desembarque); só a volta serve. O código antigo retornava 4 fixo.
@@ -105,7 +101,7 @@ describe('planTransitTrip — P7/P8 itinerário e sentido', () => {
 
     const options = planTransitTrip(
       { latitude: origin.latitude, longitude: origin.longitude },
-      { latitude: destination.latitude, longitude: destination.longitude }
+      { latitude: destination.latitude, longitude: destination.longitude },
     );
     const transferOption = options.find((o) => o.id.startsWith('transfer-'));
 
@@ -159,10 +155,7 @@ describe('planTransitTrip — caminhada zero e cálculo de pernas', () => {
   });
 
   it('coordenadas longe de qualquer parada cadastrada não quebram e ainda retornam opção', () => {
-    const options = planTransitTrip(
-      { latitude: -25.55, longitude: -49.15 },
-      { latitude: -25.3, longitude: -49.35 },
-    );
+    const options = planTransitTrip({ latitude: -25.55, longitude: -49.15 }, { latitude: -25.3, longitude: -49.35 });
     expect(options.length).toBeGreaterThan(0);
     options.forEach((o) => expect(o.duracaoTotalMinutos).toBeGreaterThan(0));
   });

@@ -7,7 +7,7 @@ pre-commit:
       run: gitleaks git --staged --redact --no-banner
     lint:
       # ponytail: sem prettier de proposito (formatar o repo todo geraria diff enorme); eslint cobre o basico.
-      glob: "*.{js,jsx,ts,tsx}"
+      glob: '*.{js,jsx,ts,tsx}'
       run: npx eslint {staged_files}
 
 commit-msg:

@@ -91,7 +91,7 @@ export const Typography = {
   heroEta: {
     fontSize: 32,
     lineHeight: 36,
-    fontVariant: ['tabular-nums'] as ('tabular-nums')[],
+    fontVariant: ['tabular-nums'] as 'tabular-nums'[],
   },
 } as const;
 

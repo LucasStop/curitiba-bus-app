@@ -311,9 +311,7 @@ class MockTransitProvider implements TransitProvider {
       if (!line) return;
 
       // Encontra os ônibus ativos dessa linha
-      const busesOnLine = this.vehicles
-        .map((v) => v.vehicle)
-        .filter((b) => b.codLinha === codLinha);
+      const busesOnLine = this.vehicles.map((v) => v.vehicle).filter((b) => b.codLinha === codLinha);
 
       busesOnLine.forEach((bus) => {
         if (!isBusApproachingStop(line, bus, stop)) return;

@@ -6,16 +6,7 @@ import { planTransitTrip } from '@/services/tripPlanner';
 import { TripPlanOption } from '@/types/transit';
 import { ArrowUpDown, ChevronRight, Footprints, LocateFixed, Search, Sparkles, X } from 'lucide-react-native';
 import React, { useState } from 'react';
-import {
-  Alert,
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Alert, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Um ponto de rota é uma parada conhecida (BusStop, com id/bairro/linhas) ou um
@@ -36,8 +27,8 @@ export default function RoutesScreen() {
   const [results, setResults] = useState<TripPlanOption[]>(() =>
     planTransitTrip(
       { latitude: RUI_BARBOSA.latitude, longitude: RUI_BARBOSA.longitude },
-      { latitude: TERMINAL_CABRAL.latitude, longitude: TERMINAL_CABRAL.longitude }
-    )
+      { latitude: TERMINAL_CABRAL.latitude, longitude: TERMINAL_CABRAL.longitude },
+    ),
   );
 
   const [pickerFor, setPickerFor] = useState<'origin' | 'destination' | null>(null);
@@ -51,7 +42,7 @@ export default function RoutesScreen() {
 
     const newResults = planTransitTrip(
       { latitude: destStop.latitude, longitude: destStop.longitude },
-      { latitude: temp.latitude, longitude: temp.longitude }
+      { latitude: temp.latitude, longitude: temp.longitude },
     );
     setResults(newResults);
   };
@@ -61,7 +52,7 @@ export default function RoutesScreen() {
     setDestStop(d);
     const newResults = planTransitTrip(
       { latitude: o.latitude, longitude: o.longitude },
-      { latitude: d.latitude, longitude: d.longitude }
+      { latitude: d.latitude, longitude: d.longitude },
     );
     setResults(newResults);
   };
@@ -84,7 +75,7 @@ export default function RoutesScreen() {
     if (hasPermission === false) {
       Alert.alert(
         'Permissão de localização negada',
-        'Habilite o acesso à localização nas configurações do app para usar sua posição atual.'
+        'Habilite o acesso à localização nas configurações do app para usar sua posição atual.',
       );
       return;
     }
@@ -92,7 +83,7 @@ export default function RoutesScreen() {
   };
 
   const filteredStops = CURITIBA_STOPS.filter((stop) =>
-    stop.nome.toLowerCase().includes(pickerQuery.trim().toLowerCase())
+    stop.nome.toLowerCase().includes(pickerQuery.trim().toLowerCase()),
   ).slice(0, 30);
 
   return (
@@ -238,11 +229,7 @@ export default function RoutesScreen() {
                       <Footprints size={16} color={Colors.light.textMuted} />
                     </View>
                   ) : (
-                    <BusBadge
-                      codigo={leg.linha?.codigo || ''}
-                      corHex={leg.linha?.corHex}
-                      size="small"
-                    />
+                    <BusBadge codigo={leg.linha?.codigo || ''} corHex={leg.linha?.corHex} size="small" />
                   )}
 
                   <View style={{ flex: 1, marginLeft: 10 }}>
@@ -264,11 +251,7 @@ export default function RoutesScreen() {
       </ScrollView>
 
       {/* Seletor de Origem/Destino: localização atual ou busca por parada */}
-      <Modal
-        visible={pickerFor !== null}
-        animationType="slide"
-        transparent
-        onRequestClose={() => setPickerFor(null)}>
+      <Modal visible={pickerFor !== null} animationType="slide" transparent onRequestClose={() => setPickerFor(null)}>
         <View style={styles.pickerOverlay}>
           <View style={styles.pickerSheet}>
             <View style={styles.pickerHandle} />
@@ -329,9 +312,7 @@ export default function RoutesScreen() {
                   <ChevronRight size={16} color={Colors.light.borderStrong} />
                 </TouchableOpacity>
               ))}
-              {filteredStops.length === 0 && (
-                <Text style={styles.pickerEmptyText}>Nenhuma parada encontrada</Text>
-              )}
+              {filteredStops.length === 0 && <Text style={styles.pickerEmptyText}>Nenhuma parada encontrada</Text>}
             </ScrollView>
           </View>
         </View>

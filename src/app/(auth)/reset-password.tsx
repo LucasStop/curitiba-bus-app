@@ -7,7 +7,15 @@ import { useAuth } from '@/providers/AuthProvider';
 import * as Linking from 'expo-linking';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // O link de recuperação (curitibabusapp://reset-password#access_token=...&refresh_token=...&type=recovery,
@@ -149,7 +157,11 @@ export default function ResetPasswordScreen() {
                 accessibilityRole="button"
                 accessibilityLabel="Salvar nova senha"
                 accessibilityState={{ disabled: submitting, busy: submitting }}>
-                {submitting ? <ActivityIndicator color={theme.onPrimary} /> : <Text style={s.primaryButtonText}>Salvar nova senha</Text>}
+                {submitting ? (
+                  <ActivityIndicator color={theme.onPrimary} />
+                ) : (
+                  <Text style={s.primaryButtonText}>Salvar nova senha</Text>
+                )}
               </TouchableOpacity>
             </>
           )}

@@ -1,11 +1,31 @@
 import { mapAuthError, RESET_SENT_MESSAGE } from './authErrors';
 
 // C3
-const invalidCredentials = { name: 'AuthApiError', status: 400, code: 'invalid_credentials', message: 'Invalid login credentials' };
+const invalidCredentials = {
+  name: 'AuthApiError',
+  status: 400,
+  code: 'invalid_credentials',
+  message: 'Invalid login credentials',
+};
 const userNotFound = { name: 'AuthApiError', status: 400, code: 'user_not_found', message: 'User not found' };
-const alreadyExists = { name: 'AuthApiError', status: 422, code: 'user_already_exists', message: 'User already registered' };
-const rateLimit = { name: 'AuthApiError', status: 429, code: 'over_request_rate_limit', message: 'Request rate limit reached' };
-const emailRateLimit = { name: 'AuthApiError', status: 429, code: 'over_email_send_rate_limit', message: 'Email rate limit exceeded' };
+const alreadyExists = {
+  name: 'AuthApiError',
+  status: 422,
+  code: 'user_already_exists',
+  message: 'User already registered',
+};
+const rateLimit = {
+  name: 'AuthApiError',
+  status: 429,
+  code: 'over_request_rate_limit',
+  message: 'Request rate limit reached',
+};
+const emailRateLimit = {
+  name: 'AuthApiError',
+  status: 429,
+  code: 'over_email_send_rate_limit',
+  message: 'Email rate limit exceeded',
+};
 const network = { name: 'AuthRetryableFetchError', status: 0, message: 'Network request failed' };
 const notConfirmed = { name: 'AuthApiError', status: 400, code: 'email_not_confirmed', message: 'Email not confirmed' };
 

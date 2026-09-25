@@ -5,8 +5,8 @@ export const CURITIBA_STOPS: BusStop[] = [
     id: 'terminal-santa-candida',
     nome: 'Terminal Santa Cândida',
     tipo: 'terminal',
-    latitude: -25.3780,
-    longitude: -49.2290,
+    latitude: -25.378,
+    longitude: -49.229,
     bairro: 'Santa Cândida',
     linhas: ['203', '020', '216'],
   },
@@ -15,7 +15,7 @@ export const CURITIBA_STOPS: BusStop[] = [
     nome: 'Terminal Cabral',
     tipo: 'terminal',
     latitude: -25.4055,
-    longitude: -49.2520,
+    longitude: -49.252,
     bairro: 'Cabral',
     linhas: ['203', '020', '216'],
   },
@@ -24,7 +24,7 @@ export const CURITIBA_STOPS: BusStop[] = [
     nome: 'Estação Passeio Público',
     tipo: 'tubo',
     latitude: -25.4248,
-    longitude: -49.2680,
+    longitude: -49.268,
     bairro: 'Centro',
     linhas: ['203', '303'],
   },
@@ -32,8 +32,8 @@ export const CURITIBA_STOPS: BusStop[] = [
     id: 'tubo-central',
     nome: 'Estação Central / Praça Tiradentes',
     tipo: 'tubo',
-    latitude: -25.4300,
-    longitude: -49.2690,
+    latitude: -25.43,
+    longitude: -49.269,
     bairro: 'Centro',
     linhas: ['203', '303'],
   },
@@ -50,7 +50,7 @@ export const CURITIBA_STOPS: BusStop[] = [
     id: 'tubo-carlos-gomes',
     nome: 'Praça Carlos Gomes',
     tipo: 'tubo',
-    latitude: -25.4330,
+    latitude: -25.433,
     longitude: -49.2708,
     bairro: 'Centro',
     linhas: ['500'],
@@ -59,8 +59,8 @@ export const CURITIBA_STOPS: BusStop[] = [
     id: 'tubo-eufrasio-correia',
     nome: 'Estação Eufrásio Correia',
     tipo: 'tubo',
-    latitude: -25.4370,
-    longitude: -49.2680,
+    latitude: -25.437,
+    longitude: -49.268,
     bairro: 'Rebouças',
     linhas: ['500', '203'],
   },
@@ -68,8 +68,8 @@ export const CURITIBA_STOPS: BusStop[] = [
     id: 'tubo-bento-viana',
     nome: 'Estação Bento Viana',
     tipo: 'tubo',
-    latitude: -25.4450,
-    longitude: -49.2840,
+    latitude: -25.445,
+    longitude: -49.284,
     bairro: 'Batel',
     linhas: ['203'],
   },
@@ -77,8 +77,8 @@ export const CURITIBA_STOPS: BusStop[] = [
     id: 'terminal-portao',
     nome: 'Terminal Portão',
     tipo: 'terminal',
-    latitude: -25.4740,
-    longitude: -49.2940,
+    latitude: -25.474,
+    longitude: -49.294,
     bairro: 'Portão',
     linhas: ['203', '020', '216'],
   },
@@ -86,8 +86,8 @@ export const CURITIBA_STOPS: BusStop[] = [
     id: 'terminal-capao-raso',
     nome: 'Terminal Capão Raso',
     tipo: 'terminal',
-    latitude: -25.4980,
-    longitude: -49.2930,
+    latitude: -25.498,
+    longitude: -49.293,
     bairro: 'Capão Raso',
     linhas: ['203', '020'],
   },
@@ -95,8 +95,8 @@ export const CURITIBA_STOPS: BusStop[] = [
     id: 'terminal-hauer',
     nome: 'Terminal Hauer',
     tipo: 'terminal',
-    latitude: -25.4710,
-    longitude: -49.2520,
+    latitude: -25.471,
+    longitude: -49.252,
     bairro: 'Hauer',
     linhas: ['500', '020'],
   },
@@ -104,8 +104,8 @@ export const CURITIBA_STOPS: BusStop[] = [
     id: 'terminal-carmo',
     nome: 'Terminal Carmo',
     tipo: 'terminal',
-    latitude: -25.4880,
-    longitude: -49.2450,
+    latitude: -25.488,
+    longitude: -49.245,
     bairro: 'Boqueirão',
     linhas: ['500'],
   },
@@ -113,8 +113,8 @@ export const CURITIBA_STOPS: BusStop[] = [
     id: 'terminal-boqueirao',
     nome: 'Terminal Boqueirão',
     tipo: 'terminal',
-    latitude: -25.5020,
-    longitude: -49.2390,
+    latitude: -25.502,
+    longitude: -49.239,
     bairro: 'Boqueirão',
     linhas: ['500', '020'],
   },
@@ -122,8 +122,8 @@ export const CURITIBA_STOPS: BusStop[] = [
     id: 'terminal-campina-siqueira',
     nome: 'Terminal Campina do Siqueira',
     tipo: 'terminal',
-    latitude: -25.4380,
-    longitude: -49.3080,
+    latitude: -25.438,
+    longitude: -49.308,
     bairro: 'Campina do Siqueira',
     linhas: ['303', '020'],
   },
@@ -145,32 +145,32 @@ export const CURITIBA_LINES: BusLine[] = [
     // interbairros e alimentador rodam em pista comum e ficam sem previsão em tempo real por ora.
     temTempoReal: true,
     trajetoIda: [
-      { latitude: -25.3780, longitude: -49.2290 }, // Santa Cândida
-      { latitude: -25.3900, longitude: -49.2400 },
-      { latitude: -25.4055, longitude: -49.2520 }, // Cabral
-      { latitude: -25.4160, longitude: -49.2610 },
-      { latitude: -25.4248, longitude: -49.2680 }, // Passeio Público
-      { latitude: -25.4300, longitude: -49.2690 }, // Central
+      { latitude: -25.378, longitude: -49.229 }, // Santa Cândida
+      { latitude: -25.39, longitude: -49.24 },
+      { latitude: -25.4055, longitude: -49.252 }, // Cabral
+      { latitude: -25.416, longitude: -49.261 },
+      { latitude: -25.4248, longitude: -49.268 }, // Passeio Público
+      { latitude: -25.43, longitude: -49.269 }, // Central
       { latitude: -25.4355, longitude: -49.2745 }, // Rui Barbosa
-      { latitude: -25.4450, longitude: -49.2840 }, // Bento Viana
-      { latitude: -25.4600, longitude: -49.2900 },
-      { latitude: -25.4740, longitude: -49.2940 }, // Portão
-      { latitude: -25.4860, longitude: -49.2935 },
-      { latitude: -25.4980, longitude: -49.2930 }, // Capão Raso
+      { latitude: -25.445, longitude: -49.284 }, // Bento Viana
+      { latitude: -25.46, longitude: -49.29 },
+      { latitude: -25.474, longitude: -49.294 }, // Portão
+      { latitude: -25.486, longitude: -49.2935 },
+      { latitude: -25.498, longitude: -49.293 }, // Capão Raso
     ],
     trajetoVolta: [
-      { latitude: -25.4980, longitude: -49.2930 },
-      { latitude: -25.4860, longitude: -49.2935 },
-      { latitude: -25.4740, longitude: -49.2940 },
-      { latitude: -25.4600, longitude: -49.2900 },
-      { latitude: -25.4450, longitude: -49.2840 },
+      { latitude: -25.498, longitude: -49.293 },
+      { latitude: -25.486, longitude: -49.2935 },
+      { latitude: -25.474, longitude: -49.294 },
+      { latitude: -25.46, longitude: -49.29 },
+      { latitude: -25.445, longitude: -49.284 },
       { latitude: -25.4355, longitude: -49.2745 },
-      { latitude: -25.4300, longitude: -49.2690 },
-      { latitude: -25.4248, longitude: -49.2680 },
-      { latitude: -25.4160, longitude: -49.2610 },
-      { latitude: -25.4055, longitude: -49.2520 },
-      { latitude: -25.3900, longitude: -49.2400 },
-      { latitude: -25.3780, longitude: -49.2290 },
+      { latitude: -25.43, longitude: -49.269 },
+      { latitude: -25.4248, longitude: -49.268 },
+      { latitude: -25.416, longitude: -49.261 },
+      { latitude: -25.4055, longitude: -49.252 },
+      { latitude: -25.39, longitude: -49.24 },
+      { latitude: -25.378, longitude: -49.229 },
     ],
     paradasIda: [
       'terminal-santa-candida',
@@ -206,22 +206,22 @@ export const CURITIBA_LINES: BusLine[] = [
     frequenciaMinutosPico: 4,
     temTempoReal: true,
     trajetoIda: [
-      { latitude: -25.4330, longitude: -49.2708 }, // Carlos Gomes
-      { latitude: -25.4370, longitude: -49.2680 }, // Eufrásio Correia
-      { latitude: -25.4490, longitude: -49.2600 },
-      { latitude: -25.4600, longitude: -49.2550 },
-      { latitude: -25.4710, longitude: -49.2520 }, // Terminal Hauer
-      { latitude: -25.4880, longitude: -49.2450 }, // Terminal Carmo
-      { latitude: -25.5020, longitude: -49.2390 }, // Terminal Boqueirão
+      { latitude: -25.433, longitude: -49.2708 }, // Carlos Gomes
+      { latitude: -25.437, longitude: -49.268 }, // Eufrásio Correia
+      { latitude: -25.449, longitude: -49.26 },
+      { latitude: -25.46, longitude: -49.255 },
+      { latitude: -25.471, longitude: -49.252 }, // Terminal Hauer
+      { latitude: -25.488, longitude: -49.245 }, // Terminal Carmo
+      { latitude: -25.502, longitude: -49.239 }, // Terminal Boqueirão
     ],
     trajetoVolta: [
-      { latitude: -25.5020, longitude: -49.2390 },
-      { latitude: -25.4880, longitude: -49.2450 },
-      { latitude: -25.4710, longitude: -49.2520 },
-      { latitude: -25.4600, longitude: -49.2550 },
-      { latitude: -25.4490, longitude: -49.2600 },
-      { latitude: -25.4370, longitude: -49.2680 },
-      { latitude: -25.4330, longitude: -49.2708 },
+      { latitude: -25.502, longitude: -49.239 },
+      { latitude: -25.488, longitude: -49.245 },
+      { latitude: -25.471, longitude: -49.252 },
+      { latitude: -25.46, longitude: -49.255 },
+      { latitude: -25.449, longitude: -49.26 },
+      { latitude: -25.437, longitude: -49.268 },
+      { latitude: -25.433, longitude: -49.2708 },
     ],
     paradasIda: [
       'tubo-carlos-gomes',
@@ -251,31 +251,21 @@ export const CURITIBA_LINES: BusLine[] = [
     frequenciaMinutosPico: 5,
     temTempoReal: false,
     trajetoIda: [
-      { latitude: -25.4380, longitude: -49.3080 }, // Campina do Siqueira
-      { latitude: -25.4360, longitude: -49.2900 },
+      { latitude: -25.438, longitude: -49.308 }, // Campina do Siqueira
+      { latitude: -25.436, longitude: -49.29 },
       { latitude: -25.4355, longitude: -49.2745 }, // Rui Barbosa
-      { latitude: -25.4300, longitude: -49.2690 }, // Central
-      { latitude: -25.4248, longitude: -49.2680 }, // Passeio
+      { latitude: -25.43, longitude: -49.269 }, // Central
+      { latitude: -25.4248, longitude: -49.268 }, // Passeio
     ],
     trajetoVolta: [
-      { latitude: -25.4248, longitude: -49.2680 },
-      { latitude: -25.4300, longitude: -49.2690 },
+      { latitude: -25.4248, longitude: -49.268 },
+      { latitude: -25.43, longitude: -49.269 },
       { latitude: -25.4355, longitude: -49.2745 },
-      { latitude: -25.4360, longitude: -49.2900 },
-      { latitude: -25.4380, longitude: -49.3080 },
+      { latitude: -25.436, longitude: -49.29 },
+      { latitude: -25.438, longitude: -49.308 },
     ],
-    paradasIda: [
-      'terminal-campina-siqueira',
-      'tubo-praca-rui-barbosa',
-      'tubo-central',
-      'tubo-passeio-publico',
-    ],
-    paradasVolta: [
-      'tubo-passeio-publico',
-      'tubo-central',
-      'tubo-praca-rui-barbosa',
-      'terminal-campina-siqueira',
-    ],
+    paradasIda: ['terminal-campina-siqueira', 'tubo-praca-rui-barbosa', 'tubo-central', 'tubo-passeio-publico'],
+    paradasVolta: ['tubo-passeio-publico', 'tubo-central', 'tubo-praca-rui-barbosa', 'terminal-campina-siqueira'],
   },
   {
     id: 'line-020',
@@ -290,22 +280,22 @@ export const CURITIBA_LINES: BusLine[] = [
     frequenciaMinutosPico: 6,
     temTempoReal: false,
     trajetoIda: [
-      { latitude: -25.4055, longitude: -49.2520 }, // Cabral
-      { latitude: -25.4300, longitude: -49.2300 }, // Tarumã
-      { latitude: -25.4710, longitude: -49.2520 }, // Hauer
-      { latitude: -25.4740, longitude: -49.2940 }, // Portão
-      { latitude: -25.4380, longitude: -49.3080 }, // Campina do Siqueira
-      { latitude: -25.4120, longitude: -49.2800 }, // Mercês
-      { latitude: -25.4055, longitude: -49.2520 }, // Cabral
+      { latitude: -25.4055, longitude: -49.252 }, // Cabral
+      { latitude: -25.43, longitude: -49.23 }, // Tarumã
+      { latitude: -25.471, longitude: -49.252 }, // Hauer
+      { latitude: -25.474, longitude: -49.294 }, // Portão
+      { latitude: -25.438, longitude: -49.308 }, // Campina do Siqueira
+      { latitude: -25.412, longitude: -49.28 }, // Mercês
+      { latitude: -25.4055, longitude: -49.252 }, // Cabral
     ],
     trajetoVolta: [
-      { latitude: -25.4055, longitude: -49.2520 },
-      { latitude: -25.4120, longitude: -49.2800 },
-      { latitude: -25.4380, longitude: -49.3080 },
-      { latitude: -25.4740, longitude: -49.2940 },
-      { latitude: -25.4710, longitude: -49.2520 },
-      { latitude: -25.4300, longitude: -49.2300 },
-      { latitude: -25.4055, longitude: -49.2520 },
+      { latitude: -25.4055, longitude: -49.252 },
+      { latitude: -25.412, longitude: -49.28 },
+      { latitude: -25.438, longitude: -49.308 },
+      { latitude: -25.474, longitude: -49.294 },
+      { latitude: -25.471, longitude: -49.252 },
+      { latitude: -25.43, longitude: -49.23 },
+      { latitude: -25.4055, longitude: -49.252 },
     ],
     paradasIda: [
       'terminal-cabral',
@@ -335,29 +325,21 @@ export const CURITIBA_LINES: BusLine[] = [
     frequenciaMinutosPico: 8,
     temTempoReal: false,
     trajetoIda: [
-      { latitude: -25.4055, longitude: -49.2520 },
-      { latitude: -25.4200, longitude: -49.2600 },
+      { latitude: -25.4055, longitude: -49.252 },
+      { latitude: -25.42, longitude: -49.26 },
       { latitude: -25.4355, longitude: -49.2745 },
-      { latitude: -25.4550, longitude: -49.2850 },
-      { latitude: -25.4740, longitude: -49.2940 },
+      { latitude: -25.455, longitude: -49.285 },
+      { latitude: -25.474, longitude: -49.294 },
     ],
     trajetoVolta: [
-      { latitude: -25.4740, longitude: -49.2940 },
-      { latitude: -25.4550, longitude: -49.2850 },
+      { latitude: -25.474, longitude: -49.294 },
+      { latitude: -25.455, longitude: -49.285 },
       { latitude: -25.4355, longitude: -49.2745 },
-      { latitude: -25.4200, longitude: -49.2600 },
-      { latitude: -25.4055, longitude: -49.2520 },
+      { latitude: -25.42, longitude: -49.26 },
+      { latitude: -25.4055, longitude: -49.252 },
     ],
-    paradasIda: [
-      'terminal-cabral',
-      'tubo-praca-rui-barbosa',
-      'terminal-portao',
-    ],
-    paradasVolta: [
-      'terminal-portao',
-      'tubo-praca-rui-barbosa',
-      'terminal-cabral',
-    ],
+    paradasIda: ['terminal-cabral', 'tubo-praca-rui-barbosa', 'terminal-portao'],
+    paradasVolta: ['terminal-portao', 'tubo-praca-rui-barbosa', 'terminal-cabral'],
   },
 ];
 
@@ -365,7 +347,8 @@ export const TRANSIT_ALERTS: TransitAlert[] = [
   {
     id: 'alert-1',
     titulo: 'Obras na Avenida Marechal Floriano Peixoto',
-    descricao: 'Desvio temporário para as linhas 500 Ligeirão Boqueirão entre as estações Hauer e Carmo devido a recapeamento asfáltico.',
+    descricao:
+      'Desvio temporário para as linhas 500 Ligeirão Boqueirão entre as estações Hauer e Carmo devido a recapeamento asfáltico.',
     data: 'Hoje, 08:30',
     tipo: 'obra',
     linhasAfetadas: ['500'],
@@ -381,7 +364,8 @@ export const TRANSIT_ALERTS: TransitAlert[] = [
   {
     id: 'alert-3',
     titulo: 'Novo tubo implantado na Linha Verde',
-    descricao: 'Estação-tubo inaugurada atendendo à linha Interbairros II com acessibilidade plena e catracas biométricas.',
+    descricao:
+      'Estação-tubo inaugurada atendendo à linha Interbairros II com acessibilidade plena e catracas biométricas.',
     data: 'Ontem',
     tipo: 'informativo',
     linhasAfetadas: ['020'],

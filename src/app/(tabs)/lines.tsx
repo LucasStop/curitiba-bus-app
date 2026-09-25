@@ -93,9 +93,7 @@ export default function LinesScreen() {
                 accessibilityState={{ selected: isActive }}
                 accessibilityLabel={`Filtrar por ${config.label}`}>
                 <View style={[styles.dot, { backgroundColor: config.corHex }]} />
-                <Text style={[styles.filterText, isActive && styles.filterTextActive]}>
-                  {config.label}
-                </Text>
+                <Text style={[styles.filterText, isActive && styles.filterTextActive]}>{config.label}</Text>
               </TouchableOpacity>
             );
           })}
