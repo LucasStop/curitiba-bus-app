@@ -1,14 +1,14 @@
-import { CuritibaMap } from "@/components/map/CuritibaMap";
-import { TransitBottomSheet } from "@/components/sheets/TransitBottomSheet";
-import { Spacing, Typography } from "@/constants/theme";
-import { useTheme } from "@/hooks/use-theme";
-import { useLiveVehicles } from "@/hooks/useLiveVehicles";
-import { useUserLocation } from "@/hooks/useUserLocation";
-import { useTransitStore } from "@/stores/useTransitStore";
-import { BusStop, BusVehicle } from "@/types/transit";
-import { useMemo } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { CuritibaMap } from '@/components/map/CuritibaMap';
+import { TransitBottomSheet } from '@/components/sheets/TransitBottomSheet';
+import { Spacing, Typography } from '@/constants/theme';
+import { useTheme } from '@/hooks/use-theme';
+import { useLiveVehicles } from '@/hooks/useLiveVehicles';
+import { useUserLocation } from '@/hooks/useUserLocation';
+import { useTransitStore } from '@/stores/useTransitStore';
+import { BusStop, BusVehicle } from '@/types/transit';
+import { useMemo } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function MapScreen() {
   const { location } = useUserLocation();
@@ -38,13 +38,13 @@ export default function MapScreen() {
         connectionBannerText: {
           fontSize: Typography.label.fontSize,
           lineHeight: Typography.label.lineHeight,
-          fontWeight: "600",
+          fontWeight: '600',
           color: theme.text,
         },
 
         // Sai do fluxo flex: fica ancorado no rodapé independente da altura do mapa/topo.
         sheetPositioner: {
-          position: "absolute",
+          position: 'absolute',
           left: 0,
           right: 0,
           bottom: 0,
@@ -66,23 +66,18 @@ export default function MapScreen() {
     <View style={styles.container}>
       {/* Mapa Principal Interativo, full-bleed */}
       <View style={styles.mapWrapper}>
-        <CuritibaMap
-          userLocation={location}
-          onSelectVehicle={handleSelectVehicle}
-          onSelectStop={handleSelectStop}
-        />
+        <CuritibaMap userLocation={location} onSelectVehicle={handleSelectVehicle} onSelectStop={handleSelectStop} />
       </View>
 
       {/* Camada transparente no topo: erro ancorado + pílulas flutuantes de busca/status */}
-      <SafeAreaView style={styles.topSafeArea} edges={["top", "left", "right"]}>
+      <SafeAreaView style={styles.topSafeArea} edges={['top', 'left', 'right']}>
         {connectionMessage && (
           <View
             style={styles.connectionBanner}
             testID="map-connection-banner"
             accessible
             accessibilityLiveRegion="polite"
-            accessibilityLabel={connectionMessage}
-          >
+            accessibilityLabel={connectionMessage}>
             <Text style={styles.connectionBannerText}>{connectionMessage}</Text>
           </View>
         )}

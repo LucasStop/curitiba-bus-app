@@ -34,9 +34,7 @@ describe('getDistanceInMeters', () => {
   });
 
   it('é simétrica (A->B == B->A)', () => {
-    expect(getDistanceInMeters(CENTRO, SANTA_CANDIDA)).toBeCloseTo(
-      getDistanceInMeters(SANTA_CANDIDA, CENTRO),
-    );
+    expect(getDistanceInMeters(CENTRO, SANTA_CANDIDA)).toBeCloseTo(getDistanceInMeters(SANTA_CANDIDA, CENTRO));
   });
 });
 

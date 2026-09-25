@@ -29,9 +29,7 @@ export function getBearing(start: LatLng, end: LatLng): number {
 
   const dLng = endLng - startLng;
   const y = Math.sin(dLng) * Math.cos(endLat);
-  const x =
-    Math.cos(startLat) * Math.sin(endLat) -
-    Math.sin(startLat) * Math.cos(endLat) * Math.cos(dLng);
+  const x = Math.cos(startLat) * Math.sin(endLat) - Math.sin(startLat) * Math.cos(endLat) * Math.cos(dLng);
 
   let brng = Math.atan2(y, x);
   brng = (brng * 180) / Math.PI;
@@ -77,9 +75,13 @@ export function getProgressAlongPath(path: LatLng[], point: LatLng): number {
     const dx = end.longitude - start.longitude;
     const dy = end.latitude - start.latitude;
     const lengthSq = dx * dx + dy * dy;
-    const t = lengthSq === 0 ? 0 : Math.max(0, Math.min(1,
-      ((point.longitude - start.longitude) * dx + (point.latitude - start.latitude) * dy) / lengthSq,
-    ));
+    const t =
+      lengthSq === 0
+        ? 0
+        : Math.max(
+            0,
+            Math.min(1, ((point.longitude - start.longitude) * dx + (point.latitude - start.latitude) * dy) / lengthSq),
+          );
 
     const dist = getDistanceInMeters(point, interpolateLatLng(start, end, t));
     if (dist < bestDist) {

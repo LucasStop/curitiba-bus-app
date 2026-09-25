@@ -12,12 +12,7 @@ interface BusBadgeProps {
   size?: 'small' | 'medium' | 'large';
 }
 
-export const BusBadge: React.FC<BusBadgeProps> = ({
-  codigo,
-  categoria = 'expresso',
-  corHex,
-  size = 'medium',
-}) => {
+export const BusBadge: React.FC<BusBadgeProps> = ({ codigo, categoria = 'expresso', corHex, size = 'medium' }) => {
   const isDark = useColorScheme() === 'dark';
   const categoryConfig = RIT_CATEGORIES[categoria];
   const fallback = isDark ? RIT_CATEGORIES.expresso.corHexDark : RIT_CATEGORIES.expresso.corHex;

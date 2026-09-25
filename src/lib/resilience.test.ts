@@ -59,9 +59,9 @@ describe('formatConnectionMessage', () => {
     const lastUpdatedAt = new Date('2026-09-22T14:32:00').getTime();
     const expectedTime = new Date(lastUpdatedAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
-    expect(
-      formatConnectionMessage({ state: 'offline', lastUpdatedAt, consecutiveFailures: 1 }),
-    ).toBe(`Sem conexão. Mostrando os últimos dados de ${expectedTime}.`);
+    expect(formatConnectionMessage({ state: 'offline', lastUpdatedAt, consecutiveFailures: 1 })).toBe(
+      `Sem conexão. Mostrando os últimos dados de ${expectedTime}.`,
+    );
   });
 
   it('offline sem nenhum dado anterior ainda avisa, sem hora', () => {

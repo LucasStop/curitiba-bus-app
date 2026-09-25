@@ -41,13 +41,11 @@ export const useTransitStore = create<TransitState>((set) => ({
     set((state) => ({
       activeDirection: state.activeDirection === 'ida' ? 'volta' : 'ida',
     })),
-  toggleMapTraffic: () =>
-    set((state) => ({ isMapTrafficVisible: !state.isMapTrafficVisible })),
+  toggleMapTraffic: () => set((state) => ({ isMapTrafficVisible: !state.isMapTrafficVisible })),
   setSheetSnapIndex: (index) => set({ sheetSnapIndex: index }),
   cycleSheetSnap: () =>
     set((state) => ({
       sheetSnapIndex: ((state.sheetSnapIndex + 1) % 3) as SheetSnapIndex,
     })),
-  clearSelection: () =>
-    set({ selectedLine: null, selectedStop: null, selectedVehicle: null }),
+  clearSelection: () => set({ selectedLine: null, selectedStop: null, selectedVehicle: null }),
 }));

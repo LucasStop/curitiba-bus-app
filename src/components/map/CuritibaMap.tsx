@@ -25,11 +25,7 @@ interface CuritibaMapProps {
   onSelectStop?: (s: BusStop) => void;
 }
 
-export const CuritibaMap: React.FC<CuritibaMapProps> = ({
-  userLocation,
-  onSelectVehicle,
-  onSelectStop,
-}) => {
+export const CuritibaMap: React.FC<CuritibaMapProps> = ({ userLocation, onSelectVehicle, onSelectStop }) => {
   const mapRef = useRef<MapView | null>(null);
 
   const { vehicles } = useLiveVehicles();
@@ -200,7 +196,7 @@ export const CuritibaMap: React.FC<CuritibaMapProps> = ({
           latitudeDelta: 0.03,
           longitudeDelta: 0.03,
         },
-        700
+        700,
       );
     }
   };
@@ -241,9 +237,7 @@ export const CuritibaMap: React.FC<CuritibaMapProps> = ({
       <View style={styles.webFallbackContainer}>
         <View style={styles.webHeader}>
           <Text style={styles.webTitle}>Mapa em Tempo Real - Curitiba RIT</Text>
-          <Text style={styles.webSubtitle}>
-            {vehicles.length} ônibus em circulação ativa agora
-          </Text>
+          <Text style={styles.webSubtitle}>{vehicles.length} ônibus em circulação ativa agora</Text>
         </View>
 
         <View style={styles.webMapSimulation}>
@@ -348,9 +342,7 @@ export const CuritibaMap: React.FC<CuritibaMapProps> = ({
             accessibilityRole="button"
             accessibilityLabel={`Sentido ${activeDirection === 'ida' ? 'ida' : 'volta'}. Toque para inverter o sentido da linha ${selectedLine.codigo}`}>
             <Navigation2 size={18} color={theme.surface} />
-            <Text style={styles.directionText}>
-              {activeDirection === 'ida' ? 'Ida' : 'Volta'}
-            </Text>
+            <Text style={styles.directionText}>{activeDirection === 'ida' ? 'Ida' : 'Volta'}</Text>
           </TouchableOpacity>
         )}
 
