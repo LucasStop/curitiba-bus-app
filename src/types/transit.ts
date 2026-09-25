@@ -1,4 +1,14 @@
-export type BusCategory = 'expresso' | 'ligeirinho' | 'interbairros' | 'alimentador' | 'troncal';
+export type BusCategory =
+  | 'expresso'
+  | 'ligeirao'
+  | 'ligeirinho'
+  | 'interbairros'
+  | 'alimentador'
+  | 'troncal'
+  | 'convencional'
+  | 'madrugueiro'
+  | 'turismo'
+  | 'operacional';
 
 export interface LatLng {
   latitude: number;
@@ -30,7 +40,7 @@ export interface BusStop {
   tipo: 'tubo' | 'comum' | 'terminal';
   latitude: number;
   longitude: number;
-  bairro: string;
+  bairro?: string; // GeoCuritiba não informa para ~8% das paradas
   linhas: string[]; // Lista de códigos das linhas que passam nesta parada (ex: ["203", "204"])
 }
 
@@ -43,8 +53,9 @@ export interface BusLine {
   terminalOrigem: string;
   terminalDestino: string;
   tarifa: number;
-  horarioFuncionamento: string;
-  frequenciaMinutosPico: number;
+  // Sem fonte pública até o acesso à URBS: ausente em vez de inventado.
+  horarioFuncionamento?: string;
+  frequenciaMinutosPico?: number;
   temTempoReal: boolean;
   trajetoIda: LatLng[];
   trajetoVolta: LatLng[];

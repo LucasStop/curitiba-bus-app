@@ -1,4 +1,4 @@
-import { CURITIBA_LINES, CURITIBA_STOPS } from '@/data/curitibaDataset';
+import { CURITIBA_STOPS, LINES_BY_CODE, STOPS_BY_ID } from '@/data/curitibaDataset';
 import { BusLine, BusStop, LatLng, TripLeg, TripPlanOption } from '@/types/transit';
 import { getDistanceInMeters } from '@/utils/geo';
 
@@ -63,9 +63,9 @@ export function planTransitTrip(origin: LatLng, destination: LatLng): TripPlanOp
 
   const options: TripPlanOption[] = [];
 
-  // Encontra as 3 paradas mais próximas da origem
+  // Paradas no raio de caminhada da origem (mínimo 3)
   const originStops = getClosestStops(origin, 3);
-  // Encontra as 3 paradas mais próximas do destino
+  // Paradas no raio de caminhada do destino (mínimo 3)
   const destStops = getClosestStops(destination, 3);
 
   // 1. Procurar conexões DIRETA (sem baldeação)
@@ -75,7 +75,7 @@ export function planTransitTrip(origin: LatLng, destination: LatLng): TripPlanOp
       const commonLines = oStop.linhas.filter((cod) => dStop.linhas.includes(cod));
 
       commonLines.forEach((codLinha) => {
-        const line = CURITIBA_LINES.find((l) => l.codigo === codLinha);
+        const line = LINES_BY_CODE.get(codLinha);
         if (!line) return;
 
         // P8: a linha só serve se o embarque vier antes do desembarque
@@ -149,13 +149,13 @@ export function planTransitTrip(origin: LatLng, destination: LatLng): TripPlanOp
   if (options.length < 2) {
     transferSearch: for (const oStop of originStops) {
       for (const line1Code of oStop.linhas) {
-        const line1 = CURITIBA_LINES.find((l) => l.codigo === line1Code);
+        const line1 = LINES_BY_CODE.get(line1Code);
         if (!line1) continue;
 
         for (const dStop of destStops) {
           for (const line2Code of dStop.linhas) {
             if (line2Code === line1Code) continue;
-            const line2 = CURITIBA_LINES.find((l) => l.codigo === line2Code);
+            const line2 = LINES_BY_CODE.get(line2Code);
             if (!line2) continue;
 
             const transferStop = findCommonTerminal(line1, line2);
@@ -199,13 +199,12 @@ export function planTransitTrip(origin: LatLng, destination: LatLng): TripPlanOp
 // explícito no dataset, ver `tipo` em BusStop) atendido pelas duas linhas.
 export function findCommonTerminal(line1: BusLine, line2: BusLine): BusStop | undefined {
   const line1Stops = new Set([...line1.paradasIda, ...line1.paradasVolta]);
-  const line2StopIds = [...line2.paradasIda, ...line2.paradasVolta];
-
-  const commonStopId = line2StopIds.find((id) => line1Stops.has(id));
-  if (!commonStopId) return undefined;
-
-  const stop = CURITIBA_STOPS.find((s) => s.id === commonStopId);
-  return stop?.tipo === 'terminal' ? stop : undefined;
+  for (const id of [...line2.paradasIda, ...line2.paradasVolta]) {
+    if (!line1Stops.has(id)) continue;
+    const stop = STOPS_BY_ID.get(id);
+    if (stop?.tipo === 'terminal') return stop;
+  }
+  return undefined;
 }
 
 function buildTransferOption(
@@ -300,13 +299,18 @@ function buildTransferOption(
   };
 }
 
-function getClosestStops(coord: LatLng, limit: number): BusStop[] {
-  return [...CURITIBA_STOPS]
-    .map((stop) => ({
-      stop,
-      distance: getDistanceInMeters(coord, { latitude: stop.latitude, longitude: stop.longitude }),
-    }))
+// Praças centrais e terminais têm uma plataforma por linha: só as N mais próximas perderiam linhas
+// que param a poucos metros. Pega tudo no raio de caminhada, garantindo um mínimo fora dele.
+const WALK_RADIUS_METERS = 500;
+const MAX_CANDIDATE_STOPS = 40;
+
+function getClosestStops(coord: LatLng, minCount: number): BusStop[] {
+  return CURITIBA_STOPS.map((stop) => ({
+    stop,
+    distance: getDistanceInMeters(coord, { latitude: stop.latitude, longitude: stop.longitude }),
+  }))
     .sort((a, b) => a.distance - b.distance)
-    .slice(0, limit)
+    .filter((item, i) => i < minCount || item.distance <= WALK_RADIUS_METERS)
+    .slice(0, MAX_CANDIDATE_STOPS)
     .map((item) => item.stop);
 }

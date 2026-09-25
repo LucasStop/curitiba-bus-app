@@ -1,6 +1,6 @@
 import { BusBadge } from '@/components/ui/BusBadge';
 import { Colors, Radius, Shadows, Typography } from '@/constants/theme';
-import { CURITIBA_STOPS } from '@/data/curitibaDataset';
+import { CURITIBA_STOPS, STOPS_BY_ID } from '@/data/curitibaDataset';
 import { useUserLocation } from '@/hooks/useUserLocation';
 import { planTransitTrip } from '@/services/tripPlanner';
 import { TripPlanOption } from '@/types/transit';
@@ -22,13 +22,21 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 // ponto de GPS/busca livre, que só precisa de nome + coordenadas.
 type RoutePoint = { nome: string; latitude: number; longitude: number };
 
+// Ids reais do GeoCuritiba (tubo Rui Barbosa 108030, tubo Carlos Gomes 108065, terminais).
+const stopById = (id: string) => STOPS_BY_ID.get(id) ?? CURITIBA_STOPS[0];
+const RUI_BARBOSA = stopById('108030');
+const CARLOS_GOMES = stopById('108065');
+const TERMINAL_CABRAL = stopById('terminal-cabral');
+const TERMINAL_BOQUEIRAO = stopById('terminal-boqueirao');
+const TERMINAL_PORTAO = stopById('terminal-portao');
+
 export default function RoutesScreen() {
-  const [originStop, setOriginStop] = useState<RoutePoint>(CURITIBA_STOPS[4]); // Praça Rui Barbosa
-  const [destStop, setDestStop] = useState<RoutePoint>(CURITIBA_STOPS[1]); // Terminal Cabral
+  const [originStop, setOriginStop] = useState<RoutePoint>(RUI_BARBOSA);
+  const [destStop, setDestStop] = useState<RoutePoint>(TERMINAL_CABRAL);
   const [results, setResults] = useState<TripPlanOption[]>(() =>
     planTransitTrip(
-      { latitude: CURITIBA_STOPS[4].latitude, longitude: CURITIBA_STOPS[4].longitude },
-      { latitude: CURITIBA_STOPS[1].latitude, longitude: CURITIBA_STOPS[1].longitude }
+      { latitude: RUI_BARBOSA.latitude, longitude: RUI_BARBOSA.longitude },
+      { latitude: TERMINAL_CABRAL.latitude, longitude: TERMINAL_CABRAL.longitude }
     )
   );
 
@@ -85,7 +93,7 @@ export default function RoutesScreen() {
 
   const filteredStops = CURITIBA_STOPS.filter((stop) =>
     stop.nome.toLowerCase().includes(pickerQuery.trim().toLowerCase())
-  );
+  ).slice(0, 30);
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
@@ -147,7 +155,7 @@ export default function RoutesScreen() {
         {/* Atalhos Rápidos */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.quickChips}>
           <TouchableOpacity
-            onPress={() => handleSelectRoute(CURITIBA_STOPS[4], CURITIBA_STOPS[1])}
+            onPress={() => handleSelectRoute(RUI_BARBOSA, TERMINAL_CABRAL)}
             style={styles.chip}
             hitSlop={{ top: 8, bottom: 8 }}
             testID="routes-quick-chip-0"
@@ -158,7 +166,7 @@ export default function RoutesScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => handleSelectRoute(CURITIBA_STOPS[5], CURITIBA_STOPS[12])}
+            onPress={() => handleSelectRoute(CARLOS_GOMES, TERMINAL_BOQUEIRAO)}
             style={styles.chip}
             hitSlop={{ top: 8, bottom: 8 }}
             testID="routes-quick-chip-1"
@@ -169,7 +177,7 @@ export default function RoutesScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => handleSelectRoute(CURITIBA_STOPS[1], CURITIBA_STOPS[8])}
+            onPress={() => handleSelectRoute(TERMINAL_CABRAL, TERMINAL_PORTAO)}
             style={styles.chip}
             hitSlop={{ top: 8, bottom: 8 }}
             testID="routes-quick-chip-2"
@@ -313,10 +321,10 @@ export default function RoutesScreen() {
                   style={styles.pickerStopRow}
                   testID={`routes-picker-stop-${stop.id}`}
                   accessibilityRole="button"
-                  accessibilityLabel={`Parada ${stop.nome}, bairro ${stop.bairro}`}>
+                  accessibilityLabel={`Parada ${stop.nome}${stop.bairro ? `, bairro ${stop.bairro}` : ''}`}>
                   <View style={{ flex: 1 }}>
                     <Text style={styles.pickerStopName}>{stop.nome}</Text>
-                    <Text style={styles.pickerStopMeta}>Bairro {stop.bairro}</Text>
+                    {stop.bairro && <Text style={styles.pickerStopMeta}>Bairro {stop.bairro}</Text>}
                   </View>
                   <ChevronRight size={16} color={Colors.light.borderStrong} />
                 </TouchableOpacity>

@@ -1,4 +1,4 @@
-import { CURITIBA_LINES, CURITIBA_STOPS } from '@/data/curitibaDataset';
+import { CURITIBA_LINES, CURITIBA_STOPS, LINES_BY_CODE, STOPS_BY_ID } from '@/data/curitibaDataset';
 import {
   ConnectionStatus,
   INITIAL_CONNECTION_STATUS,
@@ -6,7 +6,7 @@ import {
   computeBackoffDelay,
   nextConnectionStatus,
 } from '@/lib/resilience';
-import { ArrivalEstimate, BusLine, BusStop, BusVehicle, LatLng } from '@/types/transit';
+import { ArrivalEstimate, BusCategory, BusLine, BusStop, BusVehicle, LatLng } from '@/types/transit';
 import {
   calculateStepDistanceMeters,
   getBearing,
@@ -15,6 +15,8 @@ import {
   isBusApproachingStop,
 } from '@/utils/geo';
 import { AppState, AppStateStatus } from 'react-native';
+
+const SIMULATED_CATEGORIES: BusCategory[] = ['expresso', 'ligeirao', 'ligeirinho', 'interbairros', 'troncal'];
 
 const TICK_INTERVAL_MS = 3000;
 
@@ -92,9 +94,10 @@ class MockTransitProvider implements TransitProvider {
   private initSimulatedVehicles() {
     let idCounter = 1;
 
-    CURITIBA_LINES.forEach((line) => {
-      // Cria 2 a 3 veículos por linha em diferentes pontos do trajeto
-      const numBuses = line.codigo === '203' || line.codigo === '500' ? 3 : 2;
+    // ponytail: só o eixo estrutural, 1 veículo por sentido (~130 no total). Simular as 314 linhas
+    // pesa no tick e no mapa; some quando a posição real da URBS substituir a simulação.
+    CURITIBA_LINES.filter((line) => SIMULATED_CATEGORIES.includes(line.categoria)).forEach((line) => {
+      const numBuses = line.paradasVolta.length ? 2 : 1;
 
       for (let i = 0; i < numBuses; i++) {
         const isIda = i % 2 === 0;
@@ -196,7 +199,7 @@ class MockTransitProvider implements TransitProvider {
 
   private tickSimulation(now: number) {
     this.vehicles = this.vehicles.map((item) => {
-      const line = CURITIBA_LINES.find((l) => l.id === item.lineId);
+      const line = LINES_BY_CODE.get(item.vehicle.codLinha);
       if (!line) return item;
 
       const trajeto = item.direction === 'ida' ? line.trajetoIda : line.trajetoVolta;
@@ -282,7 +285,7 @@ class MockTransitProvider implements TransitProvider {
   }
 
   public getLineByCode(codigo: string): BusLine | undefined {
-    return CURITIBA_LINES.find((l) => l.codigo === codigo);
+    return LINES_BY_CODE.get(codigo);
   }
 
   public getStops(): BusStop[] {
@@ -290,7 +293,7 @@ class MockTransitProvider implements TransitProvider {
   }
 
   public getStopById(id: string): BusStop | undefined {
-    return CURITIBA_STOPS.find((s) => s.id === id);
+    return STOPS_BY_ID.get(id);
   }
 
   /**

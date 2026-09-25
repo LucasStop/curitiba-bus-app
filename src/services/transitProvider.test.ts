@@ -1,3 +1,5 @@
+jest.mock('@/data/curitibaDataset', () => require('@/data/__fixtures__/mockDataset'));
+
 import { AppState, type AppStateStatus } from 'react-native';
 import type { NetworkError as NetworkErrorType } from '@/lib/resilience';
 import type { transitService as TransitServiceInstance } from './transitProvider';
@@ -127,13 +129,18 @@ describe('transitService — resiliência contra o provedor mock (RNF-02)', () =
     expect(transitService.getConnectionStatus().state).toBe('error');
   });
 
+  // Qualquer parada com ônibus simulado se aproximando; não depende de quantos veículos cada linha tem.
+  const stopWithArrivals = () =>
+    transitService.getStops().find((s) => transitService.getArrivalsForStop(s.id).length > 0)?.id ?? '';
+
   it('geradoEmTs das chegadas é o carimbo do tick e não muda em chamadas repetidas sem tick no meio', () => {
     transitService.subscribeVehicles(() => {});
     jest.advanceTimersByTime(3000); // 1 tick bem-sucedido fixa o carimbo
 
     const tickTs = Date.now();
-    const first = transitService.getArrivalsForStop('tubo-bento-viana');
-    const second = transitService.getArrivalsForStop('tubo-bento-viana');
+    const stopId = stopWithArrivals();
+    const first = transitService.getArrivalsForStop(stopId);
+    const second = transitService.getArrivalsForStop(stopId);
 
     expect(first.length).toBeGreaterThan(0);
     expect(first.every((e: { geradoEmTs: number }) => e.geradoEmTs === tickTs)).toBe(true);
@@ -146,12 +153,13 @@ describe('transitService — resiliência contra o provedor mock (RNF-02)', () =
     transitService.subscribeVehicles(() => {});
     jest.advanceTimersByTime(3000); // tick bom: fixa lastTickTs
     const goodTickTs = Date.now();
+    const stopId = stopWithArrivals();
 
     transitService.simulateFailures(1, () => new NetworkError());
     jest.advanceTimersByTime(3000); // este tick falha, dado congelado
     jest.advanceTimersByTime(5000); // tempo passa sem nenhum tick bom novo
 
-    const arrivals = transitService.getArrivalsForStop('tubo-bento-viana');
+    const arrivals = transitService.getArrivalsForStop(stopId);
     expect(arrivals.length).toBeGreaterThan(0);
     expect(arrivals.every((e: { geradoEmTs: number }) => e.geradoEmTs === goodTickTs)).toBe(true);
     expect(Date.now()).toBeGreaterThan(goodTickTs);

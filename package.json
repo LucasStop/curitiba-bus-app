@@ -67,6 +67,7 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
+    "data:geocuritiba": "node scripts/import-geocuritiba.mjs",
     "test": "jest",
     "postinstall": "patch-package"
   },
