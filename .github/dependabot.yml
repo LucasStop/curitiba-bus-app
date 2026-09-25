@@ -5,7 +5,6 @@
 version: 2
 updates:
   # O repo usa yarn.lock; o Dependabot cobre yarn v1 pelo ecossistema "npm".
-  # Majors do Expo SDK / React Native sobem juntos (npx expo install --fix), entao ficam fora do agrupamento.
   - package-ecosystem: npm
     directory: /
     schedule:
@@ -14,13 +13,24 @@ updates:
     groups:
       minor-and-patch:
         update-types: [minor, patch]
+    # O Expo SDK fixa estas versões (inclusive patch). Sobem juntas na atualização de SDK com
+    # `npx expo install --fix`, nunca isoladas: bump solto quebrou o build em 21/09/2026 e o
+    # Dependabot abriu majors do SDK 58 em 25/09 com o projeto no 57. Alertas de segurança
+    # continuam valendo (são configuração do repositório, não deste arquivo).
     ignore:
-      # Majors incompativeis com Expo SDK 57 (causaram o incidente de 21/09 -
-      # bump quebrou o build). Remover quando o SDK 58 suportar essas majors.
-      - dependency-name: '@react-native-async-storage/async-storage'
-        versions: ['>=3.0.0']
-      - dependency-name: 'react-native-gesture-handler'
-        versions: ['>=3.0.0']
+      - dependency-name: 'expo'
+      - dependency-name: 'expo-*'
+      - dependency-name: '@expo/*'
+      - dependency-name: 'react'
+      - dependency-name: 'react-dom'
+      - dependency-name: 'react-native'
+      - dependency-name: 'react-native-*'
+      - dependency-name: '@react-native/*'
+      - dependency-name: '@react-native-async-storage/*'
+      - dependency-name: 'react-test-renderer'
+      - dependency-name: '@types/react'
+      - dependency-name: 'jest-expo'
+      - dependency-name: 'typescript'
 
   - package-ecosystem: github-actions
     directory: /
