@@ -1,0 +1,12 @@
+node_modules/
+.expo/
+dist/
+ios/
+android/
+docs/
+supabase/
+src/data/geocuritiba.json
+graphify-out/
+*.md
+yarn.lock
+.claude/
