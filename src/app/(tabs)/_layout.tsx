@@ -3,20 +3,21 @@ import { Bookmark, Bus, Map, Navigation } from 'lucide-react-native';
 import React from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Colors } from '@/constants/theme';
+import { useTheme } from '@/hooks/use-theme';
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
+  const theme = useTheme();
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: Colors.light.primary,
-        tabBarInactiveTintColor: Colors.light.textMuted,
+        tabBarActiveTintColor: theme.primary,
+        tabBarInactiveTintColor: theme.textMuted,
         tabBarStyle: {
-          backgroundColor: Colors.light.surface,
-          borderTopColor: Colors.light.border,
+          backgroundColor: theme.surface,
+          borderTopColor: theme.border,
           height: 60 + insets.bottom,
           paddingBottom: 8 + insets.bottom,
           paddingTop: 6,

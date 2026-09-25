@@ -1,7 +1,9 @@
-jest.mock('@/data/curitibaDataset', () => require('@/data/__fixtures__/mockDataset'));
-
 import { CURITIBA_LINES, CURITIBA_STOPS } from '@/data/curitibaDataset';
 import { findCommonTerminal, planTransitTrip } from './tripPlanner';
+
+// babel-jest sobe este mock para antes dos imports.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+jest.mock('@/data/curitibaDataset', () => require('@/data/__fixtures__/mockDataset'));
 
 const line = (codigo: string) => CURITIBA_LINES.find((l) => l.codigo === codigo)!;
 const stop = (id: string) => CURITIBA_STOPS.find((s) => s.id === id)!;
