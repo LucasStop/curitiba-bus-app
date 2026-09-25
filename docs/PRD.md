@@ -112,7 +112,11 @@ Investigação com testes reais de rede (`curl`), não só leitura de documenta�
 - Pedir login/senha da URBS (processo administrativo, LAI ou protocolo presencial — não é tarefa de código).
 - Com credencial: script de pré-processamento fora do app (Node) chamando `getLinhas`/`getPontosLinha`/`getShapeLinha`/`getTrechosItinerarios` no máximo ~1x/dia, gerando o JSON estático que substitui `curitibaDataset.ts` (plano já descrito em [SSD.md](SSD.md) §6); posição de veículo via `getVeiculosLinha` (sem parâmetro `linha`, que já retorna todos) com polling comedido no app.
 
-## 8.2 Dados estáticos reais via GeoCuritiba (25/09/2026)
+## 8.2 Acesso ao WebService liberado (25/09/2026)
+
+O pedido LAI 00-088136/2026 foi atendido: a URBS criou credenciais de acesso ao WebService, com condições de uso (limite de frequência, aviso de responsabilidade no app, aviso de descontinuidade). Detalhes técnicos e regras em [URBS-WEBSERVICE.md](URBS-WEBSERVICE.md). **E3 deixa de estar bloqueado.**
+
+## 8.3 Dados estáticos reais via GeoCuritiba (25/09/2026)
 
 A parte estática do E3 foi destravada sem esperar a URBS: o GeoCuritiba (IPPUC) publica, sem login, a camada `URBS_Transporte_Publico` (ArcGIS REST) com paradas (7.254), traçados (667, 314 linhas) e a tabela parada↔linha com sentido e sequência (`pontos_linha`, o número da parada sai pela relação `queryRelatedRecords`).
 
