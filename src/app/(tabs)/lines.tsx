@@ -1,17 +1,20 @@
 import { BusBadge } from '@/components/ui/BusBadge';
 import { RIT_CATEGORIES } from '@/constants/rit';
-import { Colors, Radius, Shadows, Typography } from '@/constants/theme';
+import { Radius, Shadows, Typography } from '@/constants/theme';
 import { CURITIBA_LINES } from '@/data/curitibaDataset';
 import { useFavoritesStore } from '@/stores/useFavoritesStore';
 import { useTransitStore } from '@/stores/useTransitStore';
 import { BusCategory, BusLine } from '@/types/transit';
+import { useTheme } from '@/hooks/use-theme';
 import { useRouter } from 'expo-router';
 import { Bookmark, Clock, MapPin, Search } from 'lucide-react-native';
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function LinesScreen() {
+  const theme = useTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const router = useRouter();
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<'all' | BusCategory>('all');
@@ -42,10 +45,10 @@ export default function LinesScreen() {
 
         {/* Busca */}
         <View style={styles.searchBar}>
-          <Search size={18} color={Colors.light.textMuted} />
+          <Search size={18} color={theme.textMuted} />
           <TextInput
             placeholder="Buscar por número ou nome da linha..."
-            placeholderTextColor={Colors.light.textMuted}
+            placeholderTextColor={theme.textMuted}
             style={styles.searchInput}
             value={search}
             onChangeText={setSearch}
@@ -137,8 +140,8 @@ export default function LinesScreen() {
                   accessibilityLabel={`${isFav ? 'Remover' : 'Adicionar'} linha ${line.codigo} ${isFav ? 'dos' : 'aos'} favoritos`}>
                   <Bookmark
                     size={22}
-                    color={isFav ? Colors.light.danger : Colors.light.textMuted}
-                    fill={isFav ? Colors.light.danger : 'none'}
+                    color={isFav ? theme.danger : theme.textMuted}
+                    fill={isFav ? theme.danger : 'none'}
                   />
                 </TouchableOpacity>
               </View>
@@ -147,13 +150,13 @@ export default function LinesScreen() {
 
               <View style={styles.terminalsRow}>
                 <View style={styles.terminalItem}>
-                  <MapPin size={14} color={Colors.light.textMuted} />
+                  <MapPin size={14} color={theme.textMuted} />
                   <Text style={styles.terminalText} numberOfLines={1}>
                     Origem: {line.terminalOrigem}
                   </Text>
                 </View>
                 <View style={styles.terminalItem}>
-                  <MapPin size={14} color={Colors.light.textMuted} />
+                  <MapPin size={14} color={theme.textMuted} />
                   <Text style={styles.terminalText} numberOfLines={1}>
                     Destino: {line.terminalDestino}
                   </Text>
@@ -163,7 +166,7 @@ export default function LinesScreen() {
               <View style={styles.cardBottom}>
                 {line.frequenciaMinutosPico != null && (
                   <View style={styles.metaBadge}>
-                    <Clock size={12} color={Colors.light.textMuted} />
+                    <Clock size={12} color={theme.textMuted} />
                     <Text style={styles.metaText}>Pico a cada {line.frequenciaMinutosPico} min</Text>
                   </View>
                 )}
@@ -186,163 +189,165 @@ export default function LinesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.light.background,
-  },
-  header: {
-    backgroundColor: Colors.light.surface,
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.light.border,
-  },
-  title: {
-    fontSize: Typography.screenTitle.fontSize,
-    lineHeight: Typography.screenTitle.lineHeight,
-    fontWeight: '900',
-    color: Colors.light.text,
-  },
-  subtitle: {
-    fontSize: Typography.label.fontSize,
-    lineHeight: Typography.label.lineHeight,
-    color: Colors.light.textMuted,
-    marginTop: 2,
-    marginBottom: 12,
-  },
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.light.surfaceMuted,
-    borderRadius: Radius.md,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    gap: 8,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: Typography.body.fontSize,
-    color: Colors.light.text,
-    padding: 0,
-  },
-  clearText: {
-    color: Colors.light.textMuted,
-    fontWeight: '700',
-    fontSize: Typography.body.fontSize,
-  },
-  filterRow: {
-    gap: 8,
-    marginTop: 12,
-    paddingBottom: 2,
-  },
-  filterPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.light.surfaceMuted,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: Radius.pill,
-  },
-  filterPillActive: {
-    backgroundColor: Colors.light.text,
-  },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: Radius.pill,
-    marginRight: 6,
-  },
-  filterText: {
-    fontSize: Typography.label.fontSize,
-    lineHeight: Typography.label.lineHeight,
-    fontWeight: '600',
-    // ponytail: textMuted on surfaceMuted is 4.34:1, just under AA 4.5:1 for 12pt text.
-    color: Colors.light.text,
-  },
-  filterTextActive: {
-    color: Colors.light.surface,
-  },
-  list: {
-    flex: 1,
-  },
-  listContent: {
-    padding: 16,
-    gap: 14,
-  },
-  card: {
-    backgroundColor: Colors.light.surface,
-    borderRadius: Radius.lg,
-    padding: 14,
-    ...Shadows.card,
-  },
-  cardTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  lineName: {
-    fontSize: Typography.itemTitle.fontSize,
-    lineHeight: Typography.itemTitle.lineHeight,
-    fontWeight: '800',
-    color: Colors.light.text,
-  },
-  categoryLabel: {
-    fontSize: Typography.label.fontSize,
-    lineHeight: Typography.label.lineHeight,
-    color: Colors.light.textMuted,
-    marginTop: 2,
-  },
-  favButton: {
-    padding: 6,
-  },
-  cardDivider: {
-    height: 1,
-    backgroundColor: Colors.light.surfaceMuted,
-    marginVertical: 10,
-  },
-  terminalsRow: {
-    gap: 6,
-    marginBottom: 12,
-  },
-  terminalItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  terminalText: {
-    fontSize: Typography.label.fontSize,
-    lineHeight: Typography.label.lineHeight,
-    color: Colors.light.textMuted,
-  },
-  cardBottom: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  metaBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: Colors.light.background,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: Radius.sm,
-  },
-  metaText: {
-    fontSize: Typography.label.fontSize,
-    color: Colors.light.textMuted,
-    fontWeight: '600',
-  },
-  mapButton: {
-    marginLeft: 'auto',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: Radius.sm,
-  },
-  mapButtonText: {
-    color: Colors.light.surface,
-    fontWeight: '700',
-    fontSize: Typography.label.fontSize,
-  },
-});
+function createStyles(theme: ReturnType<typeof useTheme>) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+    },
+    header: {
+      backgroundColor: theme.surface,
+      paddingHorizontal: 16,
+      paddingTop: 12,
+      paddingBottom: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.border,
+    },
+    title: {
+      fontSize: Typography.screenTitle.fontSize,
+      lineHeight: Typography.screenTitle.lineHeight,
+      fontWeight: '900',
+      color: theme.text,
+    },
+    subtitle: {
+      fontSize: Typography.label.fontSize,
+      lineHeight: Typography.label.lineHeight,
+      color: theme.textMuted,
+      marginTop: 2,
+      marginBottom: 12,
+    },
+    searchBar: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.surfaceMuted,
+      borderRadius: Radius.md,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      gap: 8,
+    },
+    searchInput: {
+      flex: 1,
+      fontSize: Typography.body.fontSize,
+      color: theme.text,
+      padding: 0,
+    },
+    clearText: {
+      color: theme.textMuted,
+      fontWeight: '700',
+      fontSize: Typography.body.fontSize,
+    },
+    filterRow: {
+      gap: 8,
+      marginTop: 12,
+      paddingBottom: 2,
+    },
+    filterPill: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.surfaceMuted,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: Radius.pill,
+    },
+    filterPillActive: {
+      backgroundColor: theme.text,
+    },
+    dot: {
+      width: 6,
+      height: 6,
+      borderRadius: Radius.pill,
+      marginRight: 6,
+    },
+    filterText: {
+      fontSize: Typography.label.fontSize,
+      lineHeight: Typography.label.lineHeight,
+      fontWeight: '600',
+      // ponytail: textMuted on surfaceMuted is 4.34:1, just under AA 4.5:1 for 12pt text.
+      color: theme.text,
+    },
+    filterTextActive: {
+      color: theme.surface,
+    },
+    list: {
+      flex: 1,
+    },
+    listContent: {
+      padding: 16,
+      gap: 14,
+    },
+    card: {
+      backgroundColor: theme.surface,
+      borderRadius: Radius.lg,
+      padding: 14,
+      ...Shadows.card,
+    },
+    cardTop: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    lineName: {
+      fontSize: Typography.itemTitle.fontSize,
+      lineHeight: Typography.itemTitle.lineHeight,
+      fontWeight: '800',
+      color: theme.text,
+    },
+    categoryLabel: {
+      fontSize: Typography.label.fontSize,
+      lineHeight: Typography.label.lineHeight,
+      color: theme.textMuted,
+      marginTop: 2,
+    },
+    favButton: {
+      padding: 6,
+    },
+    cardDivider: {
+      height: 1,
+      backgroundColor: theme.surfaceMuted,
+      marginVertical: 10,
+    },
+    terminalsRow: {
+      gap: 6,
+      marginBottom: 12,
+    },
+    terminalItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+    },
+    terminalText: {
+      fontSize: Typography.label.fontSize,
+      lineHeight: Typography.label.lineHeight,
+      color: theme.textMuted,
+    },
+    cardBottom: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    metaBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+      backgroundColor: theme.background,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: Radius.sm,
+    },
+    metaText: {
+      fontSize: Typography.label.fontSize,
+      color: theme.textMuted,
+      fontWeight: '600',
+    },
+    mapButton: {
+      marginLeft: 'auto',
+      paddingHorizontal: 14,
+      paddingVertical: 8,
+      borderRadius: Radius.sm,
+    },
+    mapButtonText: {
+      color: theme.surface,
+      fontWeight: '700',
+      fontSize: Typography.label.fontSize,
+    },
+  });
+}
