@@ -12,7 +12,7 @@ function useHasHydrated() {
   return useSyncExternalStore(
     emptySubscribe,
     () => true,
-    () => false
+    () => false,
   );
 }
 

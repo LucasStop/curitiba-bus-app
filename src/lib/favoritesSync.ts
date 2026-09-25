@@ -52,7 +52,13 @@ export async function pullAndMergeFavorites(
 }
 
 // Espelha um toggle local na nuvem. Falha de rede não desfaz o toggle local nem trava a UI (S17).
-async function syncOneToggle(supabase: SupabaseClient, userId: string, kind: Kind, ref: string, isNowFavorite: boolean) {
+async function syncOneToggle(
+  supabase: SupabaseClient,
+  userId: string,
+  kind: Kind,
+  ref: string,
+  isNowFavorite: boolean,
+) {
   try {
     if (isNowFavorite) {
       await supabase.from(TABLE).insert({ user_id: userId, kind, ref });
@@ -75,10 +81,14 @@ export function startFavoritesSync(supabase: SupabaseClient, userId: string): vo
     const added = (before: string[], after: string[]) => after.filter((ref) => !before.includes(ref));
     const removed = (before: string[], after: string[]) => before.filter((ref) => !after.includes(ref));
 
-    for (const ref of added(prev.favoriteLines, state.favoriteLines)) void syncOneToggle(supabase, userId, 'line', ref, true);
-    for (const ref of removed(prev.favoriteLines, state.favoriteLines)) void syncOneToggle(supabase, userId, 'line', ref, false);
-    for (const ref of added(prev.favoriteStops, state.favoriteStops)) void syncOneToggle(supabase, userId, 'stop', ref, true);
-    for (const ref of removed(prev.favoriteStops, state.favoriteStops)) void syncOneToggle(supabase, userId, 'stop', ref, false);
+    for (const ref of added(prev.favoriteLines, state.favoriteLines))
+      void syncOneToggle(supabase, userId, 'line', ref, true);
+    for (const ref of removed(prev.favoriteLines, state.favoriteLines))
+      void syncOneToggle(supabase, userId, 'line', ref, false);
+    for (const ref of added(prev.favoriteStops, state.favoriteStops))
+      void syncOneToggle(supabase, userId, 'stop', ref, true);
+    for (const ref of removed(prev.favoriteStops, state.favoriteStops))
+      void syncOneToggle(supabase, userId, 'stop', ref, false);
 
     prev = state;
   });

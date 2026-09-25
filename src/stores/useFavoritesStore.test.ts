@@ -13,7 +13,10 @@ describe('useFavoritesStore initial state', () => {
 
 describe('migrateFavorites (v0 -> v1, dataset real)', () => {
   it('keeps ids that still exist and drops the mock-only ones', () => {
-    const migrated = migrateFavorites({ favoriteLines: ['203', 'nao-existe'], favoriteStops: ['terminal-cabral', 'tubo-central'] });
+    const migrated = migrateFavorites({
+      favoriteLines: ['203', 'nao-existe'],
+      favoriteStops: ['terminal-cabral', 'tubo-central'],
+    });
     expect(migrated.favoriteLines).toEqual(['203']);
     expect(migrated.favoriteStops).toEqual(['terminal-cabral']);
   });

@@ -6,7 +6,15 @@ import { validateEmail } from '@/lib/validation';
 import { useAuth } from '@/providers/AuthProvider';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ForgotPasswordScreen() {
@@ -78,7 +86,11 @@ export default function ForgotPasswordScreen() {
                 accessibilityRole="button"
                 accessibilityLabel="Enviar link de recuperação"
                 accessibilityState={{ disabled: submitting, busy: submitting }}>
-                {submitting ? <ActivityIndicator color={theme.onPrimary} /> : <Text style={s.primaryButtonText}>Enviar link</Text>}
+                {submitting ? (
+                  <ActivityIndicator color={theme.onPrimary} />
+                ) : (
+                  <Text style={s.primaryButtonText}>Enviar link</Text>
+                )}
               </TouchableOpacity>
             </>
           )}

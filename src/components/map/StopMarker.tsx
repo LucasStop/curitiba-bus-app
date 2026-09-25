@@ -10,9 +10,7 @@ interface StopMarkerProps {
 
 export function getStopMarkerAccessibilityLabel(stop: BusStop, isSelected = false): string {
   const tipo = stop.tipo === 'terminal' ? 'Terminal' : 'Estação-tubo';
-  return `${tipo} ${stop.nome}${stop.bairro ? `, bairro ${stop.bairro}` : ''}${
-    isSelected ? ', selecionada' : ''
-  }`;
+  return `${tipo} ${stop.nome}${stop.bairro ? `, bairro ${stop.bairro}` : ''}${isSelected ? ', selecionada' : ''}`;
 }
 
 // Memoizado: stops são estáticos (CURITIBA_STOPS), mas sem isso todo tick de veículo
