@@ -149,6 +149,7 @@ export default function RoutesScreen() {
           <TouchableOpacity
             onPress={() => handleSelectRoute(CURITIBA_STOPS[4], CURITIBA_STOPS[1])}
             style={styles.chip}
+            hitSlop={{ top: 8, bottom: 8 }}
             testID="routes-quick-chip-0"
             accessibilityRole="button"
             accessibilityLabel="Rota rápida de Rui Barbosa até Cabral">
@@ -159,6 +160,7 @@ export default function RoutesScreen() {
           <TouchableOpacity
             onPress={() => handleSelectRoute(CURITIBA_STOPS[5], CURITIBA_STOPS[12])}
             style={styles.chip}
+            hitSlop={{ top: 8, bottom: 8 }}
             testID="routes-quick-chip-1"
             accessibilityRole="button"
             accessibilityLabel="Rota rápida de Carlos Gomes até Boqueirão">
@@ -169,6 +171,7 @@ export default function RoutesScreen() {
           <TouchableOpacity
             onPress={() => handleSelectRoute(CURITIBA_STOPS[1], CURITIBA_STOPS[8])}
             style={styles.chip}
+            hitSlop={{ top: 8, bottom: 8 }}
             testID="routes-quick-chip-2"
             accessibilityRole="button"
             accessibilityLabel="Rota rápida de Cabral até Portão">
@@ -208,10 +211,12 @@ export default function RoutesScreen() {
                 </Text>
               </View>
 
-              <View style={styles.walkMeta}>
-                <Footprints size={14} color={Colors.light.textMuted} />
-                <Text style={styles.walkText}>{opt.caminhadaTotalMetros}m a pé</Text>
-              </View>
+              {opt.caminhadaTotalMetros > 0 && (
+                <View style={styles.walkMeta}>
+                  <Footprints size={14} color={Colors.light.textMuted} />
+                  <Text style={styles.walkText}>{opt.caminhadaTotalMetros}m a pé</Text>
+                </View>
+              )}
             </View>
 
             <View style={styles.legsDivider} />
