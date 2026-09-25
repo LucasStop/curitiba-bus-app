@@ -8,7 +8,7 @@ import { BusCategory, BusLine } from '@/types/transit';
 import { useRouter } from 'expo-router';
 import { Bookmark, Clock, MapPin, Search } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function LinesScreen() {
@@ -103,12 +103,18 @@ export default function LinesScreen() {
       </View>
 
       {/* Lista de Linhas */}
-      <ScrollView style={styles.list} contentContainerStyle={styles.listContent}>
-        {filteredLines.map((line) => {
+      <FlatList
+        style={styles.list}
+        contentContainerStyle={styles.listContent}
+        data={filteredLines}
+        keyExtractor={(line) => line.id}
+        initialNumToRender={8}
+        extraData={favoriteLines}
+        renderItem={({ item: line }) => {
           const isFav = favoriteLines.includes(line.codigo);
 
           return (
-            <View key={line.id} style={styles.card}>
+            <View style={styles.card}>
               <View style={styles.cardTop}>
                 <BusBadge codigo={line.codigo} corHex={line.corHex} size="large" />
 
@@ -156,10 +162,12 @@ export default function LinesScreen() {
               </View>
 
               <View style={styles.cardBottom}>
-                <View style={styles.metaBadge}>
-                  <Clock size={12} color={Colors.light.textMuted} />
-                  <Text style={styles.metaText}>Pico a cada {line.frequenciaMinutosPico} min</Text>
-                </View>
+                {line.frequenciaMinutosPico != null && (
+                  <View style={styles.metaBadge}>
+                    <Clock size={12} color={Colors.light.textMuted} />
+                    <Text style={styles.metaText}>Pico a cada {line.frequenciaMinutosPico} min</Text>
+                  </View>
+                )}
 
                 <TouchableOpacity
                   onPress={() => handleOpenOnMap(line)}
@@ -173,8 +181,8 @@ export default function LinesScreen() {
               </View>
             </View>
           );
-        })}
-      </ScrollView>
+        }}
+      />
     </SafeAreaView>
   );
 }
@@ -328,6 +336,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   mapButton: {
+    marginLeft: 'auto',
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: Radius.sm,

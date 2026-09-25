@@ -150,14 +150,14 @@ export default function FavoritesScreen() {
             testID="favorites-tab-favorites-button"
             accessibilityRole="button"
             accessibilityState={{ selected: activeTab === 'favorites' }}
-            accessibilityLabel={`Ver favoritos, ${favoriteLines.length + favoriteStops.length} salvos`}>
+            accessibilityLabel={`Ver favoritos, ${lines.length + stops.length} salvos`}>
             <Bookmark
               size={16}
               color={activeTab === 'favorites' ? theme.text : theme.textMuted}
               fill={activeTab === 'favorites' ? theme.text : 'none'}
             />
             <Text style={[styles.tabButtonText, activeTab === 'favorites' && styles.tabButtonTextActive]}>
-              Favoritos ({favoriteLines.length + favoriteStops.length})
+              Favoritos ({lines.length + stops.length})
             </Text>
           </TouchableOpacity>
 
@@ -267,7 +267,7 @@ export default function FavoritesScreen() {
                     activeOpacity={0.8}
                     testID={`favorites-stop-card-${stop.id}`}
                     accessibilityRole="button"
-                    accessibilityLabel={`Ver parada ${stop.nome}, bairro ${stop.bairro} no mapa`}
+                    accessibilityLabel={`Ver parada ${stop.nome}${stop.bairro ? `, bairro ${stop.bairro}` : ''} no mapa`}
                     accessibilityActions={[{ name: 'delete', label: 'Remover dos favoritos' }]}
                     onAccessibilityAction={(e) => e.nativeEvent.actionName === 'delete' && toggleFavoriteStop(stop.id)}>
                     <View style={styles.favoriteCardRow}>
@@ -276,7 +276,7 @@ export default function FavoritesScreen() {
                       </View>
                       <View style={{ flex: 1, marginLeft: 12 }}>
                         <Text style={styles.favLineName}>{stop.nome}</Text>
-                        <Text style={styles.favLineTerminals}>Bairro {stop.bairro}</Text>
+                        {stop.bairro && <Text style={styles.favLineTerminals}>Bairro {stop.bairro}</Text>}
                       </View>
 
                       <TouchableOpacity
