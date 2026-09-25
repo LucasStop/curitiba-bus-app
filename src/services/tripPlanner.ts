@@ -27,7 +27,7 @@ export interface TransferLeg {
 export function buildItineraryBetween(
   line: BusLine,
   boardingStopId: string,
-  alightingStopId: string
+  alightingStopId: string,
 ): TransferLeg | null {
   if (boardingStopId === alightingStopId) {
     return { sentido: 'ida', quantidadeParadas: 0 };
@@ -98,7 +98,7 @@ export function planTransitTrip(origin: LatLng, destination: LatLng): TripPlanOp
 
         const busDistMeters = getDistanceInMeters(
           { latitude: oStop.latitude, longitude: oStop.longitude },
-          { latitude: dStop.latitude, longitude: dStop.longitude }
+          { latitude: dStop.latitude, longitude: dStop.longitude },
         );
         // ~350 metros por minuto de ônibus
         const busMin = Math.max(3, Math.round(busDistMeters / 350));
@@ -173,17 +173,7 @@ export function planTransitTrip(origin: LatLng, destination: LatLng): TripPlanOp
             }
 
             options.push(
-              buildTransferOption(
-                origin,
-                destination,
-                oStop,
-                dStop,
-                line1,
-                line2,
-                transferStop,
-                trecho1,
-                trecho2
-              )
+              buildTransferOption(origin, destination, oStop, dStop, line1, line2, transferStop, trecho1, trecho2),
             );
             break transferSearch;
           }
@@ -216,7 +206,7 @@ function buildTransferOption(
   line2: BusLine,
   transferStop: BusStop,
   trecho1: TransferLeg,
-  trecho2: TransferLeg
+  trecho2: TransferLeg,
 ): TripPlanOption {
   const walkToStopMeters = getDistanceInMeters(origin, {
     latitude: oStop.latitude,
@@ -231,11 +221,11 @@ function buildTransferOption(
 
   const firstLegMeters = getDistanceInMeters(
     { latitude: oStop.latitude, longitude: oStop.longitude },
-    { latitude: transferStop.latitude, longitude: transferStop.longitude }
+    { latitude: transferStop.latitude, longitude: transferStop.longitude },
   );
   const secondLegMeters = getDistanceInMeters(
     { latitude: transferStop.latitude, longitude: transferStop.longitude },
-    { latitude: dStop.latitude, longitude: dStop.longitude }
+    { latitude: dStop.latitude, longitude: dStop.longitude },
   );
   const firstBusMin = Math.max(3, Math.round(firstLegMeters / 350));
   const secondBusMin = Math.max(3, Math.round(secondLegMeters / 350));

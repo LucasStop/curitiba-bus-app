@@ -82,11 +82,18 @@ export default function SignInScreen() {
             accessibilityRole="button"
             accessibilityLabel="Entrar"
             accessibilityState={{ disabled: submitting, busy: submitting }}>
-            {submitting ? <ActivityIndicator color={theme.onPrimary} /> : <Text style={s.primaryButtonText}>Entrar</Text>}
+            {submitting ? (
+              <ActivityIndicator color={theme.onPrimary} />
+            ) : (
+              <Text style={s.primaryButtonText}>Entrar</Text>
+            )}
           </TouchableOpacity>
 
           <Link href="/(auth)/forgot-password" asChild>
-            <TouchableOpacity testID="sign-in-forgot-password" accessibilityRole="button" accessibilityLabel="Esqueci minha senha">
+            <TouchableOpacity
+              testID="sign-in-forgot-password"
+              accessibilityRole="button"
+              accessibilityLabel="Esqueci minha senha">
               <Text style={s.linkText}>Esqueci minha senha</Text>
             </TouchableOpacity>
           </Link>

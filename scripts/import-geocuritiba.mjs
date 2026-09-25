@@ -28,7 +28,13 @@ async function get(path, params) {
 async function queryAll(layer, params) {
   const out = [];
   for (let offset = 0; ; offset += PAGE) {
-    const body = await get(`${layer}/query`, { where: '1=1', resultOffset: offset, resultRecordCount: PAGE, orderByFields: 'objectid', ...params });
+    const body = await get(`${layer}/query`, {
+      where: '1=1',
+      resultOffset: offset,
+      resultRecordCount: PAGE,
+      orderByFields: 'objectid',
+      ...params,
+    });
     out.push(...body.features);
     if (!body.exceededTransferLimit && body.features.length < PAGE) return out;
   }
@@ -37,7 +43,11 @@ async function queryAll(layer, params) {
 const stopFeatures = await queryAll(1, { outFields: 'objectid,num,nome_ponto,tipo,lat,lon', returnGeometry: false });
 console.log(`paradas: ${stopFeatures.length}`);
 
-const lineFeatures = await queryAll(2, { outFields: 'objectid,cod,nome_linha,categoria_servico', returnGeometry: true, outSR: 4326 });
+const lineFeatures = await queryAll(2, {
+  outFields: 'objectid,cod,nome_linha,categoria_servico',
+  returnGeometry: true,
+  outSR: 4326,
+});
 console.log(`traçados: ${lineFeatures.length}`);
 
 const terminalFeatures = await queryAll(0, { outFields: 'objectid,nome,bairro', returnGeometry: false });
@@ -70,7 +80,11 @@ const { dataset, stats } = buildDataset({
   terminals: terminalFeatures.map((f) => f.attributes),
 });
 
-const json = JSON.stringify({ source: `${BASE} (IPPUC/URBS)`, generatedAt: new Date().toISOString().slice(0, 10), ...dataset });
+const json = JSON.stringify({
+  source: `${BASE} (IPPUC/URBS)`,
+  generatedAt: new Date().toISOString().slice(0, 10),
+  ...dataset,
+});
 writeFileSync(OUT, json);
 const byCat = dataset.lines.reduce((a, l) => ({ ...a, [l.categoria]: (a[l.categoria] ?? 0) + 1 }), {});
 console.log({
