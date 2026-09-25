@@ -50,4 +50,4 @@ Branches `feat/…`, `fix/…`, `docs/…`; commits em inglês explicando o porq
 
 ## Fonte dos dados
 - **Paradas, linhas e traçados:** GeoCuritiba, camada `URBS_Transporte_Publico` (IPPUC/URBS), pública. Gerados em `src/data/geocuritiba.json` por `yarn data:geocuritiba` (rodar de novo para atualizar e abrir PR).
-- **Tempo real e horários:** [Transporte Coletivo de Curitiba, Dados Abertos](https://dadosabertos.curitiba.pr.gov.br/conjuntodado/detalhe?chave=ca40f13b-ef61-472b-810f-dd705f85fd2e) (URBS), dependem de credencial (pedido LAI em andamento).
+- **Tempo real e horários:** WebService da URBS, acesso concedido via LAI em 24/09/2026. Métodos, regras de uso e formato real das respostas em [docs/URBS-WEBSERVICE.md](docs/URBS-WEBSERVICE.md). Integração em andamento.
