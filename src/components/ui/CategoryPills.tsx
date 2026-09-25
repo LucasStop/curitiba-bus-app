@@ -3,15 +3,7 @@ import { Colors, Radius, Shadows, Typography } from '@/constants/theme';
 import { useTransitStore } from '@/stores/useTransitStore';
 import { BusCategory } from '@/types/transit';
 import React from 'react';
-import {
-  ScrollView,
-  StyleProp,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  ViewStyle,
-} from 'react-native';
+import { ScrollView, StyleProp, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 
 // Filtra os ônibus do mapa: só as categorias simuladas (SIMULATED_CATEGORIES em transitProvider).
 const CATEGORIES: { key: 'all' | BusCategory; label: string; dotColor?: string }[] = [
@@ -28,10 +20,7 @@ export interface CategoryPillsProps {
   contentContainerStyle?: StyleProp<ViewStyle>;
 }
 
-export const CategoryPills: React.FC<CategoryPillsProps> = ({
-  style,
-  contentContainerStyle,
-}) => {
+export const CategoryPills: React.FC<CategoryPillsProps> = ({ style, contentContainerStyle }) => {
   const activeCategory = useTransitStore((s) => s.activeCategory);
   const setActiveCategory = useTransitStore((s) => s.setActiveCategory);
   const selectedLine = useTransitStore((s) => s.selectedLine);
@@ -54,24 +43,15 @@ export const CategoryPills: React.FC<CategoryPillsProps> = ({
                 setSelectedLine(null);
                 setActiveCategory(cat.key);
               }}
-              style={[
-                styles.pill,
-                isSelected ? styles.pillSelected : styles.pillUnselected,
-              ]}
+              style={[styles.pill, isSelected ? styles.pillSelected : styles.pillUnselected]}
               hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}
               activeOpacity={0.7}
               testID={`category-pill-${cat.key}`}
               accessibilityRole="button"
               accessibilityState={{ selected: isSelected }}
               accessibilityLabel={`Filtrar por ${cat.label}`}>
-              {cat.dotColor && (
-                <View style={[styles.dot, { backgroundColor: cat.dotColor }]} />
-              )}
-              <Text
-                style={[
-                  styles.label,
-                  isSelected ? styles.labelSelected : styles.labelUnselected,
-                ]}>
+              {cat.dotColor && <View style={[styles.dot, { backgroundColor: cat.dotColor }]} />}
+              <Text style={[styles.label, isSelected ? styles.labelSelected : styles.labelUnselected]}>
                 {cat.label}
               </Text>
             </TouchableOpacity>

@@ -14,7 +14,7 @@ function parseStopName(raw) {
 }
 
 const CATEGORY = {
-  'LIGEIRÃO': 'ligeirao',
+  LIGEIRÃO: 'ligeirao',
   EXPRESSO: 'expresso',
   'LINHA DIRETA': 'ligeirinho',
   INTERBAIRROS: 'interbairros',

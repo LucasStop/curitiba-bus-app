@@ -25,7 +25,11 @@ const NETWORK_NAMES = ['AuthRetryableFetchError', 'FunctionsFetchError'];
 export function mapAuthError(error: unknown, context: AuthErrorContext = 'other'): string {
   const e = (typeof error === 'object' && error !== null ? error : {}) as AuthLikeError;
 
-  if (NETWORK_NAMES.includes(e.name ?? '') || e.status === 0 || /network request failed|failed to fetch/i.test(e.message ?? '')) {
+  if (
+    NETWORK_NAMES.includes(e.name ?? '') ||
+    e.status === 0 ||
+    /network request failed|failed to fetch/i.test(e.message ?? '')
+  ) {
     return NETWORK;
   }
   if (e.status === 429 || RATE_LIMIT_CODES.includes(e.code ?? '')) return RATE_LIMIT;

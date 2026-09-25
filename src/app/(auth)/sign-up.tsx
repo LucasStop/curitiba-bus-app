@@ -116,11 +116,18 @@ export default function SignUpScreen() {
             accessibilityRole="button"
             accessibilityLabel="Criar conta"
             accessibilityState={{ disabled: submitting, busy: submitting }}>
-            {submitting ? <ActivityIndicator color={theme.onPrimary} /> : <Text style={s.primaryButtonText}>Criar conta</Text>}
+            {submitting ? (
+              <ActivityIndicator color={theme.onPrimary} />
+            ) : (
+              <Text style={s.primaryButtonText}>Criar conta</Text>
+            )}
           </TouchableOpacity>
 
           <Link href="/(auth)/sign-in" asChild>
-            <TouchableOpacity testID="sign-up-go-sign-in" accessibilityRole="button" accessibilityLabel="Já tem conta? Entrar">
+            <TouchableOpacity
+              testID="sign-up-go-sign-in"
+              accessibilityRole="button"
+              accessibilityLabel="Já tem conta? Entrar">
               <Text style={s.linkText}>Já tem conta? Entrar</Text>
             </TouchableOpacity>
           </Link>

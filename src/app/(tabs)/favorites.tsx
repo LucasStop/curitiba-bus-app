@@ -208,7 +208,9 @@ export default function FavoritesScreen() {
                   accessibilityRole="button"
                   accessibilityLabel={`Ver linha ${line.codigo}, ${line.nome} no mapa`}
                   accessibilityActions={[{ name: 'delete', label: 'Remover dos favoritos' }]}
-                  onAccessibilityAction={(e) => e.nativeEvent.actionName === 'delete' && toggleFavoriteLine(line.codigo)}>
+                  onAccessibilityAction={(e) =>
+                    e.nativeEvent.actionName === 'delete' && toggleFavoriteLine(line.codigo)
+                  }>
                   <View style={styles.favoriteCardRow}>
                     <BusBadge codigo={line.codigo} corHex={line.corHex} size="large" />
                     <View style={{ flex: 1, marginLeft: 12 }}>
@@ -304,9 +306,7 @@ export default function FavoritesScreen() {
                             <Text style={styles.nextBusEtaNumber}>Agora</Text>
                           ) : (
                             <>
-                              <Text style={styles.nextBusEtaNumber}>
-                                {Math.round(nextBus.minutosAteChegada)}
-                              </Text>
+                              <Text style={styles.nextBusEtaNumber}>{Math.round(nextBus.minutosAteChegada)}</Text>
                               <Text style={styles.nextBusEtaUnit}>min</Text>
                             </>
                           )}

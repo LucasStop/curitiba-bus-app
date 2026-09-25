@@ -207,7 +207,9 @@ describe('AuthProvider: ações', () => {
   it('erro de rede lançado como exceção vira mensagem, não crash', async () => {
     await mount();
     mockAuth.signInWithPassword.mockRejectedValue(new TypeError('Network request failed'));
-    expect((await ctx().signIn('a@b.co', 'senha1234')).error).toBe('Sem conexão. Verifique a internet e tente de novo.');
+    expect((await ctx().signIn('a@b.co', 'senha1234')).error).toBe(
+      'Sem conexão. Verifique a internet e tente de novo.',
+    );
   });
 
   it('signOut encerra a sessão', async () => {

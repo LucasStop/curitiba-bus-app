@@ -6,7 +6,9 @@ import { useEffect, useMemo, useState } from 'react';
 
 export function useLiveVehicles() {
   const [vehicles, setVehicles] = useState<BusVehicle[]>(() => transitService.getVehicles());
-  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(() => transitService.getConnectionStatus());
+  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(() =>
+    transitService.getConnectionStatus(),
+  );
   const selectedLine = useTransitStore((s) => s.selectedLine);
   const activeCategory = useTransitStore((s) => s.activeCategory);
 

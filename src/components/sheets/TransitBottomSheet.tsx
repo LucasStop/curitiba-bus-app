@@ -500,13 +500,13 @@ export const TransitBottomSheet: React.FC = () => {
   const filteredLines = CURITIBA_LINES.filter(
     (l) =>
       l.codigo.toLowerCase().includes(localSearch.toLowerCase()) ||
-      l.nome.toLowerCase().includes(localSearch.toLowerCase())
+      l.nome.toLowerCase().includes(localSearch.toLowerCase()),
   ).slice(0, MAX_SEARCH_RESULTS);
 
   const filteredStops = CURITIBA_STOPS.filter(
     (s) =>
       s.nome.toLowerCase().includes(localSearch.toLowerCase()) ||
-      s.bairro?.toLowerCase().includes(localSearch.toLowerCase())
+      s.bairro?.toLowerCase().includes(localSearch.toLowerCase()),
   ).slice(0, MAX_SEARCH_RESULTS);
 
   // 1. Visão de Detalhes da Parada Selecionada
@@ -635,9 +635,7 @@ export const TransitBottomSheet: React.FC = () => {
   if (selectedLine) {
     const isFav = favoriteLines.includes(selectedLine.codigo);
     const stopIds = activeDirection === 'ida' ? selectedLine.paradasIda : selectedLine.paradasVolta;
-    const lineStops = stopIds
-      .map((id) => CURITIBA_STOPS.find((s) => s.id === id))
-      .filter((s): s is BusStop => !!s);
+    const lineStops = stopIds.map((id) => CURITIBA_STOPS.find((s) => s.id === id)).filter((s): s is BusStop => !!s);
 
     return (
       <Animated.View style={[styles.sheetContainer, { height: animatedHeight }]}>
@@ -719,7 +717,10 @@ export const TransitBottomSheet: React.FC = () => {
                 <View
                   style={[
                     styles.timelineDot,
-                    { backgroundColor: idx === 0 || idx === lineStops.length - 1 ? selectedLine.corHex : theme.textMuted },
+                    {
+                      backgroundColor:
+                        idx === 0 || idx === lineStops.length - 1 ? selectedLine.corHex : theme.textMuted,
+                    },
                   ]}
                 />
                 {idx < lineStops.length - 1 && <View style={styles.timelineLine} />}
