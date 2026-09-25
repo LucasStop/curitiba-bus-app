@@ -141,6 +141,16 @@ export default function FavoritesScreen() {
               </View>
             </>
           )}
+          <TouchableOpacity
+            onPress={() => router.push('/about')}
+            style={styles.aboutLink}
+            hitSlop={{ top: 10, bottom: 10 }}
+            testID="account-about-link"
+            accessibilityRole="link"
+            accessibilityLabel="Sobre o app e política de privacidade">
+            <Info size={14} color={theme.textMuted} />
+            <Text style={styles.aboutLinkText}>Sobre e privacidade</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.tabToggle}>
@@ -572,6 +582,19 @@ function createStyles(theme: ReturnType<typeof useTheme>) {
       lineHeight: Typography.label.lineHeight,
       fontWeight: '700',
       color: theme.textMuted,
+    },
+    aboutLink: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      alignSelf: 'flex-start',
+      gap: 6,
+      marginTop: 10,
+    },
+    aboutLinkText: {
+      fontSize: Typography.label.fontSize,
+      fontWeight: '600',
+      color: theme.textMuted,
+      textDecorationLine: 'underline',
     },
     accountSection: {
       marginTop: 12,

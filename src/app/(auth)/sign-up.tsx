@@ -1,9 +1,11 @@
 import { FormField } from '@/components/auth/FormField';
 import { useAuthScreenStyles } from '@/components/auth/authScreenStyles';
+import { PRIVACY_POLICY_URL } from '@/constants/links';
 import { useTheme } from '@/hooks/use-theme';
 import { validateEmail, validatePassword } from '@/lib/validation';
 import { useAuth } from '@/providers/AuthProvider';
 import { Link, useRouter } from 'expo-router';
+import { openBrowserAsync } from 'expo-web-browser';
 import React, { useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -107,6 +109,15 @@ export default function SignUpScreen() {
               {formError}
             </Text>
           ) : null}
+
+          <TouchableOpacity
+            onPress={() => openBrowserAsync(PRIVACY_POLICY_URL)}
+            style={{ marginBottom: 12 }}
+            testID="sign-up-privacy-link"
+            accessibilityRole="link"
+            accessibilityLabel="Ao criar a conta você concorda com a política de privacidade. Abrir a política">
+            <Text style={s.linkText}>Ao criar a conta, você concorda com a política de privacidade</Text>
+          </TouchableOpacity>
 
           <TouchableOpacity
             style={[s.primaryButton, submitting && s.buttonDisabled]}
