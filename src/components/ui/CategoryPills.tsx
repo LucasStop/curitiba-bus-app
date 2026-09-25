@@ -13,13 +13,14 @@ import {
   ViewStyle,
 } from 'react-native';
 
+// Filtra os ônibus do mapa: só as categorias simuladas (SIMULATED_CATEGORIES em transitProvider).
 const CATEGORIES: { key: 'all' | BusCategory; label: string; dotColor?: string }[] = [
   { key: 'all', label: 'Todas as Linhas' },
   { key: 'expresso', label: 'Expressos', dotColor: RIT_CATEGORIES.expresso.corHex },
+  { key: 'ligeirao', label: 'Ligeirões', dotColor: RIT_CATEGORIES.ligeirao.corHex },
   { key: 'ligeirinho', label: 'Ligeirinhos', dotColor: RIT_CATEGORIES.ligeirinho.corHex },
   { key: 'interbairros', label: 'Interbairros', dotColor: RIT_CATEGORIES.interbairros.corHex },
-  { key: 'alimentador', label: 'Alimentadores', dotColor: RIT_CATEGORIES.alimentador.corHex },
-  { key: 'troncal', label: 'Convencionais', dotColor: RIT_CATEGORIES.troncal.corHex },
+  { key: 'troncal', label: 'Troncais', dotColor: RIT_CATEGORIES.troncal.corHex },
 ];
 
 export interface CategoryPillsProps {

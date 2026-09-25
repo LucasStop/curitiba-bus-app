@@ -2,9 +2,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
+import { LINES_BY_CODE, STOPS_BY_ID } from '@/data/curitibaDataset';
+
 interface FavoritesState {
   favoriteLines: string[]; // Códigos das linhas, ex: ["203", "500"]
-  favoriteStops: string[]; // IDs das paradas, ex: ["tubo-central"]
+  favoriteStops: string[]; // IDs das paradas, ex: ["108030", "terminal-cabral"]
 
   toggleFavoriteLine: (codLinha: string) => void;
   isFavoriteLine: (codLinha: string) => boolean;
@@ -47,6 +49,17 @@ export const useFavoritesStore = create<FavoritesState>()(
     {
       name: 'curitiba-bus-favorites',
       storage: createJSONStorage(() => AsyncStorage),
+      // v1: dataset real do GeoCuritiba. Ids de parada do mock (tubo-*) deixam de existir.
+      version: 1,
+      migrate: (persisted) => migrateFavorites(persisted as Partial<FavoritesState>),
     }
   )
 );
+
+export function migrateFavorites(state: Partial<FavoritesState>) {
+  return {
+    ...state,
+    favoriteLines: (state.favoriteLines ?? []).filter((c) => LINES_BY_CODE.has(c)),
+    favoriteStops: (state.favoriteStops ?? []).filter((id) => STOPS_BY_ID.has(id)),
+  } as FavoritesState;
+}

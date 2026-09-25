@@ -2,7 +2,7 @@
 
 App mobile (Expo / React Native) para acompanhar o transporte coletivo de Curitiba (RIT/URBS): mapa com linhas, paradas e ônibus, previsão de chegada, planejador "Como Ir" e favoritos.
 
-> Estado: protótipo com **dados simulados** (5 linhas, 17 paradas). A integração com os dados abertos da URBS ainda não foi feita. Veja o que falta em [docs/PRD.md](docs/PRD.md).
+> Estado: rede estática **real** (314 linhas, ~7 mil paradas, traçados) importada do GeoCuritiba; posição de ônibus, previsão de chegada e horários ainda **simulados** até o acesso ao WebService da URBS. Veja o que falta em [docs/PRD.md](docs/PRD.md).
 
 ## Rodar
 Requisitos: Node 20, Yarn 1.22 e o app Expo Go (iOS) ou um simulador.
@@ -49,4 +49,5 @@ src/utils/geo.ts  Haversine, bearing, interpolação
 Branches `feat/…`, `fix/…`, `docs/…`; commits em inglês explicando o porquê; entrega por Pull Request (sem push direto na `main`). O pre-commit roda gitleaks e eslint (`lefthook install`).
 
 ## Fonte dos dados
-[Transporte Coletivo de Curitiba, Dados Abertos](https://dadosabertos.curitiba.pr.gov.br/conjuntodado/detalhe?chave=ca40f13b-ef61-472b-810f-dd705f85fd2e) (URBS).
+- **Paradas, linhas e traçados:** GeoCuritiba, camada `URBS_Transporte_Publico` (IPPUC/URBS), pública. Gerados em `src/data/geocuritiba.json` por `yarn data:geocuritiba` (rodar de novo para atualizar e abrir PR).
+- **Tempo real e horários:** [Transporte Coletivo de Curitiba, Dados Abertos](https://dadosabertos.curitiba.pr.gov.br/conjuntodado/detalhe?chave=ca40f13b-ef61-472b-810f-dd705f85fd2e) (URBS), dependem de credencial (pedido LAI em andamento).

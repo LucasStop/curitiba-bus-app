@@ -24,6 +24,12 @@ import {
   useWindowDimensions,
 } from 'react-native';
 
+const MAX_SEARCH_RESULTS = 30;
+// Terminais com mais linhas primeiro: é onde a RIT integra.
+const FEATURED_STOPS = CURITIBA_STOPS.filter((s) => s.tipo === 'terminal')
+  .sort((a, b) => b.linhas.length - a.linhas.length)
+  .slice(0, 5);
+
 export const TransitBottomSheet: React.FC = () => {
   const [localSearch, setLocalSearch] = useState('');
   // Date.now() não pode rodar direto na render (regra de pureza) e "há X min" precisa
@@ -495,13 +501,13 @@ export const TransitBottomSheet: React.FC = () => {
     (l) =>
       l.codigo.toLowerCase().includes(localSearch.toLowerCase()) ||
       l.nome.toLowerCase().includes(localSearch.toLowerCase())
-  );
+  ).slice(0, MAX_SEARCH_RESULTS);
 
   const filteredStops = CURITIBA_STOPS.filter(
     (s) =>
       s.nome.toLowerCase().includes(localSearch.toLowerCase()) ||
-      s.bairro.toLowerCase().includes(localSearch.toLowerCase())
-  );
+      s.bairro?.toLowerCase().includes(localSearch.toLowerCase())
+  ).slice(0, MAX_SEARCH_RESULTS);
 
   // 1. Visão de Detalhes da Parada Selecionada
   if (selectedStop) {
@@ -533,7 +539,7 @@ export const TransitBottomSheet: React.FC = () => {
                 </Text>
               </View>
               <Text style={styles.sheetTitle}>{selectedStop.nome}</Text>
-              <Text style={styles.sheetSubtitle}>Bairro {selectedStop.bairro}</Text>
+              {selectedStop.bairro && <Text style={styles.sheetSubtitle}>Bairro {selectedStop.bairro}</Text>}
             </View>
 
             <TouchableOpacity
@@ -708,7 +714,7 @@ export const TransitBottomSheet: React.FC = () => {
               style={styles.timelineItem}
               testID={`sheet-timeline-stop-${stop.id}`}
               accessibilityRole="button"
-              accessibilityLabel={`Parada ${stop.nome}, bairro ${stop.bairro}`}>
+              accessibilityLabel={`Parada ${stop.nome}${stop.bairro ? `, bairro ${stop.bairro}` : ''}`}>
               <View style={styles.timelinePoint}>
                 <View
                   style={[
@@ -720,7 +726,7 @@ export const TransitBottomSheet: React.FC = () => {
               </View>
               <View style={styles.timelineContent}>
                 <Text style={styles.timelineStopName}>{stop.nome}</Text>
-                <Text style={styles.timelineStopBairro}>Bairro {stop.bairro}</Text>
+                {stop.bairro && <Text style={styles.timelineStopBairro}>Bairro {stop.bairro}</Text>}
               </View>
               <ChevronRight size={16} color={theme.borderStrong} />
             </TouchableOpacity>
@@ -811,11 +817,11 @@ export const TransitBottomSheet: React.FC = () => {
                 style={styles.stopCard}
                 testID={`sheet-stop-result-${stop.id}`}
                 accessibilityRole="button"
-                accessibilityLabel={`Parada ${stop.nome}, bairro ${stop.bairro}`}>
+                accessibilityLabel={`Parada ${stop.nome}${stop.bairro ? `, bairro ${stop.bairro}` : ''}`}>
                 <MapPin size={18} color={theme.primary} />
                 <View style={{ flex: 1, marginLeft: 10 }}>
                   <Text style={styles.stopCardName}>{stop.nome}</Text>
-                  <Text style={styles.stopCardMeta}>Bairro {stop.bairro}</Text>
+                  {stop.bairro && <Text style={styles.stopCardMeta}>Bairro {stop.bairro}</Text>}
                 </View>
                 <ChevronRight size={16} color={theme.borderStrong} />
               </TouchableOpacity>
@@ -824,7 +830,7 @@ export const TransitBottomSheet: React.FC = () => {
         ) : (
           <>
             <Text style={styles.sectionHeader}>Estações-Tubo e Terminais em Destaque</Text>
-            {CURITIBA_STOPS.slice(0, 5).map((stop) => (
+            {FEATURED_STOPS.map((stop) => (
               <TouchableOpacity
                 key={stop.id}
                 onPress={() => setSelectedStop(stop)}
@@ -837,7 +843,8 @@ export const TransitBottomSheet: React.FC = () => {
                   <Text style={styles.stopCardName}>{stop.nome}</Text>
                   <Text style={styles.stopCardMeta}>
                     {stop.tipo === 'terminal' ? 'Terminal' : 'Estação-Tubo'} • Linhas:{' '}
-                    {stop.linhas.join(', ')}
+                    {stop.linhas.slice(0, 6).join(', ')}
+                    {stop.linhas.length > 6 ? ` +${stop.linhas.length - 6}` : ''}
                   </Text>
                 </View>
                 <ChevronRight size={16} color={theme.borderStrong} />
