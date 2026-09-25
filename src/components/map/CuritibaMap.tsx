@@ -1,18 +1,23 @@
 import { CURITIBA_COORDINATES } from '@/constants/rit';
 import { DARK_MAP_STYLE, LIGHT_MAP_STYLE } from '@/constants/mapStyles';
 import { Colors, Radius, Shadows } from '@/constants/theme';
-import { CURITIBA_STOPS } from '@/data/curitibaDataset';
+import { CURITIBA_STOPS, STOPS_BY_ID } from '@/data/curitibaDataset';
 import { useLiveVehicles } from '@/hooks/useLiveVehicles';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useTheme } from '@/hooks/use-theme';
 import { useTransitStore } from '@/stores/useTransitStore';
 import { BusStop, BusVehicle, LatLng } from '@/types/transit';
 import { Layers, LocateFixed, Navigation2, X } from 'lucide-react-native';
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import MapView, { Marker, Polyline } from 'react-native-maps';
+import MapView, { Marker, Polyline, Region } from 'react-native-maps';
 import { BusMarker, getBusMarkerAccessibilityLabel } from './BusMarker';
 import { StopMarker, getStopMarkerAccessibilityLabel } from './StopMarker';
+
+const TUBE_ZOOM_DELTA = 0.08;
+const STOP_ZOOM_DELTA = 0.02;
+// ponytail: teto fixo, clustering se o zoom próximo em área densa ficar vazio demais
+const MAX_STOP_MARKERS = 150;
 
 interface CuritibaMapProps {
   userLocation: LatLng;
@@ -210,11 +215,25 @@ export const CuritibaMap: React.FC<CuritibaMapProps> = ({
   // Paradas a exibir: todas ou apenas as da linha selecionada
   // useMemo: sem isso o filter roda de novo a cada tick de veículo (3s), mesmo
   // quando selectedLine/activeDirection não mudaram.
+  const [region, setRegion] = useState<Region>(CURITIBA_COORDINATES);
   const displayedStops = useMemo(() => {
-    if (!selectedLine) return CURITIBA_STOPS;
-    const activeStopIds = activeDirection === 'ida' ? selectedLine.paradasIda : selectedLine.paradasVolta;
-    return CURITIBA_STOPS.filter((stop) => activeStopIds.includes(stop.id));
-  }, [selectedLine, activeDirection]);
+    if (selectedLine) {
+      const ids = activeDirection === 'ida' ? selectedLine.paradasIda : selectedLine.paradasVolta;
+      return ids.map((id) => STOPS_BY_ID.get(id)).filter((s): s is BusStop => !!s);
+    }
+    // ~7 mil paradas: por zoom, terminais sempre, tubos no zoom médio, pontos comuns só de perto.
+    const { latitude, longitude, latitudeDelta, longitudeDelta } = region;
+    const visible = CURITIBA_STOPS.filter(
+      (s) =>
+        (s.tipo === 'terminal' ||
+          (s.tipo === 'tubo' && latitudeDelta < TUBE_ZOOM_DELTA) ||
+          latitudeDelta < STOP_ZOOM_DELTA) &&
+        Math.abs(s.latitude - latitude) < latitudeDelta / 2 &&
+        Math.abs(s.longitude - longitude) < longitudeDelta / 2,
+    ).slice(0, MAX_STOP_MARKERS);
+    if (selectedStop && !visible.includes(selectedStop)) visible.push(selectedStop);
+    return visible;
+  }, [selectedLine, activeDirection, region, selectedStop]);
 
   // Renderização Web simplificada caso execute no navegador
   if (Platform.OS === 'web') {
@@ -276,7 +295,8 @@ export const CuritibaMap: React.FC<CuritibaMapProps> = ({
         showsTraffic={isMapTrafficVisible}
         showsCompass={false}
         showsMyLocationButton={false}
-        showsUserLocation={true}>
+        showsUserLocation={true}
+        onRegionChangeComplete={setRegion}>
         {/* Rota desenhada com a cor oficial da linha */}
         {activePolyline.length > 0 && selectedLine && (
           <Polyline

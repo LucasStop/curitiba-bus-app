@@ -1,3 +1,5 @@
+jest.mock('@/data/curitibaDataset', () => require('@/data/__fixtures__/mockDataset'));
+
 import { CURITIBA_LINES, CURITIBA_STOPS } from '@/data/curitibaDataset';
 import { findCommonTerminal, planTransitTrip } from './tripPlanner';
 

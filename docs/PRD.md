@@ -112,5 +112,13 @@ Investigação com testes reais de rede (`curl`), não só leitura de documenta�
 - Pedir login/senha da URBS (processo administrativo, LAI ou protocolo presencial — não é tarefa de código).
 - Com credencial: script de pré-processamento fora do app (Node) chamando `getLinhas`/`getPontosLinha`/`getShapeLinha`/`getTrechosItinerarios` no máximo ~1x/dia, gerando o JSON estático que substitui `curitibaDataset.ts` (plano já descrito em [SSD.md](SSD.md) §6); posição de veículo via `getVeiculosLinha` (sem parâmetro `linha`, que já retorna todos) com polling comedido no app.
 
+## 8.2 Dados estáticos reais via GeoCuritiba (25/09/2026)
+
+A parte estática do E3 foi destravada sem esperar a URBS: o GeoCuritiba (IPPUC) publica, sem login, a camada `URBS_Transporte_Publico` (ArcGIS REST) com paradas (7.254), traçados (667, 314 linhas) e a tabela parada↔linha com sentido e sequência (`pontos_linha`, o número da parada sai pela relação `queryRelatedRecords`).
+
+- `scripts/import-geocuritiba.mjs` baixa tudo, e `scripts/geocuritiba-transform.cjs` (com teste) limpa nomes, extrai bairro do endereço, une plataformas de terminal num nó só, ordena paradas por sentido, orienta e simplifica os traçados (Douglas-Peucker 8 m). Saída: `src/data/geocuritiba.json` (~1,6 MB), 314 linhas, 6.955 paradas.
+- Campos sem fonte pública ficam **ausentes**, não inventados: frequência no pico e horário de funcionamento. Tarifa = tarifa padrão.
+- Continua bloqueado pela URBS: posição real de veículo, ETA real, horários/GTFS.
+
 ## 9. Fora deste documento
 Identidade visual e tokens: [DESIGN.md](../DESIGN.md). Arquitetura, modelo de dados e fluxos: [SSD.md](SSD.md). Testes: [TDD.md](TDD.md). Segurança: [SECURITY.md](SECURITY.md). Privacidade: [PRIVACY.md](PRIVACY.md).
