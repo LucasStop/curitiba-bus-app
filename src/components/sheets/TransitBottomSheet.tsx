@@ -838,7 +838,7 @@ export const TransitBottomSheet: React.FC = () => {
                 style={styles.stopCard}
                 testID={`sheet-stop-featured-${stop.id}`}
                 accessibilityRole="button"
-                accessibilityLabel={`${/^(Terminal|Estação)/.test(stop.nome) ? '' : stop.tipo === 'terminal' ? 'Terminal ' : 'Estação-tubo '}${stop.nome}, linhas ${stop.linhas.join(', ')}`}>
+                accessibilityLabel={`${/^(Terminal|Estação)/.test(stop.nome) ? '' : stop.tipo === 'terminal' ? 'Terminal ' : 'Estação-tubo '}${stop.nome}, linhas ${stop.linhas.slice(0, 6).join(', ')}${stop.linhas.length > 6 ? ` e mais ${stop.linhas.length - 6}` : ''}`}>
                 <MapPin size={18} color={stop.tipo === 'terminal' ? theme.warning : theme.primary} />
                 <View style={{ flex: 1, marginLeft: 10 }}>
                   <Text style={styles.stopCardName}>{stop.nome}</Text>

@@ -10,9 +10,17 @@ import { BusStop, BusVehicle, LatLng } from '@/types/transit';
 import { Layers, LocateFixed, Navigation2, X } from 'lucide-react-native';
 import React, { useMemo, useRef, useState } from 'react';
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import MapView, { Marker, Polyline, Region } from 'react-native-maps';
+import MapView, { Callout, Marker, Polyline, Region } from 'react-native-maps';
 import { BusMarker, getBusMarkerAccessibilityLabel } from './BusMarker';
 import { StopMarker, getStopMarkerAccessibilityLabel } from './StopMarker';
+
+// No iOS (New Architecture) o Marker ignora accessibilityLabel: o VoiceOver lê o `title` da anotação.
+// Com `title`, o toque abriria o balão nativo por cima do painel; um Callout vazio o suprime.
+const NoCallout = () => (
+  <Callout tooltip>
+    <View />
+  </Callout>
+);
 
 const TUBE_ZOOM_DELTA = 0.08;
 const STOP_ZOOM_DELTA = 0.02;
@@ -310,8 +318,10 @@ export const CuritibaMap: React.FC<CuritibaMapProps> = ({ userLocation, onSelect
             tracksViewChanges={false}
             testID={`stop-marker-${stop.id}`}
             accessibilityRole="button"
-            accessibilityLabel={getStopMarkerAccessibilityLabel(stop, selectedStop?.id === stop.id)}>
+            accessibilityLabel={getStopMarkerAccessibilityLabel(stop, selectedStop?.id === stop.id)}
+            title={getStopMarkerAccessibilityLabel(stop, selectedStop?.id === stop.id)}>
             <StopMarker stop={stop} isSelected={selectedStop?.id === stop.id} />
+            <NoCallout />
           </Marker>
         ))}
 
@@ -325,8 +335,10 @@ export const CuritibaMap: React.FC<CuritibaMapProps> = ({ userLocation, onSelect
             anchor={{ x: 0.5, y: 0.5 }}
             testID={`bus-marker-${bus.codLinha}-${bus.id}`}
             accessibilityRole="button"
-            accessibilityLabel={getBusMarkerAccessibilityLabel(bus, selectedVehicle?.id === bus.id)}>
+            accessibilityLabel={getBusMarkerAccessibilityLabel(bus, selectedVehicle?.id === bus.id)}
+            title={getBusMarkerAccessibilityLabel(bus, selectedVehicle?.id === bus.id)}>
             <BusMarker vehicle={bus} isSelected={selectedVehicle?.id === bus.id} />
+            <NoCallout />
           </Marker>
         ))}
       </MapView>

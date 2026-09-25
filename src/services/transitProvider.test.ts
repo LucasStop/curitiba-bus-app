@@ -1,8 +1,10 @@
-jest.mock('@/data/curitibaDataset', () => require('@/data/__fixtures__/mockDataset'));
-
 import { AppState, type AppStateStatus } from 'react-native';
 import type { NetworkError as NetworkErrorType } from '@/lib/resilience';
 import type { transitService as TransitServiceInstance } from './transitProvider';
+
+// babel-jest sobe este mock para antes dos imports.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+jest.mock('@/data/curitibaDataset', () => require('@/data/__fixtures__/mockDataset'));
 
 type AppStateHandler = (status: AppStateStatus) => void;
 
