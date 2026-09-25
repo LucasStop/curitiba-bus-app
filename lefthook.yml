@@ -1,14 +1,21 @@
 # Guarda local antes do commit. Depois de clonar: lefthook install
 # Pular uma vez: LEFTHOOK=0 git commit
 pre-commit:
-  parallel: true
+  # Em sequência: formatar antes do lint, que lê os mesmos arquivos.
+  piped: true
   commands:
-    segredo:
-      run: gitleaks git --staged --redact --no-banner
+    formato:
+      priority: 1
+      glob: '*.{js,jsx,ts,tsx,cjs,mjs,json,yml,yaml}'
+      run: npx prettier --write --ignore-unknown {staged_files}
+      stage_fixed: true
     lint:
-      # ponytail: sem prettier de proposito (formatar o repo todo geraria diff enorme); eslint cobre o basico.
+      priority: 2
       glob: '*.{js,jsx,ts,tsx}'
       run: npx eslint {staged_files}
+    segredo:
+      priority: 3
+      run: gitleaks git --staged --redact --no-banner
 
 commit-msg:
   commands:
