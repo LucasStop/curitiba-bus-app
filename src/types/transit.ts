@@ -19,7 +19,7 @@ export interface LatLng {
 
 export interface BusVehicle {
   id: string;
-  prefixo: string; // Ex: "BA001" (Articulado/Biarticulado), "HA123" (Híbrido)
+  prefixo: string; // Ex: "JB612", "BC189"
   codLinha: string; // Ex: "203", "500", "020"
   nomeLinha: string;
   categoria: BusCategory;
@@ -58,7 +58,7 @@ export interface BusLine {
   terminalOrigem: string;
   terminalDestino: string;
   tarifa: number;
-  // Sem fonte pública até o acesso à URBS: ausente em vez de inventado.
+  // Sem fonte importada ainda (GTFS/getTabelaLinha da URBS): ausente em vez de inventado.
   horarioFuncionamento?: string;
   frequenciaMinutosPico?: number;
   temTempoReal: boolean;

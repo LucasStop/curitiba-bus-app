@@ -82,7 +82,7 @@ class MockTransitProvider implements TransitProvider {
     let idCounter = 1;
 
     // ponytail: só o eixo estrutural, 1 veículo por sentido (~130 no total). Simular as 314 linhas
-    // pesa no tick e no mapa; some quando a posição real da URBS substituir a simulação.
+    // pesa no tick e no mapa; a simulação só roda como fallback sem Supabase (Jest, dev sem .env.local).
     CURITIBA_LINES.filter((line) => SIMULATED_CATEGORIES.includes(line.categoria)).forEach((line) => {
       const numBuses = line.paradasVolta.length ? 2 : 1;
 
@@ -256,8 +256,8 @@ class MockTransitProvider implements TransitProvider {
   /**
    * Só pra QA/teste: força as próximas `count` atualizações a falhar (por padrão, com
    * `NetworkError`, o erro de "sem conexão"). O provedor mock nunca falha sozinho, então é
-   * assim que se exercita o caminho de erro/backoff — a chamada real da URBS lançará
-   * `NetworkError` de verdade no lugar disso.
+   * assim que se exercita o caminho de erro/backoff — o SupabaseTransitProvider lança
+   * `NetworkError` de verdade quando a leitura do Supabase falha.
    */
   public simulateFailures(count: number, makeError?: () => Error): void {
     this.pendingFailures = count;

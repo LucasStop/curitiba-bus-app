@@ -144,7 +144,7 @@ export function planTransitTrip(origin: LatLng, destination: LatLng): TripPlanOp
   });
 
   // 2. Se poucas rotas diretas, buscar baldeação real: só existe se as duas
-  // linhas candidatas de fato passam por um terminal em comum no mock data.
+  // linhas candidatas de fato passam por um terminal em comum no dataset (GeoCuritiba).
   // Nada de terminal fixo "chutado" — isso é o bug original (rota fabricada).
   if (options.length < 2) {
     transferSearch: for (const oStop of originStops) {

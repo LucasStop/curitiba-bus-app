@@ -20,8 +20,9 @@ export function getBusMarkerAccessibilityLabel(vehicle: BusVehicle, isSelected =
   }${vehicle.foraDaRota ? ', fora da rota' : ''}${isSelected ? ', selecionado' : ''}`;
 }
 
-// Memoizado: sem isso, cada tick de simulação (3s) recria todos os veículos e força
-// re-render de TODOS os BusMarker, mesmo os que não mudaram de seleção/veículo props.
+// Memoizado: sem isso, cada rodada nova de posições (~2 min com Supabase; 3s na simulação)
+// recria todos os veículos e força re-render de TODOS os BusMarker, mesmo os que não mudaram
+// de seleção/veículo props.
 export const BusMarker: React.FC<BusMarkerProps> = React.memo(({ vehicle, isSelected = false }) => {
   const theme = useTheme();
 
