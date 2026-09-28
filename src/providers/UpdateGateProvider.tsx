@@ -7,8 +7,9 @@ import { compareVersions, fetchAppVersion } from '@/lib/appVersion';
 // Gate de atualizacao forcada: le `app_config.min_version` no boot e compara com a versao
 // instalada (expo-constants, nao app.json — funciona igual em dev client e build EAS).
 // Renderizado fora do Stack de navegacao para bloquear qualquer tela, login incluido.
-// Preparado pra quando a API real da URBS (LAI 00-088136/2026) exigir clients atualizados;
-// hoje `app_config` sempre existe com min_version = versao atual, entao nunca dispara.
+// Preparado pra forçar atualização se o contrato de bus_positions/bus_feed_status mudar de forma
+// incompatível (o app nunca chama a URBS diretamente); hoje `app_config` sempre existe com
+// min_version = versao atual, entao nunca dispara.
 export function UpdateGateProvider({ children }: { children: React.ReactNode }) {
   const [outdated, setOutdated] = useState(false);
   const [iosUrl, setIosUrl] = useState<string | null>(null);

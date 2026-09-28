@@ -332,6 +332,12 @@ export default function FavoritesScreen() {
           /* Seção de Alertas e Notícias URBS */
           <>
             <Text style={styles.sectionTitle}>Mural de Avisos da URBS</Text>
+            {TRANSIT_ALERTS.length === 0 && (
+              <View style={styles.emptyCard}>
+                <Bell size={28} color={theme.textSubtle} />
+                <Text style={styles.emptyText}>Os avisos oficiais da URBS ainda não estão integrados ao app.</Text>
+              </View>
+            )}
             {TRANSIT_ALERTS.map((alert) => {
               // Cor nunca é o único sinal: aviso e informação também trocam o glifo.
               const isWarning = alert.tipo !== 'informativo';

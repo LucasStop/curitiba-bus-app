@@ -253,7 +253,7 @@ export const CuritibaMap: React.FC<CuritibaMapProps> = ({ userLocation, onSelect
             <Text style={styles.webCenterText}>Centro de Curitiba</Text>
           </View>
 
-          {/* Ônibus simulados na interface Web */}
+          {/* 6 primeiros ônibus: reais com Supabase configurado, simulados sem (Jest, dev sem .env.local) */}
           <View style={styles.webVehicleGrid}>
             {vehicles.slice(0, 6).map((v) => (
               <TouchableOpacity

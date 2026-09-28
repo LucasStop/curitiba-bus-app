@@ -2,7 +2,7 @@
 
 Memória de design do projeto. O `/frontend-design` e o `impeccable` leem este arquivo antes de gerar UI. Regras globais do `~/.claude/CLAUDE.md` valem; aqui só a identidade do repo.
 
-Cada seção tem **Hoje** (auditado no código em 21/09/2026) e **Decisão/Proposta**. Decisões do Lucas de 21/09/2026 estão marcadas como **Decidido**. Nada foi aplicado ao código ainda.
+Cada seção tem **Hoje** (auditado no código em 21/09/2026) e **Decisão/Proposta**. Decisões do Lucas de 21/09/2026 estão marcadas como **Decidido**. Desde então, os tokens de cor (`src/constants/theme.ts`) e as cores por categoria RIT (`src/constants/rit.ts`) já foram aplicados ao código; o resto de cada seção "Proposta" segue como está até ser implementado.
 
 ## Brand
 - Produto: app de transporte coletivo de Curitiba (RIT/URBS) com mapa ao vivo, previsão de chegada e planejador de rota.
@@ -42,9 +42,9 @@ Cores reais são aproximações de tom (nenhuma fonte pública dá o hex oficial
 | Alimentador | `#C2410C` / branco | 5,18 | `#FB923C` | 8,27 |
 | Convencional (novo) | `#FACC15` / `#1C1917` | 11,42 | `#FACC15` | 12,23 |
 
-- Troncal e Alimentador são ambos laranja na rua: fundir Troncal em "Convencional/Troncal" ou dar a Troncal o mesmo tom com um marcador de forma. Decidir ao mapear as linhas reais (E3).
+- **Decidido:** Troncal e Convencional não foram fundidas numa categoria só — ao importar a rede real do GeoCuritiba (linhas reais mapeadas em E3), as duas ficaram como categorias separadas em `rit.ts`, mas com a mesma cor `#FACC15`/`#1C1917` (mesmo contorno `#A16207`); o que diferencia uma da outra no badge é só o rótulo do texto e o código da linha, não a cor. Alimentador segue com o próprio laranja (`#C2410C`), sem fusão com Troncal.
 - O amarelo `#FACC15` contra fundo claro `#F8FAFC` tem só 1,46: o badge precisa de contorno `#A16207` de 1 px. Em fundo escuro `#111827` todos os badges passam de 6:1.
-- Fora do escopo agora: Circular Centro, Turismo, Jardineira, SITES.
+- Turismo, Madrugueiro, Operacional e Convencional saíram do "fora de escopo": as quatro têm cor definida em `rit.ts` e linhas reais em operação. Seguem fora do escopo, sem categoria própria: Circular Centro, Jardineira, SITES — não fazem parte de `BusCategory` hoje.
 - Neutros e o primário viram tokens semânticos em `theme.ts`, com par claro/escuro: `text`, `textMuted`, `textSubtle`, `border`, `surface`, `surfaceMuted`, `background`, `accent` (o primário acima), `warning`, `danger`, `success`. Categorias ficam em `rit.ts`.
 - Não usar cor dinâmica do sistema (Material You): a identidade por categoria não pode mudar com o papel de parede.
 - Modo escuro segue o sistema, sem chave própria no app.
@@ -64,7 +64,7 @@ Manter fonte do sistema (leve, boa leitura em mapa; as fontes da Prefeitura e da
 Grade de 4 px. Raios: `sm=8`, `md=12`, `lg=16`, `pill=999` (cobre 16 dos usos e elimina 3, 5, 6, 22). Duas elevações (cartão e painel). Densidade confortável, alvo de toque mínimo de 44 pt no iOS e 48 dp no Android.
 
 ## Componentes (padrões)
-- Badge de linha (`BusBadge`) e pílulas de categoria (`CategoryPills`): já existem; devem consumir os tokens de `rit.ts`. O código da linha e o rótulo da categoria ficam sempre visíveis.
+- Badge de linha (`BusBadge`) e pílulas de categoria (`CategoryPills`): consomem os tokens de `rit.ts`. `CategoryPills` lista as 10 categorias de `RIT_CATEGORIES` (antes eram 5 fixas no componente, e ~51% dos ônibus reais não tinham pílula correspondente). O código da linha e o rótulo da categoria ficam sempre visíveis.
 - **Painel deslizante (`TransitBottomSheet`):** 3 alturas, 12%, 45% e 88% da área acima da tab bar. Mínimo `max(12%, ~96dp)`: handle com alvo de 48 dp mais uma linha de contexto (ex.: "Linha 203: 4 min"). Não modal, sem scrim. Handle com `accessibilityRole="adjustable"` e ações expandir/recolher; toque no handle alterna as alturas. Largura máxima de ~640 dp em tablet.
 - **Botões do mapa** (localização, camadas): pilha à direita, logo acima do painel, ocultos acima de 45%. Alvo mínimo 48 dp, margem 16 dp, 56 dp no principal, fundo sólido e sombra, ícone com contraste 3:1, `accessibilityLabel` em todos. A bússola só aparece com o mapa rotacionado (canto superior esquerdo).
 - **Marcadores do mapa:**
@@ -75,7 +75,7 @@ Grade de 4 px. Raios: `sm=8`, `md=12`, `lg=16`, `pill=999` (cobre 16 dos usos e 
 - **Mapa base:** esmaecido e dessaturado; esconder POIs comerciais e manter só terminais e tubos; linhas e ônibus em destaque.
 - **Ao vivo vs programado:** dado em tempo real com ícone pulsante; dado só de tabela em cinza com rótulo "programado"; sempre mostrar a idade do dado ("há 2 min"). Viagem cancelada riscada com texto ("Cancelado", "Provável cancelamento") e o que fazer. Fecha o RNF-02.
 - **Planejador ("Como ir"):** linha do tempo em vez de cartões soltos: trechos coloridos por categoria, espera, duração, nº de paradas e onde descer.
-- Estados de carregando, vazio e erro: padrão único, definido quando os dados reais chegarem (E3).
+- Estados de carregando, vazio e erro: os dados reais chegaram (PR #145, 25/09). Mapa esparso/parado de madrugada: a URBS às vezes devolve um retrato atrasado (falhas do tipo "empty feed" concentradas de madrugada), e o app mantém os últimos dados na tela em vez de esvaziar o mapa. Feed desatualizado: mensagens já definidas em `formatConnectionMessage` (`src/lib/resilience.ts`) — "Sem conexão. Mostrando os últimos dados de HH:MM." e "Não foi possível atualizar. Mostrando os últimos dados de HH:MM."; o provedor marca estado de erro quando o feed passa de 6 min sem atualizar, mantendo os últimos ônibus visíveis.
 - Ícones: `lucide-react-native` (licença ISC, já em uso; 21 ícones diferentes). Não misturar outra biblioteca.
 
 ## Acessibilidade
@@ -109,7 +109,7 @@ Grade de 4 px. Raios: `sm=8`, `md=12`, `lg=16`, `pill=999` (cobre 16 dos usos e 
 - Sem cópia de identidade de terceiros: só princípios (ver Brand e Ativos).
 
 ## Pendências de decisão
-1. **Nome de exibição definitivo antes de publicar** — "Buser" é provisório e colide com app existente (ver Brand).
+1. ~~Nome de exibição definitivo antes de publicar~~ — **Resolvido em 22/09/2026**: o nome é "Busier" (ver Brand), escolhido justamente para não colidir com o "Buser" existente (buser.com.br). Sobra só a busca formal de anterioridade antes de publicação comercial (item 4).
 2. Aprovar a escala tipográfica (com o ETA em 32) e a de raios.
 3. Aprovar a tabela de categorias RIT e a fusão Troncal/Convencional.
 4. Busca de anterioridade do nome (Play, App Store, INPI) antes do release.

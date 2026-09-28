@@ -13,7 +13,7 @@ export function useLiveVehicles() {
   const activeCategory = useTransitStore((s) => s.activeCategory);
 
   useEffect(() => {
-    // Escuta atualizações periódicas da simulação/API
+    // Escuta atualizações periódicas do Supabase (dado real) ou da simulação
     const unsubscribeVehicles = transitService.subscribeVehicles((updatedList) => {
       setVehicles(updatedList);
     });
