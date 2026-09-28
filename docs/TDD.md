@@ -2,7 +2,7 @@
 
 Regra do projeto: teste primeiro em regra de negócio, cálculo, dinheiro, auth e parsing. **Os casos são definidos pelo Lucas; a implementação é feita depois de aprovados.** CSS, layout e CRUD sem regra não levam teste. Requisitos: [PRD.md](PRD.md). Design: [SSD.md](SSD.md).
 
-Estado: `jest-expo` está instalado e o CI roda `yarn test --ci` a cada PR. Estão implementados e verdes os casos de contas **C1 a C5 e C7** (seção A6), o `AuthProvider` (mock do Supabase, sem rede) e, no backend Supabase, **R1 a R6** (RLS e a Edge Function `delete-account`, via pgTAP e Deno test, fora do jest). O restante (A1 a A5, C6, A7) segue PROPOSTO até aprovação. Nas seções A1 a A5, a coluna "Hoje" diz se o caso deve falhar (vermelho) contra o código atual, o que confirma o bug.
+Estado: `jest-expo` está instalado e o CI roda `yarn test --ci` a cada PR (184 testes verdes). Estão implementados e verdes os casos de contas **C1 a C5 e C7** (seção A6), o `AuthProvider` (mock do Supabase, sem rede), a leitura de posição real (`supabaseTransitProvider.test.ts`) e a inferência de sentido (`vehicleMapping.test.ts`) e, no backend Supabase, **R1 a R6** (RLS e a Edge Function `delete-account`, via pgTAP e Deno test, fora do jest). A Edge Function `urbs-vehicles` também tem Deno test, no mesmo passo do CI (`Test (Edge Functions)`): `parse_test.ts` (4 casos, com fixture real gravada) e `handler_test.ts` (401 sem segredo, 405 fora de POST, 204 no throttle de 90 s, fluxo feliz, e 502 por categoria — rede, timeout, HTTP, JSON inválido, feed vazio — sempre sem o segredo no log). O pgTAP das duas suítes de RLS (`bus_positions_rls.test.sql`, 14 asserções, e `favorites_rls.test.sql`, 15) rodou verde localmente em 28/09/2026 (não roda no CI, precisa de Docker). O restante (A1 a A5 nos casos ainda vermelhos, C6, A7 ponta a ponta) segue PROPOSTO até aprovação. Nas seções A1 a A5, a coluna "Hoje" diz se o caso deve falhar (vermelho) contra o código atual, o que confirma o bug.
 
 ### Como rodar
 ```bash
@@ -16,6 +16,8 @@ Testes ficam ao lado do código (`*.test.ts` / `*.test.tsx`). Nenhum teste faz c
 | Camada | Ferramenta | Onde roda | Gate |
 |---|---|---|---|
 | A. Unitária | `jest-expo` (instalado) | local e CI | Sim, no CI (`yarn test --ci`) |
+| A. Edge Functions | Deno test | local e CI | Sim, no CI (`Test (Edge Functions)`) |
+| A. RLS (Supabase) | pgTAP (`supabase test db`) | local (Docker) | Não; roda à mão, precisa de Docker |
 | B. No app | `idb` + simulador iOS + Expo Go | local (macOS) | Não; roda antes de release e a cada mudança de tela |
 
 ## 2. Camada A: casos unitários propostos
@@ -38,8 +40,8 @@ Arquivos alvo: `src/utils/geo.ts`, `src/services/transitProvider.ts`, `src/servi
 |---|---|---|---|
 | E1 | Ônibus a menos de 400 m, no sentido da parada | estado "Chegando" | **vermelho** (só existe `formatMinutes`) |
 | E2 | Ônibus a 2 km, no sentido da parada | minutos = distância ÷ 22 km/h, arredondado | verde |
-| E3 | Ônibus que já passou a parada (mesmo sentido) | não entra na lista | **vermelho** |
-| E4 | Ônibus da mesma linha no sentido oposto | não entra na lista | **vermelho** |
+| E3 | Ônibus que já passou a parada (mesmo sentido) | não entra na lista | **verde**: `isBusApproachingStop` em `src/utils/geo.test.ts` |
+| E4 | Ônibus da mesma linha no sentido oposto | não entra na lista | **verde**: `isBusApproachingStop` em `src/utils/geo.test.ts` |
 | E5 | Parada inexistente | lista vazia | verde |
 | E6 | Nenhum ônibus da linha ativo | lista vazia | verde |
 | E7 | Vários ônibus | ordenados por minutos, do menor ao maior | verde |
@@ -51,23 +53,23 @@ Arquivos alvo: `src/utils/geo.ts`, `src/services/transitProvider.ts`, `src/servi
 | P1 | Origem e destino junto a duas paradas com linha em comum | ao menos uma rota direta com essa linha | verde |
 | P2 | Rota direta: tempo = caminhada (80 m/min) + ônibus + caminhada | soma correta, arredondamento definido | verde |
 | P3 | Opções ordenadas por duração total | ordem crescente | verde |
-| P4 | Sem linha em comum e sem terminal comum às duas linhas | resultado vazio, nunca uma rota inventada | **vermelho** (cria "via Terminal Cabral" com tempos fixos) |
-| P5 | Baldeação só entre linhas que realmente se encontram no terminal | verificação por dado, não fixa | **vermelho** |
+| P4 | Sem linha em comum e sem terminal comum às duas linhas | resultado vazio, nunca uma rota inventada | **verde**: `tripPlanner.test.ts` ("não fabrica baldeação via Terminal Cabral") |
+| P5 | Baldeação só entre linhas que realmente se encontram no terminal | verificação por dado, não fixa | **verde**: `findCommonTerminal` em `tripPlanner.test.ts` |
 | P6 | Tarifa: uma tarifa única na baldeação dentro do terminal | tarifa = 6,00, sem cobrar duas vezes | verde (valor) / conferir regra oficial |
-| P7 | Número de paradas da perna de ônibus | vem do trajeto, não fixo (4/5/3) | **vermelho** |
-| P8 | Sentido: parada de embarque antes da de desembarque no trajeto da linha | rota só existe se a ordem for válida | **vermelho** |
-| P9 | Origem = destino | sem rota, ou mensagem "você já está lá" (definir) | a definir |
+| P7 | Número de paradas da perna de ônibus | vem do trajeto, não fixo (4/5/3) | **verde**: `tripPlanner.test.ts` |
+| P8 | Sentido: parada de embarque antes da de desembarque no trajeto da linha | rota só existe se a ordem for válida | **verde**: `tripPlanner.test.ts` |
+| P9 | Origem = destino | sem rota | **verde**: `tripPlanner.test.ts` (retorna `[]`; decisão: sem rota, sem mensagem própria) |
 
 ### A4. Favoritos (`useFavoritesStore`)
 | # | Caso | Esperado | Hoje |
 |---|---|---|---|
-| F1 | Estado inicial | listas vazias | **vermelho** (nasce com `['203','500']` e 2 paradas) |
+| F1 | Estado inicial | listas vazias | **verde**: `useFavoritesStore.test.ts` |
 | F2 | `toggleFavoriteLine` duas vezes | adiciona e remove | verde |
 | F3 | `toggleFavoriteStop` duas vezes | adiciona e remove | verde |
 | F4 | Reidratação a partir do AsyncStorage (mock) | recupera as listas salvas | a verificar |
 
-### A5. Parsers da URBS (E3)
-Casos definidos depois que o acesso à API for confirmado e houver respostas reais para usar como fixtures (sem chave nem dado pessoal nas fixtures, o repo é público). Mínimo: resposta vazia, campo ausente, categoria desconhecida, coordenada inválida.
+### A5. Parsers da URBS (E3), IMPLEMENTADO
+Casos em `supabase/functions/urbs-vehicles/parse_test.ts` (Deno, fixture real gravada em `fixtures/getVeiculos.sample.json`, sem chave nem dado pessoal, sem chamada à URBS): descarta fora de operação (`SITUACAO`/`SENT`/`REFRESH` vazios), recolhimento (`CODIGOLINHA = "REC"`), posição com mais de 10 min, coordenada fora da caixa de Curitiba, entrada inválida (nulo, string, lixo); normaliza `SITUACAO`, `SITUACAO2`, `ADAPT`, coordenadas; trata a virada de meia-noite do `REFRESH`. Linha ausente do dataset (`X37`, `X43`) não é descartada aqui — chega normal em `bus_positions` — quem ignora é o app ao montar o mapa (`SupabaseTransitProvider`, sem `BusLine` correspondente).
 
 ### A6. Contas (E9)
 | # | Caso | Esperado | Estado |
@@ -83,7 +85,7 @@ Casos definidos depois que o acesso à API for confirmado e houver respostas rea
 Também cobertos (sem número no plano): cliente Supabase criado sob demanda e sem quebrar o modo visitante quando faltam as variáveis (`src/lib/supabase.test.ts`); `AuthProvider` com sessão via `onAuthStateChange`, `AppState` ligando e desligando o refresh, e `deleteAccount` que só limpa a sessão local depois de a Edge Function confirmar (`src/providers/AuthProvider.test.tsx`).
 
 ### A7. RLS no banco e Edge Function, IMPLEMENTADO
-Casos R1 a R5 em `supabase/tests/favorites_rls.test.sql` (pgTAP, banco local do Docker, tudo em transação com rollback; o usuário é simulado com `set local role` + `set local request.jwt.claims`). Caso R6 em `supabase/functions/delete-account/handler_test.ts` (Deno, clientes falsos injetados no handler). Escritos antes da migration e da função, vistos falhar, depois verdes.
+Casos R1 a R5 em `supabase/tests/favorites_rls.test.sql` (pgTAP, banco local do Docker, tudo em transação com rollback; o usuário é simulado com `set local role` + `set local request.jwt.claims`). Caso R6 em `supabase/functions/delete-account/handler_test.ts` (Deno, clientes falsos injetados no handler). Escritos antes da migration e da função, vistos falhar, depois verdes. `supabase test db` também roda `supabase/tests/bus_positions_rls.test.sql` (pgTAP, 14 asserções, sem numeração própria no plano): RLS ligada e forçada em `bus_positions`/`bus_feed_status`, retenção de 10 min por `REFRESH` e leitura mais velha nunca sobrescrevendo a mais nova.
 
 | # | Caso | Esperado | Onde |
 |---|---|---|---|
@@ -99,14 +101,14 @@ Extras no mesmo arquivo pgTAP: RLS ligada e forçada, e sem `update` (nem o dono
 Como rodar (precisa de Docker; nada disso toca o projeto remoto):
 ```bash
 supabase start                 # sobe o Postgres local e aplica supabase/migrations
-supabase test db               # R1 a R5
+supabase test db               # R1 a R5 (favorites_rls) + bus_positions_rls (14 asserções)
 supabase stop
 deno test --config supabase/functions/delete-account/deno.json supabase/functions/delete-account/handler_test.ts   # R6
 deno check --config supabase/functions/delete-account/deno.json supabase/functions/delete-account/*.ts
 deno test --allow-read=supabase/functions/urbs-vehicles/fixtures --config supabase/functions/urbs-vehicles/deno.json supabase/functions/urbs-vehicles/   # urbs-vehicles (fixture, sem chamada real)
 deno check --config supabase/functions/urbs-vehicles/deno.json supabase/functions/urbs-vehicles/*.ts
 ```
-O R6 acima cobre a lógica com clientes falsos. A integração de ponta a ponta (função real, Auth real, dois usuários) foi conferida à mão com `supabase functions serve`; não há teste automatizado dela.
+O R6 acima cobre a lógica com clientes falsos. A integração de ponta a ponta (função real, Auth real, dois usuários) foi conferida à mão com `supabase functions serve`; não há teste automatizado dela. O mesmo vale para `urbs-vehicles`: os testes acima cobrem parsing e handler com dependências falsas; a integração de ponta a ponta (cron real disparando a função, gravando no banco) não tem teste automatizado — conferir pela saúde em produção (`select * from bus_feed_status`).
 
 ## 3. Camada B: cenários no app com idb
 Ambiente: simulador `iPhone 17` (`8574D031-AD26-4A58-B522-8FF4B736B24B`, iOS 26.5), `idb_companion` ativo, app aberto no Expo Go (`host.exp.Exponent`) via `yarn start`. Não tocar no app "O Parceiro", que também está instalado no simulador.
@@ -117,7 +119,7 @@ Ferramentas: `idb ui describe-all` (árvore de acessibilidade, para localizar el
 
 | # | Cenário | Passos | Resultado esperado (observável) |
 |---|---|---|---|
-| S1 | Abertura | Definir GPS em Curitiba; abrir o projeto no Expo Go | Aba Mapa visível, mapa carregado, ônibus na tela |
+| S1 | Abertura | Definir GPS em Curitiba; abrir o projeto no Expo Go | Aba Mapa visível, mapa carregado, ônibus na tela (contagem real varia com o horário; poucos ônibus de madrugada é esperado, não é bug) |
 | S2 | Abas | Tocar Mapa, Linhas, Como Ir, Favoritos, nessa ordem | Cada título aparece; sem erro nem tela em branco |
 | S3 | Filtro por categoria | No Mapa, tocar um filtro de categoria | Só ônibus da categoria escolhida |
 | S4 | Catálogo e "Ver no Mapa" | Em Linhas, buscar "203" e tocar "Ver no Mapa" | Volta ao Mapa com a linha 203 isolada e traçado colorido |

@@ -8,12 +8,12 @@ Referências cruzadas: [`docs/app-base/RELATORIO_BENCHMARK.md`](app-base/RELATOR
 
 ## Status das capturas
 
-Capturadas em 22/09/2026, simulador iOS "iPhone 17 - Busier", dev build (`expo run:ios`), app com dados reais da API (12 veículos ao vivo no momento da captura). Pasta: `docs/app-base/curitiba-bus-app/` (fora do git, mesma regra das outras).
+Capturadas em 22/09/2026, simulador iOS "iPhone 17 - Busier", dev build (`expo run:ios`), app com dados SIMULADOS (`MockTransitProvider`, 12 veículos simulados no momento da captura — a integração real com a API da URBS só chegou em 25/09 via PR #145, depois desta captura). Pasta: `docs/app-base/curitiba-bus-app/` (fora do git, mesma regra das outras).
 
 | Arquivo | Rota | Estado |
 |---|---|---|
 | `01_mapa_home.png` | `(tabs)/index.tsx` | padrão, mapa + sheet parcialmente aberto |
-| `02_mapa_sheet_parada.png` | `(tabs)/index.tsx` | detalhe do Terminal Santa Cândida, chegadas em tempo real |
+| `02_mapa_sheet_parada.png` | `(tabs)/index.tsx` | detalhe do Terminal Santa Cândida, chegadas simuladas (captura de 22/09, antes da integração real) |
 | `03_linhas_lista.png` | `(tabs)/lines.tsx` | catálogo completo, sem filtro |
 | `04_linhas_busca.png` | `(tabs)/lines.tsx` | busca "203" ativa, resultado filtrado |
 | `05_planejador_form.png` | `(tabs)/routes.tsx` | modal "Selecionar origem" (o form não tem estado vazio — ver nota abaixo) |
@@ -33,7 +33,7 @@ Capturadas em 22/09/2026, simulador iOS "iPhone 17 - Busier", dev build (`expo r
 |---|---|---|---|---|
 | Google Maps | `google-maps/01_home_map.png` | `01_mapa_home.png` | Deles: mapa satélite denso, barra de busca fixa no topo, sempre visível, com foto de perfil e atalhos (Trabalho/Restaurantes). Nosso: busca só existe dentro do bottom sheet — precisa puxar o sheet pra cima pra achar. | `src/app/(tabs)/index.tsx`, `src/components/sheets/TransitBottomSheet.tsx` (campo `sheet-search-input`) |
 | Waze | `waze/01_home_map.png` | `01_mapa_home.png` | Mesmo padrão: busca "Para onde?" fixa no topo + atalhos (Casa/Trabalho/Facul). Tema escuro por padrão. Nosso mapa é claro/minimalista por decisão deliberada (`DESIGN.md`: "zero anúncio", POIs ocultos) — não é gap, é escolha, mas vale registrar a ausência de dark mode no mapa em si (o resto do app segue o tema do sistema). | `src/constants/mapStyles.ts`, `src/constants/theme.ts` (Colors.dark) |
-| Moovit | `moovit/01_home_map.png` | `01_mapa_home.png` | Deles: card "Meu destino frequente" com ETA calculado direto na home, sem precisar abrir planejador. Nosso: a contagem "12 ao vivo" no topo é boa síntese, mas não há atalho de "destino frequente"/rota salva na tela inicial. | `src/app/(tabs)/index.tsx` |
+| Moovit | `moovit/01_home_map.png` | `01_mapa_home.png` | Deles: card "Meu destino frequente" com ETA calculado direto na home, sem precisar abrir planejador. Nosso: não há atalho de "destino frequente"/rota salva na tela inicial; a contagem "12 ao vivo" que aparecia na captura de 22/09 também não existe mais na UI hoje. | `src/app/(tabs)/index.tsx` |
 | Curitiba 156 | `curitiba-156/07_destino_mapa.png` | `01_mapa_home.png` | Tela deles é destino-único dentro de um fluxo de compra de cartão, não comparável a uma home de mapa. Sem gap aplicável. | — |
 | Curitiba App | N/A — sem tela de mapa capturada | `01_mapa_home.png` | N/A — app não tem uma home de mapa prória (é agregador de serviços da prefeitura). | — |
 
@@ -44,7 +44,7 @@ Capturadas em 22/09/2026, simulador iOS "iPhone 17 - Busier", dev build (`expo r
 | Google Maps | `google-maps/02_stop_detail_tubo.png`, `03_stop_lines_list.png` | `02_mapa_sheet_parada.png` | Comparável: ambos mostram card de parada com linhas atendidas. Nosso card de chegada (linha + veículo + acessível + tempo) é mais denso em informação por linha que o do Google Maps. | `src/components/ui/BusBadge.tsx`, `src/components/sheets/TransitBottomSheet.tsx` |
 | Moovit | `moovit/02_station_detail.png`, `04_nearby_stations.png` | `02_mapa_sheet_parada.png` | Moovit usa ícone colorido por linha (quadrado) em vez de badge com texto — nosso `BusBadge` com número da linha + cor RIT é mais informativo, mas ocupa mais espaço horizontal. | `src/components/ui/BusBadge.tsx`, `src/constants/rit.ts` |
 | Waze | N/A — sem tela de detalhe de parada capturada (app não é de transporte público) | `02_mapa_sheet_parada.png` | N/A | — |
-| Curitiba 156 | `curitiba-156/05_linha_020_horarios.png` | `03_linhas_lista.png` | Deles: tabela estática de horários por dia da semana (sem tempo real). Nosso: `Pico a cada N min` + ETA dinâmico via `02_mapa_sheet_parada.png` — já é o diferencial apontado em `RELATORIO_BENCHMARK.md` §5. | `src/app/(tabs)/lines.tsx` |
+| Curitiba 156 | `curitiba-156/05_linha_020_horarios.png` | `03_linhas_lista.png` | Deles: tabela estática de horários por dia da semana (sem tempo real). Nosso: ETA dinâmico via `02_mapa_sheet_parada.png` já é o diferencial apontado em `RELATORIO_BENCHMARK.md` §5. `Pico a cada N min` (badge de `lines.tsx`) não aparece hoje: o GeoCuritiba não publica frequência, então `frequenciaMinutosPico` fica `undefined` em toda linha real (só existe nos fixtures de mock); a importação do GTFS (Fase 3, em andamento, não mesclada) deve trazer o dado de volta. | `src/app/(tabs)/lines.tsx` |
 | Curitiba App | `curitiba-app/06_linha_020_horarios.png`, `07_linha_020_itinerario.png` | `03_linhas_lista.png` | Mesmo padrão estático de horário fixo, sem tempo real. Sem gap novo além do já registrado no benchmark. | — |
 
 ## 3. Planejador de rota ("Como ir")

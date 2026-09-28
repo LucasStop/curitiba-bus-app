@@ -16,8 +16,9 @@ export function getStopMarkerAccessibilityLabel(stop: BusStop, isSelected = fals
   return `${prefixo}${stop.nome}${stop.bairro ? `, bairro ${stop.bairro}` : ''}${isSelected ? ', selecionada' : ''}`;
 }
 
-// Memoizado: stops são estáticos (CURITIBA_STOPS), mas sem isso todo tick de veículo
-// (3s) e toda mudança de seleção re-renderizam as ~20+ paradas junto com os ônibus.
+// Memoizado: stops são estáticos (CURITIBA_STOPS), mas sem isso toda atualização de veículo
+// (nova rodada de posições) e toda mudança de seleção re-renderizam até MAX_STOP_MARKERS paradas
+// junto com os ônibus.
 export const StopMarker: React.FC<StopMarkerProps> = React.memo(({ stop, isSelected = false }) => {
   const styles = STYLES[useColorScheme() === 'dark' ? 'dark' : 'light'];
   const isTerminal = stop.tipo === 'terminal';

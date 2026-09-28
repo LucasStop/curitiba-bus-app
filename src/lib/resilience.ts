@@ -1,8 +1,8 @@
 // Peças puras e testáveis da resiliência do provedor de dados de trânsito: tipo de erro,
 // status de conexão exposto pra UI, cálculo de backoff e a mensagem em pt-BR (DESIGN.md
-// § Tom e voz: erro diz o que fazer, não só o que falhou). Usado hoje pelo provedor mock
-// (`transitProvider.ts`, que nunca falha sozinho) e depois pela chamada real da URBS —
-// nada aqui depende de timer nem de rede real, por isso dá pra testar direto.
+// § Tom e voz: erro diz o que fazer, não só o que falhou). Usado pelo SupabaseTransitProvider
+// (falha real ao ler o Supabase) e pelo mock (falha forçada em teste) — o app nunca chama a
+// URBS diretamente. Nada aqui depende de timer nem de rede real, por isso dá pra testar direto.
 
 // Falha ao buscar dados por causa de conectividade (sem rede, timeout, etc.) — distinta de
 // um erro genérico (dado malformado, bug no parsing), pra UI mostrar "sem conexão" e não
