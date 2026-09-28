@@ -141,8 +141,8 @@ export const CURITIBA_LINES: BusLine[] = [
     tarifa: 6.0,
     horarioFuncionamento: '05:00 - 00:30',
     frequenciaMinutosPico: 3,
-    // AVL embarcado chega primeiro no eixo estrutural (canaleta): Expresso e Ligeirão. Ligeirinho,
-    // interbairros e alimentador rodam em pista comum e ficam sem previsão em tempo real por ora.
+    // temTempoReal só importa pra simulação (MockTransitProvider): com Supabase configurado, toda
+    // chegada é marcada como tempo real, independente da categoria.
     temTempoReal: true,
     trajetoIda: [
       { latitude: -25.378, longitude: -49.229 }, // Santa Cândida

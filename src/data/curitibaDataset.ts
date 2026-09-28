@@ -4,7 +4,8 @@ import { BusCategory, BusLine, BusStop, LatLng, TransitAlert } from '@/types/tra
 import raw from './geocuritiba.json';
 
 // Rede estática real (paradas, linhas, traçados) gerada por `yarn data:geocuritiba` a partir do
-// GeoCuritiba (IPPUC/URBS). Posição de veículo e horários seguem simulados até o acesso à URBS.
+// GeoCuritiba (IPPUC/URBS). Posição de veículo vem do SupabaseTransitProvider (dado real); horários
+// seguem ausentes — importação do GTFS da URBS pendente (Fase 3, em andamento).
 
 interface RawLine {
   id: string;
@@ -18,7 +19,8 @@ interface RawLine {
   paradasVolta: string[];
 }
 
-// AVL embarcado chega primeiro no eixo estrutural (canaleta): Expresso e Ligeirão.
+// temTempoReal só importa pra simulação (MockTransitProvider): com Supabase configurado, toda
+// chegada é marcada como tempo real (ver isRealtime em computeArrivals), independente da categoria.
 const REALTIME_CATEGORIES: BusCategory[] = ['expresso', 'ligeirao'];
 
 const toLatLng = ([latitude, longitude]: number[]): LatLng => ({ latitude, longitude });
@@ -48,31 +50,6 @@ export const CURITIBA_LINES: BusLine[] = (raw.lines as RawLine[]).map((l) => {
 export const STOPS_BY_ID = new Map(CURITIBA_STOPS.map((s) => [s.id, s]));
 export const LINES_BY_CODE = new Map(CURITIBA_LINES.map((l) => [l.codigo, l]));
 
-export const TRANSIT_ALERTS: TransitAlert[] = [
-  {
-    id: 'alert-1',
-    titulo: 'Obras na Avenida Marechal Floriano Peixoto',
-    descricao:
-      'Desvio temporário para as linhas 500 Ligeirão Boqueirão entre as estações Hauer e Carmo devido a recapeamento asfáltico.',
-    data: 'Hoje, 08:30',
-    tipo: 'obra',
-    linhasAfetadas: ['500'],
-  },
-  {
-    id: 'alert-2',
-    titulo: 'Linha 203 com frequência reforçada no pico',
-    descricao: 'A URBS adicionou 4 veículos articulados extras no eixo Santa Cândida / Capão Raso entre 17h30 e 19h30.',
-    data: 'Hoje, 11:00',
-    tipo: 'informativo',
-    linhasAfetadas: ['203'],
-  },
-  {
-    id: 'alert-3',
-    titulo: 'Novo tubo implantado na Linha Verde',
-    descricao:
-      'Estação-tubo inaugurada atendendo à linha Interbairros II com acessibilidade plena e catracas biométricas.',
-    data: 'Ontem',
-    tipo: 'informativo',
-    linhasAfetadas: ['020'],
-  },
-];
+// Mural vazio até integrar os avisos oficiais (getMensagemPainelLinhas da URBS). Avisos
+// inventados aqui apareciam como se fossem da URBS.
+export const TRANSIT_ALERTS: TransitAlert[] = [];

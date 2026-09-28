@@ -94,5 +94,4 @@ export const RIT_CATEGORIES: Record<
 
 export const URBS_CONFIG = {
   tarifaPadrao: 6.0,
-  intervaloAtualizacaoMs: 5000,
 };

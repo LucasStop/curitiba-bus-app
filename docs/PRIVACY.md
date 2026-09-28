@@ -8,7 +8,7 @@ Controlador: Lucas Stopinski da Silva, pessoa física (projeto acadêmico, sem C
 Como agente de tratamento de pequeno porte (pessoa natural), não indicamos encarregado (Res. CD/ANPD nº 2/2022, art. 11); o e-mail acima é o canal de comunicação com o titular exigido nesse caso.
 
 ## 2. Modos de uso
-- **Visitante (sem conta):** mapa, linhas, previsão de chegada, planejador e favoritos funcionam sem cadastro. Nada é enviado a servidores nossos; os favoritos ficam só no aparelho.
+- **Visitante (sem conta):** mapa, linhas, previsão de chegada, planejador e favoritos funcionam sem cadastro. O app consulta o Supabase mesmo sem conta: lê a versão mínima do app ao abrir e, com o mapa aberto, verifica a cada 30 segundos se as posições dos ônibus mudaram, baixando-as quando mudam. Essas consultas não levam localização nem identificador do aparelho. Os favoritos ficam só no aparelho.
 - **Com conta (opcional):** permite sincronizar favoritos entre aparelhos.
 
 ## 3. Dados que tratamos
@@ -19,29 +19,34 @@ Como agente de tratamento de pequeno porte (pessoa natural), não indicamos enca
 | Favoritos (linhas e paradas) | Se você estiver logado | Sincronizar entre aparelhos | Banco Postgres do Supabase |
 | Dados técnicos de sessão | Se você estiver logado | Manter o login | No aparelho, cifrados |
 | Endereço IP e navegador/aparelho (user agent) | A cada cadastro, login, troca de senha ou renovação de sessão | Registro de segurança dos eventos de autenticação, gerado automaticamente pelo Supabase Auth | Logs do Supabase |
+| Endereço IP, navegador/aparelho (user agent), horário e caminho da requisição | A cada requisição ao Supabase, com ou sem conta (posições dos ônibus, versão mínima do app ao abrir, favoritos) | Prestar o serviço; registro técnico automático do provedor | Logs do Supabase, 1 dia no plano atual `[CONFIRMAR]` |
+
+Se você estiver logado, a requisição carrega o token da sua sessão, então esse log pode ficar associado ao id da sua conta `[CONFIRMAR]`.
 
 ## 4. Dados que NÃO coletamos
-- **Localização:** o GPS é usado somente no aparelho para centralizar o mapa e sugerir rotas. Não é enviada, nem armazenada, nem registrada em log por nós.
+- **Localização:** o GPS é usado somente no aparelho para centralizar o mapa e sugerir rotas. Não é enviada, nem armazenada, nem registrada em log por nós. As requisições que buscam a posição dos ônibus também não enviam sua localização.
 - Histórico de viagens ou de buscas, contatos, fotos, identificadores de publicidade.
 
 ## 5. Base legal (LGPD art. 7)
 - **Conta e sincronização de favoritos:** execução de contrato a pedido do titular (art. 7º, V). A conta é opcional e só existe porque você a criou.
 - **Registros de segurança da autenticação (IP e user agent):** legítimo interesse em proteger as contas contra acesso indevido (art. 7º, IX). `[CONFIRMAR]` com advogado.
+- **Logs técnicos de acesso à API (IP e user agent, de todos os usuários, com ou sem conta):** legítimo interesse em operar e proteger o serviço (art. 7º, IX). `[CONFIRMAR]` com advogado.
 - **Localização:** não há tratamento por nós, porque o dado não sai do aparelho. O acesso ao GPS depende da sua permissão no aviso do sistema e pode ser revogado nos ajustes do aparelho.
 
 ## 6. Compartilhamento e operadores
-- **Supabase** atua como operador (hospedagem de autenticação e banco), no projeto criado na região São Paulo (`sa-east-1`, confirmado no painel do projeto).
+- **Supabase** atua como operador: hospeda autenticação, banco de dados, as funções de servidor (Edge Functions) e as posições dos ônibus lidas por todos os usuários, com ou sem conta, no projeto criado na região São Paulo (`sa-east-1`, confirmado no painel do projeto).
+- **URBS** é a fonte das posições dos ônibus: uma rotina periódica no nosso servidor consulta a URBS e grava as posições no banco. Essa consulta é feita pelo servidor, sem nenhum dado do usuário.
 - **Provedor do mapa:** o mapa é desenhado pelo Apple Maps (iPhone) ou pelo Google Maps (Android), que recebem dados técnicos do aparelho ao carregar o mapa. No Android, o Google Maps SDK coleta automaticamente dados do aparelho (sistema, modelo), endereço IP, relatórios de falha, um identificador próprio do SDK e interações com o mapa (arrastar, zoom), para uso do próprio Google. No iPhone, o que o Apple Maps recebe dentro de apps de terceiros não está documentado de forma equivalente `[CONFIRMAR]`. Esses dados são tratados por Google e Apple conforme as políticas deles, não chegam a nós.
 - Não vendemos nem compartilhamos dados para publicidade.
 
 ## 7. Transferência internacional
-O Supabase é uma empresa sediada nos Estados Unidos. O banco fica em São Paulo, mas os logs e o acesso técnico da empresa podem envolver servidores ou equipes fora do Brasil `[CONFIRMAR]`. Se houver transferência internacional, ela se apoia em cláusulas contratuais (LGPD art. 33, II); o contrato de tratamento de dados do Supabase usa as cláusulas-padrão da União Europeia, e a ANPD exige as cláusulas-padrão brasileiras (Res. CD/ANPD nº 19/2024) `[CONFIRMAR]` se o Supabase já as incorporou.
+O Supabase é uma empresa sediada nos Estados Unidos. O banco fica em São Paulo, mas os logs e o acesso técnico da empresa podem envolver servidores ou equipes fora do Brasil `[CONFIRMAR]`. Isso vale também para quem usa o app sem conta: os logs técnicos de toda requisição (item 3) passam pela mesma infraestrutura. Se houver transferência internacional, ela se apoia em cláusulas contratuais (LGPD art. 33, II); o contrato de tratamento de dados do Supabase usa as cláusulas-padrão da União Europeia, e a ANPD exige as cláusulas-padrão brasileiras (Res. CD/ANPD nº 19/2024) `[CONFIRMAR]` se o Supabase já as incorporou.
 
 ## 8. Retenção e exclusão
 Mantemos e-mail e favoritos enquanto a conta existir. Você pode **excluir a conta dentro do app** (Favoritos, seção Conta); a exclusão remove o usuário e seus favoritos. Sem conta, apagar o app apaga os dados locais.
 
 - **Backups:** no plano atual (gratuito) o Supabase não faz backup automático do banco, então não sobra cópia dos seus dados em backup depois da exclusão. Se mudarmos para um plano pago, backups diários guardam os dados por até 7 dias após a exclusão, e esta política será atualizada.
-- **Logs de segurança:** os registros de autenticação (item 3) ficam no armazenamento de logs do Supabase por 1 dia no plano atual. Se o armazenamento desses registros no banco estiver ativado no projeto, eles ficam até serem apagados `[CONFIRMAR]` configuração do projeto.
+- **Logs técnicos:** os registros de autenticação e os logs de toda requisição à API (item 3, com ou sem conta) ficam no armazenamento de logs do Supabase por 1 dia no plano atual. Se o armazenamento desses registros no banco estiver ativado no projeto, eles ficam até serem apagados `[CONFIRMAR]` configuração do projeto.
 - **Pedido de exclusão pela web:** página para pedir a exclusão sem abrir o app, exigida pelo Google Play. Pendente: `[PREENCHER]` URL.
 
 ## 9. Seus direitos (LGPD art. 18)
@@ -51,7 +56,7 @@ Confirmação e acesso aos dados, correção, anonimização ou eliminação, po
 Sessão cifrada no aparelho, controle de acesso por linha no banco (RLS), comunicação por HTTPS. Veja [SECURITY.md](SECURITY.md). Em caso de incidente relevante, avisaremos os afetados e a ANPD conforme a lei.
 
 ## 11. Crianças e adolescentes
-O app de ônibus pode ser usado por adolescentes (estudantes usam o transporte coletivo), então se enquadra como serviço de "acesso provável" por crianças e adolescentes do Estatuto Digital da Criança e do Adolescente (Lei 15.211/2025, em vigor desde 17/03/2026). Sem conta, o app não coleta dado pessoal de ninguém. A conta é opcional, pede só e-mail e senha, e não há perfilamento, publicidade nem interação entre usuários. Idade mínima para criar conta e obrigações específicas dessa lei (sinal de idade das lojas, consentimento dos responsáveis para menores de 12 anos, LGPD art. 14) `[CONFIRMAR]` com advogado.
+O app de ônibus pode ser usado por adolescentes (estudantes usam o transporte coletivo), então se enquadra como serviço de "acesso provável" por crianças e adolescentes do Estatuto Digital da Criança e do Adolescente (Lei 15.211/2025, em vigor desde 17/03/2026). Sem conta, o app não pede cadastro nem faz perfilamento; ficam só os logs técnicos de acesso (IP e user agent) por 1 dia no Supabase, descritos no item 3, como em qualquer serviço web. A conta é opcional, pede só e-mail e senha, e não há perfilamento, publicidade nem interação entre usuários. Idade mínima para criar conta e obrigações específicas dessa lei (sinal de idade das lojas, consentimento dos responsáveis para menores de 12 anos, LGPD art. 14) `[CONFIRMAR]` com advogado.
 
 ## 12. Alterações
-Mudanças relevantes serão avisadas no app. Data desta versão: 25/09/2026.
+Mudanças relevantes serão avisadas no app. Data desta versão: 28/09/2026.
