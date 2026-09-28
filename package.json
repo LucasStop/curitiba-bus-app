@@ -71,6 +71,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "data:geocuritiba": "node scripts/import-geocuritiba.mjs",
+    "data:gtfs": "node scripts/import-gtfs.mjs",
     "test": "jest",
     "postinstall": "patch-package"
   },

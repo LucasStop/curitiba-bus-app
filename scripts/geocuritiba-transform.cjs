@@ -168,4 +168,4 @@ function buildDataset({ stops, lines, stopLines, terminals }) {
   return { dataset: { stops: outStops, lines: outLines }, stats };
 }
 
-module.exports = { parseStopName, mapCategory, simplifyPath, buildDataset };
+module.exports = { parseStopName, mapCategory, simplifyPath, segmentDistanceMeters, buildDataset };
