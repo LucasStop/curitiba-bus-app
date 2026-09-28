@@ -223,7 +223,8 @@ export const CuritibaMap: React.FC<CuritibaMapProps> = ({ userLocation, onSelect
   const displayedStops = useMemo(() => {
     if (selectedLine) {
       const ids = activeDirection === 'ida' ? selectedLine.paradasIda : selectedLine.paradasVolta;
-      return ids.map((id) => STOPS_BY_ID.get(id)).filter((s): s is BusStop => !!s);
+      // Set: em linha de anel o terminal é a 1ª e a última parada (marcador com chave repetida).
+      return [...new Set(ids)].map((id) => STOPS_BY_ID.get(id)).filter((s): s is BusStop => !!s);
     }
     // ~7 mil paradas: por zoom, terminais sempre, tubos no zoom médio, pontos comuns só de perto.
     const { latitude, longitude, latitudeDelta, longitudeDelta } = region;
@@ -345,7 +346,7 @@ export const CuritibaMap: React.FC<CuritibaMapProps> = ({ userLocation, onSelect
 
       {/* Botões Flutuantes de Controle (Estilo Google Maps & Waze) */}
       <View style={styles.fabContainer}>
-        {selectedLine && (
+        {selectedLine && selectedLine.paradasVolta.length > 0 && (
           <TouchableOpacity
             style={[styles.fabButton, styles.directionButton]}
             onPress={toggleActiveDirection}

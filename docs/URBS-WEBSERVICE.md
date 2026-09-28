@@ -33,7 +33,7 @@ Todos `GET` em `https://transporteservico.urbs.curitiba.pr.gov.br/<método>.php?
 | `getOcorrenciaCCOporLinha` | `cod` (opcional) | `ID`, `TIPO`, `LINHA`, `MENSAGEM` | ocorrências do centro de controle |
 | `getValorTarifa` | `data` (opcional, `YYYYMMDD`) | `RIT`, `CONVENCIONAL`, `CIRCULAR_CENTRO`, `TURISMO`, decreto | tarifa real |
 | `getPois` | — | `POI_NAME`, `POI_CATEGORY_NAME`, `LAT`, `LON`, `POI_DESC` | pontos de interesse |
-| GTFS | — | ZIP em `http://files.urbs.curitiba.pr.gov.br/google/google_transit.zip` (**público, sem código**, ~9 MB) | horários e paradas em lote |
+| GTFS | — | ZIP em `http://files.urbs.curitiba.pr.gov.br/google/google_transit.zip` (**público, sem código**, ~9 MB) | horários e paradas em lote; usado pelo app (ver [GTFS](#gtfs)) |
 
 "Tabela" = sequência de horários de um veículo; cada tabela de uma linha é um ônibus diferente.
 
@@ -44,7 +44,7 @@ Verificado com uma chamada real; difere da documentação do portal:
 - Resposta é um **objeto** indexado pelo prefixo do veículo (`{"JB612": {...}}`), não uma lista. 1.524 veículos, ~330 KB, ~170 ms.
 - Campos: `COD`, `REFRESH` (`HH:MM:SS`), `LAT`, `LON` (string com ponto decimal), `CODIGOLINHA`, `ADAPT` (`"1"`/`"0"`), `TIPO_VEIC`, `TABELA`, `SITUACAO`, **`SITUACAO2`**, **`SENT`**, `TCOUNT` (número).
 - **Não documentados e úteis:** `SENT` = `IDA` / `VOLTA` / `CIRCULAR` (o sentido real do ônibus) e `SITUACAO2` = `REALIZANDO ROTA` / `FORA DA ROTA` / `TIPO INCOMPATIVEL` / `INDETERMINADA` / `COM MENSAGEM NÃO LIDA`.
-- O app **não usa** `SENT` para decidir ida/volta: o "IDA" da URBS não é o ida/volta do app (ida = sentido alfabeticamente primeiro no GeoCuritiba). O sentido do app vem do deslocamento do veículo ao longo do trajeto de ida (`vehicleMapping.ts`).
+- O app **não usa** `SENT` para decidir ida/volta: o "IDA" da URBS não é o ida/volta do app (ida = traçado com mais viagens no GTFS, ou o sentido alfabeticamente primeiro no GeoCuritiba nas linhas sem GTFS). O sentido do app vem do deslocamento do veículo ao longo dos traçados de ida e de volta (`vehicleMapping.ts`).
 - `SITUACAO`: `NO HORÁRIO` (562), `ATRASADO` (407), `ADIANTADO` (139), `NÃO CONFORMIDADE` (19), **vazio (397)**.
 - Os com `SITUACAO`/`SENT`/`REFRESH` vazios não estão operando uma viagem: descartados em `parse.ts` (Edge Function `urbs-vehicles`), junto com `CODIGOLINHA = "REC"`, coordenada fora da caixa de Curitiba e `REFRESH` com mais de 10 min de idade.
 - `REFRESH` variou de 17:24 a 17:38 na mesma resposta: há posições com até ~15 min. Descartadas pelo mesmo filtro de 10 min acima.
@@ -52,7 +52,20 @@ Verificado com uma chamada real; difere da documentação do portal:
 
 ## `getLinhas` na prática
 
-309 linhas, mesmos campos da documentação. Comparado com o dataset do GeoCuritiba (`src/data/geocuritiba.json`, 314 linhas): `X37` e `X43` existem na URBS e não no dataset; `202`, `370`, `527`, `539`, `811`, `X50`, `X51` estão no dataset e não na URBS (provavelmente desativadas). A resposta vem com `content-type: text/html; charset=ISO-8859-1`, mas o corpo decodifica corretamente como UTF-8. Ônibus das linhas ausentes do dataset (`X37`, `X43`) chegam em `bus_positions` normalmente, mas o app os ignora ao montar o mapa — não há `BusLine` correspondente.
+309 linhas, mesmos campos da documentação. Comparado com o dataset do GeoCuritiba (`src/data/geocuritiba.json`, 314 linhas): `X37` e `X43` existem na URBS e não no dataset; `202`, `370`, `527`, `539`, `811`, `X50`, `X51` estão no dataset e não na URBS (provavelmente desativadas). A resposta vem com `content-type: text/html; charset=ISO-8859-1`, mas o corpo decodifica corretamente como UTF-8. O `yarn data:gtfs` usa esta lista (a última amostra salva, sem chamada nova) para tirar as 7 linhas desativadas do app. `X37` e `X43` continuam fora: o GTFS tem a rota, mas sem nenhuma viagem, então não há traçado nem paradas. Ônibus dessas duas linhas chegam em `bus_positions` normalmente, mas o app os ignora ao montar o mapa, porque não há `BusLine` correspondente.
+
+## GTFS
+
+Arquivo público da URBS (CC BY 4.0, publicado no Portal de Dados Abertos de Curitiba), não é método do WebService e não usa o código de acesso. `yarn data:gtfs` (`scripts/import-gtfs.mjs`) baixa o zip no máximo 1 vez a cada 24 h (cache em `docs/urbs-lai/gtfs/`, fora do git), junta com `src/data/geocuritiba.json` e com o último `getLinhas` salvo, e grava `src/data/network.json` só se a validação passar (linhas e paradas obrigatórias, cobertura, mapeamento de paradas, tamanho até 3 MB). A lógica fica em `scripts/gtfs-transform.cjs`, com testes em `scripts/gtfs-transform.test.js`.
+
+Particularidades do feed `20260818` (e por isso a lógica do importador):
+- `direction_id` não separa ida e volta: a 203 tem os dois sentidos no `direction_id` 0, cada um com seu `shape_id`. O importador pega o traçado com mais viagens como ida e, como volta, o traçado que começa onde a ida termina e termina onde ela começa (até 800 m). Traçado fechado ou sem par = linha de um sentido só.
+- `service_id` 1 = dia útil (mesmo código `DIA` do WebService); os dias do `calendar.txt` não refletem isso. Horário de funcionamento e frequência no pico (mediana dos intervalos entre 06:00 e 09:00) saem só das viagens de dia útil; a frequência usa só os traçados de ida e volta escolhidos, porque as variantes de linha circular saem do mesmo ponto e distorciam a conta.
+- `stop_code` é o número da parada da URBS, o mesmo id do GeoCuritiba. Plataformas de terminal têm `parent_station` e viram o terminal do GeoCuritiba mais próximo (até 300 m).
+- ~50 rotas não têm viagem nenhuma (entre elas `020`, `X37`, `X43`). Essas linhas ficam como estão no GeoCuritiba (volta = ida invertida, sem horário).
+- 11 linhas abertas têm viagens de um sentido só no feed (a `184` tem 3 viagens, todas de ida; também `231`, `509`, `619`...). Como o GeoCuritiba tem os dois sentidos delas, a linha fica inteira no GeoCuritiba; o horário continua vindo do GTFS.
+
+Resultado em 28/09/2026: 307 linhas, 198 com traçado e paradas do GTFS (186 com volta própria), 109 do GeoCuritiba; 6.856 paradas; 210 linhas com horário e 187 com frequência no pico (4 a 92 min). A tela Sobre do app traz a atribuição, o aviso de modificação e o texto de isenção exigidos pelas regras do Portal.
 
 ## Operação
 

@@ -9,6 +9,7 @@ import {
   getDistanceInMeters,
   interpolateLatLng,
   isBusApproachingStop,
+  projectOntoPath,
 } from './geo';
 import { BusLine, BusStop, BusVehicle } from '@/types/transit';
 
@@ -73,6 +74,25 @@ describe('interpolateLatLng', () => {
 
   it('origem e destino iguais retorna o mesmo ponto para qualquer t', () => {
     expect(interpolateLatLng(CENTRO, CENTRO, 0.5)).toEqual(CENTRO);
+  });
+});
+
+describe('projectOntoPath', () => {
+  const path = [
+    { latitude: -25.4, longitude: -49.3 },
+    { latitude: -25.4, longitude: -49.29 },
+    { latitude: -25.4, longitude: -49.28 },
+  ];
+  it('devolve a posição ao longo do trajeto e a distância perpendicular até ele', () => {
+    const p = projectOntoPath(path, { latitude: -25.3991, longitude: -49.285 });
+    expect(p.progress).toBeCloseTo(1.5, 5);
+    expect(p.distanceMeters).toBeGreaterThan(95);
+    expect(p.distanceMeters).toBeLessThan(105);
+  });
+  it('ponto antes do início fica preso no início, com a distância até ele', () => {
+    const p = projectOntoPath(path, { latitude: -25.4, longitude: -49.301 });
+    expect(p.progress).toBe(0);
+    expect(p.distanceMeters).toBeCloseTo(100, -1);
   });
 });
 

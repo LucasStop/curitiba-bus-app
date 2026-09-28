@@ -1,5 +1,5 @@
 import { BusLine, BusSituation, BusVehicle, LatLng } from '@/types/transit';
-import { getBearing, getDistanceInMeters, getProgressAlongPath } from '@/utils/geo';
+import { getBearing, getDistanceInMeters, projectOntoPath } from '@/utils/geo';
 
 // Linha da tabela bus_positions (só as colunas que o app lê).
 export interface BusPositionRow {
@@ -18,6 +18,8 @@ export interface BusPositionRow {
 
 const MIN_MOVE_METERS = 30;
 const MAX_SPEED_KMH = 90;
+// Os dois traçados avançando a distâncias parecidas = mesma rua nos dois sentidos: ambíguo.
+const SAME_STREET_METERS = 10;
 
 const SITUATIONS: Record<string, BusSituation> = {
   on_time: 'no_horario',
@@ -27,17 +29,23 @@ const SITUATIONS: Record<string, BusSituation> = {
 };
 
 /**
- * Sentido no vocabulário do app (ida/volta = ordem dos sentidos do GeoCuritiba), inferido pelo
- * deslocamento ao longo do trajeto de ida. O `SENT` da URBS não serve: o "IDA" dela não é o nosso.
- * Linha sem volta (circular) é sempre ida. Sem posição anterior ou parado: null.
+ * Sentido no vocabulário do app (ida = traçado principal da linha no dataset), inferido pelo
+ * deslocamento: candidato é o sentido em cujo traçado o ônibus avançou; com os dois avançando
+ * (trecho comum), vale o traçado mais próximo. O `SENT` da URBS não serve: o "IDA" dela não é o
+ * nosso. Linha sem volta (circular) é sempre ida. Sem posição anterior, parado ou ambíguo: null.
  */
 export function resolveDirection(line: BusLine, prev: LatLng | null, curr: LatLng): 'ida' | 'volta' | null {
   if (!line.paradasVolta.length) return 'ida';
   if (!prev || getDistanceInMeters(prev, curr) < MIN_MOVE_METERS) return null;
-  const before = getProgressAlongPath(line.trajetoIda, prev);
-  const after = getProgressAlongPath(line.trajetoIda, curr);
-  if (after === before) return null;
-  return after > before ? 'ida' : 'volta';
+  const advancing = (['ida', 'volta'] as const).flatMap((sentido) => {
+    const path = sentido === 'ida' ? line.trajetoIda : line.trajetoVolta;
+    const after = projectOntoPath(path, curr);
+    return after.progress > projectOntoPath(path, prev).progress ? [{ sentido, distance: after.distanceMeters }] : [];
+  });
+  if (advancing.length < 2) return advancing[0]?.sentido ?? null;
+  const [a, b] = advancing;
+  if (Math.abs(a.distance - b.distance) < SAME_STREET_METERS) return null;
+  return a.distance < b.distance ? a.sentido : b.sentido;
 }
 
 export function mapRowToVehicle(row: BusPositionRow, line: BusLine): BusVehicle {

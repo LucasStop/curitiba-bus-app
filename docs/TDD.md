@@ -2,7 +2,7 @@
 
 Regra do projeto: teste primeiro em regra de negócio, cálculo, dinheiro, auth e parsing. **Os casos são definidos pelo Lucas; a implementação é feita depois de aprovados.** CSS, layout e CRUD sem regra não levam teste. Requisitos: [PRD.md](PRD.md). Design: [SSD.md](SSD.md).
 
-Estado: `jest-expo` está instalado e o CI roda `yarn test --ci` a cada PR (184 testes verdes). Estão implementados e verdes os casos de contas **C1 a C5 e C7** (seção A6), o `AuthProvider` (mock do Supabase, sem rede), a leitura de posição real (`supabaseTransitProvider.test.ts`) e a inferência de sentido (`vehicleMapping.test.ts`) e, no backend Supabase, **R1 a R6** (RLS e a Edge Function `delete-account`, via pgTAP e Deno test, fora do jest). A Edge Function `urbs-vehicles` também tem Deno test, no mesmo passo do CI (`Test (Edge Functions)`): `parse_test.ts` (4 casos, com fixture real gravada) e `handler_test.ts` (401 sem segredo, 405 fora de POST, 204 no throttle de 90 s, fluxo feliz, e 502 por categoria — rede, timeout, HTTP, JSON inválido, feed vazio — sempre sem o segredo no log). O pgTAP das duas suítes de RLS (`bus_positions_rls.test.sql`, 14 asserções, e `favorites_rls.test.sql`, 15) rodou verde localmente em 28/09/2026 (não roda no CI, precisa de Docker). O restante (A1 a A5 nos casos ainda vermelhos, C6, A7 ponta a ponta) segue PROPOSTO até aprovação. Nas seções A1 a A5, a coluna "Hoje" diz se o caso deve falhar (vermelho) contra o código atual, o que confirma o bug.
+Estado: `jest-expo` está instalado e o CI roda `yarn test --ci` a cada PR (213 testes verdes). Estão implementados e verdes os casos de contas **C1 a C5 e C7** (seção A6), o `AuthProvider` (mock do Supabase, sem rede), a leitura de posição real (`supabaseTransitProvider.test.ts`) a inferência de sentido com os dois traçados (`vehicleMapping.test.ts`), o importador do GTFS (`scripts/gtfs-transform.test.js`) e, no backend Supabase, **R1 a R6** (RLS e a Edge Function `delete-account`, via pgTAP e Deno test, fora do jest). A Edge Function `urbs-vehicles` também tem Deno test, no mesmo passo do CI (`Test (Edge Functions)`): `parse_test.ts` (4 casos, com fixture real gravada) e `handler_test.ts` (401 sem segredo, 405 fora de POST, 204 no throttle de 90 s, fluxo feliz, e 502 por categoria — rede, timeout, HTTP, JSON inválido, feed vazio — sempre sem o segredo no log). O pgTAP das duas suítes de RLS (`bus_positions_rls.test.sql`, 14 asserções, e `favorites_rls.test.sql`, 15) rodou verde localmente em 28/09/2026 (não roda no CI, precisa de Docker). O restante (A1 a A5 nos casos ainda vermelhos, C6, A7 ponta a ponta) segue PROPOSTO até aprovação. Nas seções A1 a A5, a coluna "Hoje" diz se o caso deve falhar (vermelho) contra o código atual, o que confirma o bug.
 
 ### Como rodar
 ```bash
@@ -34,6 +34,7 @@ Arquivos alvo: `src/utils/geo.ts`, `src/services/transitProvider.ts`, `src/servi
 | G6 | `interpolateLatLng` com t = 0, 0,5 e 1 | início, meio, fim | verde |
 | G7 | `formatDistance(450)` e `formatDistance(1800)` | "450 m" e "1.8 km" | verde |
 | G8 | `formatMinutes` de 0, 1, 2, 12 | "Chegando", "Chegando", "2 min", "12 min" | verde |
+| G9 | `projectOntoPath`: ponto a ~100 m ao lado do meio do 2º segmento | posição 1,5 e ~100 m de distância | verde |
 
 ### A2. ETA (`getArrivalsForStop`)
 | # | Caso | Esperado | Hoje |
@@ -59,6 +60,7 @@ Arquivos alvo: `src/utils/geo.ts`, `src/services/transitProvider.ts`, `src/servi
 | P7 | Número de paradas da perna de ônibus | vem do trajeto, não fixo (4/5/3) | **verde**: `tripPlanner.test.ts` |
 | P8 | Sentido: parada de embarque antes da de desembarque no trajeto da linha | rota só existe se a ordem for válida | **verde**: `tripPlanner.test.ts` |
 | P9 | Origem = destino | sem rota | **verde**: `tripPlanner.test.ts` (retorna `[]`; decisão: sem rota, sem mensagem própria) |
+| P10 | Desembarque no terminal de linha circular (1ª e última parada) | conta as paradas até o fim da sequência | **verde**: `buildItineraryBetween` em `tripPlanner.test.ts` |
 
 ### A4. Favoritos (`useFavoritesStore`)
 | # | Caso | Esperado | Hoje |
@@ -67,6 +69,7 @@ Arquivos alvo: `src/utils/geo.ts`, `src/services/transitProvider.ts`, `src/servi
 | F2 | `toggleFavoriteLine` duas vezes | adiciona e remove | verde |
 | F3 | `toggleFavoriteStop` duas vezes | adiciona e remove | verde |
 | F4 | Reidratação a partir do AsyncStorage (mock) | recupera as listas salvas | a verificar |
+| F5 | Migração v1 → v2 (rede com o GTFS) | remove linhas desativadas (ex.: 202) | **verde**: `useFavoritesStore.test.ts` |
 
 ### A5. Parsers da URBS (E3), IMPLEMENTADO
 Casos em `supabase/functions/urbs-vehicles/parse_test.ts` (Deno, fixture real gravada em `fixtures/getVeiculos.sample.json`, sem chave nem dado pessoal, sem chamada à URBS): descarta fora de operação (`SITUACAO`/`SENT`/`REFRESH` vazios), recolhimento (`CODIGOLINHA = "REC"`), posição com mais de 10 min, coordenada fora da caixa de Curitiba, entrada inválida (nulo, string, lixo); normaliza `SITUACAO`, `SITUACAO2`, `ADAPT`, coordenadas; trata a virada de meia-noite do `REFRESH`. Linha ausente do dataset (`X37`, `X43`) não é descartada aqui — chega normal em `bus_positions` — quem ignora é o app ao montar o mapa (`SupabaseTransitProvider`, sem `BusLine` correspondente).

@@ -48,6 +48,24 @@ describe('resolveDirection', () => {
   });
 });
 
+describe('resolveDirection com traçado de volta próprio', () => {
+  // Volta por uma rua paralela ~200 m ao norte, percorrida para oeste.
+  const north = path.map((p) => ({ ...p, latitude: p.latitude + 0.0018 })).reverse();
+  const twoStreets = { ...line, trajetoVolta: north } as BusLine;
+  it('para leste na rua da ida = ida', () => {
+    expect(resolveDirection(twoStreets, path[1], path[2])).toBe('ida');
+  });
+  it('para oeste na rua da volta = volta', () => {
+    expect(resolveDirection(twoStreets, north[1], north[2])).toBe('volta');
+  });
+  it('os dois traçados avançando à mesma distância (trecho comum) = null', () => {
+    // Volta que repete o 1º trecho da ida no mesmo sentido antes de subir e voltar.
+    const loop = { ...line, trajetoVolta: [path[0], path[1], north[2], north[3]] } as BusLine;
+    const mid = (a: number) => ({ latitude: -25.4, longitude: -49.3 + a });
+    expect(resolveDirection(loop, mid(0.002), mid(0.008))).toBeNull();
+  });
+});
+
 describe('mapRowToVehicle', () => {
   it('mapeia campos, situação e acessibilidade', () => {
     const v = mapRowToVehicle(row({ status: 'early', route_state: 'off_route' }), line);

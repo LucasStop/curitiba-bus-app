@@ -699,19 +699,21 @@ export const TransitBottomSheet: React.FC = () => {
             </TouchableOpacity>
           </View>
 
-          {/* Alternador de Sentido */}
-          <TouchableOpacity
-            onPress={toggleActiveDirection}
-            style={styles.directionToggle}
-            activeOpacity={0.8}
-            testID="sheet-direction-toggle-button"
-            accessibilityRole="button"
-            accessibilityLabel={`Sentido atual: ${activeDirection === 'ida' ? 'ida' : 'volta'}. Toque para inverter`}>
-            <ArrowLeftRight size={16} color={theme.text} />
-            <Text style={styles.directionToggleText}>
-              Sentido: {activeDirection === 'ida' ? 'Ida' : 'Volta'} (Inverter)
-            </Text>
-          </TouchableOpacity>
+          {/* Alternador de Sentido (linha circular não tem volta) */}
+          {selectedLine.paradasVolta.length > 0 && (
+            <TouchableOpacity
+              onPress={toggleActiveDirection}
+              style={styles.directionToggle}
+              activeOpacity={0.8}
+              testID="sheet-direction-toggle-button"
+              accessibilityRole="button"
+              accessibilityLabel={`Sentido atual: ${activeDirection === 'ida' ? 'ida' : 'volta'}. Toque para inverter`}>
+              <ArrowLeftRight size={16} color={theme.text} />
+              <Text style={styles.directionToggleText}>
+                Sentido: {activeDirection === 'ida' ? 'Ida' : 'Volta'} (Inverter)
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         <Text style={styles.sectionHeader}>Itinerário ({lineStops.length} Paradas)</Text>

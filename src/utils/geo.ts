@@ -56,14 +56,15 @@ export function interpolateLatLng(start: LatLng, end: LatLng, t: number): LatLng
 }
 
 /**
- * Projeta um ponto sobre um trajeto (polilinha) e retorna sua posição ao longo dele:
- * índice do segmento + fração dentro do segmento (0 = início do trajeto).
+ * Projeta um ponto sobre um trajeto (polilinha): posição ao longo dele (índice do segmento +
+ * fração dentro do segmento, 0 = início) e distância em metros até o trajeto.
  * Usa lat/lng como plano cartesiano (aproximação suficiente para trechos urbanos curtos,
- * mesma simplificação já usada em interpolateLatLng). Serve para comparar se um ponto
- * está antes ou depois de outro no mesmo trajeto/sentido.
+ * mesma simplificação já usada em interpolateLatLng).
  */
-export function getProgressAlongPath(path: LatLng[], point: LatLng): number {
-  if (path.length < 2) return 0;
+export function projectOntoPath(path: LatLng[], point: LatLng): { progress: number; distanceMeters: number } {
+  if (path.length < 2) {
+    return { progress: 0, distanceMeters: path.length ? getDistanceInMeters(point, path[0]) : Infinity };
+  }
 
   let bestSegment = 0;
   let bestT = 0;
@@ -91,7 +92,12 @@ export function getProgressAlongPath(path: LatLng[], point: LatLng): number {
     }
   }
 
-  return bestSegment + bestT;
+  return { progress: bestSegment + bestT, distanceMeters: bestDist };
+}
+
+/** Posição de um ponto ao longo do trajeto; serve para comparar se ele está antes ou depois de outro. */
+export function getProgressAlongPath(path: LatLng[], point: LatLng): number {
+  return projectOntoPath(path, point).progress;
 }
 
 /**
@@ -108,6 +114,9 @@ export function isBusApproachingStop(line: BusLine, bus: BusVehicle, stop: BusSt
   const busCoord: LatLng = { latitude: bus.latitude, longitude: bus.longitude };
   const stopCoord: LatLng = { latitude: stop.latitude, longitude: stop.longitude };
 
+  // ponytail: em linha circular o terminal é 1ª e última parada; a projeção pega a ponta mais
+  // próxima (em geral o início), então o ônibus voltando ao terminal não aparece como chegando.
+  // Resolver exige guardar o índice da parada na sequência em vez de projetar a coordenada.
   return getProgressAlongPath(trajeto, busCoord) <= getProgressAlongPath(trajeto, stopCoord);
 }
 

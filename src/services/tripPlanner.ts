@@ -36,7 +36,8 @@ export function buildItineraryBetween(
   for (const sentido of sentidos) {
     const paradas = sentido === 'ida' ? line.paradasIda : line.paradasVolta;
     const boardingIdx = paradas.indexOf(boardingStopId);
-    const alightingIdx = paradas.indexOf(alightingStopId);
+    // Busca depois do embarque: em linha circular o terminal é a 1ª e a última parada.
+    const alightingIdx = paradas.indexOf(alightingStopId, boardingIdx + 1);
     if (boardingIdx >= 0 && alightingIdx > boardingIdx) {
       return { sentido, quantidadeParadas: alightingIdx - boardingIdx };
     }

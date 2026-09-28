@@ -161,6 +161,14 @@ export default function LinesScreen() {
                     Destino: {line.terminalDestino}
                   </Text>
                 </View>
+                {line.horarioFuncionamento && (
+                  <View style={styles.terminalItem}>
+                    <Clock size={14} color={theme.textMuted} />
+                    <Text style={styles.terminalText} numberOfLines={1}>
+                      {line.horarioFuncionamento}
+                    </Text>
+                  </View>
+                )}
               </View>
 
               <View style={styles.cardBottom}>

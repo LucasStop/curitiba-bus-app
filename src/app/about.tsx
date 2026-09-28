@@ -1,4 +1,4 @@
-import { CONTACT_EMAIL, PRIVACY_POLICY_URL } from '@/constants/links';
+import { CONTACT_EMAIL, DATA_LICENSE_URL, PRIVACY_POLICY_URL } from '@/constants/links';
 import { Radius, Typography } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import Constants from 'expo-constants';
@@ -37,10 +37,26 @@ export default function AboutScreen() {
         </Text>
 
         <Text style={styles.sectionTitle}>Fonte dos dados</Text>
-        <Text style={styles.body}>
-          Linhas, paradas e trajetos: URBS e IPPUC (GeoCuritiba). Posições dos ônibus: URBS, atualizadas a cada 2
-          minutos. Previsões de chegada são estimativas pela distância. Algumas linhas podem estar desatualizadas.
+        <Text style={styles.body} testID="about-data-source">
+          Linhas, paradas, trajetos e horários: GTFS da URBS, obtido pelo Portal de Dados Abertos de Curitiba, combinado
+          com o GeoCuritiba (IPPUC/URBS). Os dados foram modificados: trajetos simplificados, plataformas agrupadas por
+          terminal e horários resumidos. Posições dos ônibus: URBS, atualizadas a cada 2 minutos. Previsões de chegada
+          são estimativas pela distância.
         </Text>
+        {/* Texto exigido pelas regras de uso do Portal de Dados Abertos de Curitiba. */}
+        <Text style={[styles.muted, styles.disclaimer]}>
+          O Portal de Dados Abertos de Curitiba e o órgão ou entidade de onde foram acessados os dados não garantem sua
+          autenticidade, qualidade, integridade e atualidade após terem sido disponibilizados para uso secundário.
+        </Text>
+        <TouchableOpacity
+          style={styles.linkRow}
+          onPress={() => openBrowserAsync(DATA_LICENSE_URL)}
+          testID="about-data-license-link"
+          accessibilityRole="link"
+          accessibilityLabel="Abrir a licença dos dados, Creative Commons Atribuição 4.0">
+          <Text style={styles.linkText}>Licença dos dados: CC BY 4.0</Text>
+          <ExternalLinkIcon size={16} color={theme.primary} />
+        </TouchableOpacity>
 
         <Text style={styles.sectionTitle}>Privacidade</Text>
         <TouchableOpacity
@@ -77,6 +93,7 @@ function createStyles(theme: ReturnType<typeof useTheme>) {
       color: theme.text,
     },
     muted: { fontSize: Typography.label.fontSize, color: theme.textMuted, marginTop: 2 },
+    disclaimer: { lineHeight: Typography.label.lineHeight, marginTop: 8, marginBottom: 12 },
     sectionTitle: {
       fontSize: Typography.label.fontSize,
       fontWeight: '800',

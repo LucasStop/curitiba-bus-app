@@ -58,7 +58,7 @@ export interface BusLine {
   terminalOrigem: string;
   terminalDestino: string;
   tarifa: number;
-  // Sem fonte importada ainda (GTFS/getTabelaLinha da URBS): ausente em vez de inventado.
+  // Do GTFS da URBS (dias úteis); ausente nas linhas sem viagem no GTFS.
   horarioFuncionamento?: string;
   frequenciaMinutosPico?: number;
   temTempoReal: boolean;

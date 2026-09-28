@@ -1,5 +1,6 @@
 import { CURITIBA_LINES, CURITIBA_STOPS } from '@/data/curitibaDataset';
-import { findCommonTerminal, planTransitTrip } from './tripPlanner';
+import { BusLine } from '@/types/transit';
+import { buildItineraryBetween, findCommonTerminal, planTransitTrip } from './tripPlanner';
 
 // babel-jest sobe este mock para antes dos imports.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -114,6 +115,14 @@ describe('planTransitTrip — P7/P8 itinerário e sentido', () => {
     expect(busLegs[0]?.linha?.sentido).toBe('volta');
     expect(busLegs[1]?.linha?.quantidadeParadas).toBe(1);
     expect(busLegs[1]?.linha?.sentido).toBe('ida');
+  });
+});
+
+describe('buildItineraryBetween', () => {
+  it('desembarque no terminal de linha circular (1ª e última parada) conta até o fim', () => {
+    const loop = { paradasIda: ['T', 'a', 'b', 'T'], paradasVolta: [] } as unknown as BusLine;
+    expect(buildItineraryBetween(loop, 'b', 'T')).toEqual({ sentido: 'ida', quantidadeParadas: 1 });
+    expect(buildItineraryBetween(loop, 'T', 'b')).toEqual({ sentido: 'ida', quantidadeParadas: 2 });
   });
 });
 

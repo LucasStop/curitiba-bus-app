@@ -2,7 +2,7 @@
 
 App mobile (Expo / React Native) para acompanhar o transporte coletivo de Curitiba (RIT/URBS): mapa com linhas, paradas e ônibus, previsão de chegada, planejador "Como Ir" e favoritos.
 
-> Estado: rede estática **real** (314 linhas, ~7 mil paradas, traçados) importada do GeoCuritiba; posição de ônibus também **real** (WebService da URBS, gravado no Supabase a cada 2 min) e previsão de chegada calculada pela distância até essas posições. Horários ainda ausentes: importação do GTFS da URBS em andamento. Veja o que falta em [docs/PRD.md](docs/PRD.md).
+> Estado: rede estática **real** (307 linhas, ~6,9 mil paradas, traçados dos dois sentidos e horários de dia útil) montada a partir do GTFS público da URBS e do GeoCuritiba; posição de ônibus também **real** (WebService da URBS, gravado no Supabase a cada 2 min) e previsão de chegada calculada pela distância até essas posições. Veja o que falta em [docs/PRD.md](docs/PRD.md).
 
 ## Rodar
 Requisitos: Node 20, Yarn 1.22 e o app Expo Go (iOS) ou um simulador.
@@ -34,7 +34,7 @@ src/lib/          validação, erros do Auth, merge de favoritos, cliente Supaba
 src/providers/    AuthProvider e useAuth (sessão opcional)
 src/stores/       zustand: seleção do mapa e favoritos (persistidos)
 src/services/     transitProvider (contrato + simulação), realtime/ (SupabaseTransitProvider, vehicleMapping), arrivals, tripPlanner
-src/data/         rede estática real do GeoCuritiba (geocuritiba.json); __fixtures__/ para os testes
+src/data/         rede estática real (network.json, gerado de geocuritiba.json + GTFS); __fixtures__/ para os testes
 src/utils/geo.ts  Haversine, bearing, interpolação
 supabase/         functions/ (delete-account, urbs-vehicles), migrations/, tests/ (pgTAP)
 ```
@@ -52,5 +52,5 @@ supabase/         functions/ (delete-account, urbs-vehicles), migrations/, tests
 Branches `feat/…`, `fix/…`, `docs/…`; commits em inglês explicando o porquê; entrega por Pull Request (sem push direto na `main`). O pre-commit roda gitleaks e eslint (`lefthook install`).
 
 ## Fonte dos dados
-- **Paradas, linhas e traçados:** GeoCuritiba, camada `URBS_Transporte_Publico` (IPPUC/URBS), pública. Gerados em `src/data/geocuritiba.json` por `yarn data:geocuritiba` (rodar de novo para atualizar e abrir PR).
-- **Tempo real e horários:** WebService da URBS, acesso concedido via LAI em 24/09/2026. Posição dos ônibus integrada (PR #145): `pg_cron` a cada 2 min → Edge Function `urbs-vehicles` → `bus_positions` no Supabase; o app só lê do Supabase. Horários e alertas oficiais ainda não. Métodos, regras de uso e formato real das respostas em [docs/URBS-WEBSERVICE.md](docs/URBS-WEBSERVICE.md).
+- **Paradas, linhas, traçados e horários:** GTFS público da URBS (CC BY 4.0, via Portal de Dados Abertos de Curitiba) combinado com o GeoCuritiba, camada `URBS_Transporte_Publico` (IPPUC/URBS). `yarn data:geocuritiba` gera `src/data/geocuritiba.json`; `yarn data:gtfs` junta os dois em `src/data/network.json`, que é o que o app carrega (rodar de novo para atualizar e abrir PR). Detalhes em [docs/URBS-WEBSERVICE.md](docs/URBS-WEBSERVICE.md#gtfs).
+- **Tempo real:** WebService da URBS, acesso concedido via LAI em 24/09/2026. Posição dos ônibus integrada (PR #145): `pg_cron` a cada 2 min → Edge Function `urbs-vehicles` → `bus_positions` no Supabase; o app só lê do Supabase. Alertas oficiais ainda não (#146). Métodos, regras de uso e formato real das respostas em [docs/URBS-WEBSERVICE.md](docs/URBS-WEBSERVICE.md).

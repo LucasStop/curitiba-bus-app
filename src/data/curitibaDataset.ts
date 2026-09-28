@@ -1,11 +1,11 @@
 import { RIT_CATEGORIES, URBS_CONFIG } from '@/constants/rit';
 import { BusCategory, BusLine, BusStop, LatLng, TransitAlert } from '@/types/transit';
 
-import raw from './geocuritiba.json';
+import raw from './network.json';
 
-// Rede estática real (paradas, linhas, traçados) gerada por `yarn data:geocuritiba` a partir do
-// GeoCuritiba (IPPUC/URBS). Posição de veículo vem do SupabaseTransitProvider (dado real); horários
-// seguem ausentes — importação do GTFS da URBS pendente (Fase 3, em andamento).
+// Rede estática real gerada por `yarn data:gtfs`: GTFS público da URBS (paradas, traçados dos dois
+// sentidos e horários de dia útil) com o GeoCuritiba (IPPUC/URBS) para nomes de parada e para as
+// linhas que o GTFS não cobre. Posição de veículo vem do SupabaseTransitProvider.
 
 interface RawLine {
   id: string;
@@ -14,9 +14,13 @@ interface RawLine {
   categoria: string;
   terminalOrigem: string;
   terminalDestino: string;
-  trajeto: number[][];
+  trajetoIda: number[][];
+  // Só nas linhas do GTFS; nas do GeoCuritiba a volta é a ida invertida.
+  trajetoVolta?: number[][];
   paradasIda: string[];
   paradasVolta: string[];
+  horarioFuncionamento?: string;
+  frequenciaMinutosPico?: number;
 }
 
 // temTempoReal só importa pra simulação (MockTransitProvider): com Supabase configurado, toda
@@ -29,7 +33,7 @@ export const CURITIBA_STOPS: BusStop[] = raw.stops as BusStop[];
 
 export const CURITIBA_LINES: BusLine[] = (raw.lines as RawLine[]).map((l) => {
   const categoria = l.categoria as BusCategory;
-  const trajetoIda = l.trajeto.map(toLatLng);
+  const trajetoIda = l.trajetoIda.map(toLatLng);
   return {
     id: l.id,
     codigo: l.codigo,
@@ -41,9 +45,11 @@ export const CURITIBA_LINES: BusLine[] = (raw.lines as RawLine[]).map((l) => {
     tarifa: URBS_CONFIG.tarifaPadrao,
     temTempoReal: REALTIME_CATEGORIES.includes(categoria),
     trajetoIda,
-    trajetoVolta: [...trajetoIda].reverse(),
+    trajetoVolta: l.trajetoVolta?.map(toLatLng) ?? [...trajetoIda].reverse(),
     paradasIda: l.paradasIda,
     paradasVolta: l.paradasVolta,
+    horarioFuncionamento: l.horarioFuncionamento,
+    frequenciaMinutosPico: l.frequenciaMinutosPico,
   };
 });
 

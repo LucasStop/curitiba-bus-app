@@ -32,7 +32,8 @@ export const useTransitStore = create<TransitState>((set) => ({
   isMapTrafficVisible: false,
   sheetSnapIndex: 1,
 
-  setSelectedLine: (line) => set({ selectedLine: line, selectedStop: null }),
+  // Toda linha abre na ida: o sentido da linha anterior podia ser 'volta' numa linha sem volta.
+  setSelectedLine: (line) => set({ selectedLine: line, selectedStop: null, activeDirection: 'ida' }),
   setSelectedStop: (stop) => set({ selectedStop: stop }),
   setSelectedVehicle: (vehicle) => set({ selectedVehicle: vehicle }),
   setActiveCategory: (category) => set({ activeCategory: category }),

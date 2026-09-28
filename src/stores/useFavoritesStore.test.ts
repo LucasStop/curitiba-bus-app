@@ -21,3 +21,9 @@ describe('migrateFavorites (v0 -> v1, dataset real)', () => {
     expect(migrated.favoriteStops).toEqual(['terminal-cabral']);
   });
 });
+
+describe('migrateFavorites (v1 -> v2, rede com o GTFS)', () => {
+  it('drops lines that URBS no longer runs', () => {
+    expect(migrateFavorites({ favoriteLines: ['202', '203'], favoriteStops: [] }).favoriteLines).toEqual(['203']);
+  });
+});

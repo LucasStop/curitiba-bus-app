@@ -50,7 +50,9 @@ export const useFavoritesStore = create<FavoritesState>()(
       name: 'curitiba-bus-favorites',
       storage: createJSONStorage(() => AsyncStorage),
       // v1: dataset real do GeoCuritiba. Ids de parada do mock (tubo-*) deixam de existir.
-      version: 1,
+      // v2: rede com o GTFS; saem as linhas fora do getLinhas da URBS (202, 370...) e as paradas
+      // que ficaram sem linha.
+      version: 2,
       migrate: (persisted) => migrateFavorites(persisted as Partial<FavoritesState>),
     },
   ),
