@@ -1,5 +1,4 @@
 {
-  "model": "sonnet",
   "enabledPlugins": {
     "expo@claude-plugins-official": true
   }
