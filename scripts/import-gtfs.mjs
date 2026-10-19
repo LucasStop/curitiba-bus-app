@@ -100,12 +100,16 @@ console.log(
 console.log(`Por categoria: ${JSON.stringify(c.byCategory)}`);
 console.log(`Removidas (fora do getLinhas): ${report.removed.join(', ') || '-'}`);
 console.log(`Adicionadas: ${report.added.join(', ') || '-'}`);
-console.log(`No GTFS e ignoradas (fora do getLinhas ou mapeamento baixo): ${report.ignoredGtfs.join(', ') || '-'}`);
+console.log(
+  `No GTFS e ignoradas (fora do getLinhas, mapeamento baixo ou padrão fraco): ${report.ignoredGtfs.join(', ') || '-'}`,
+);
+console.log(`No getLinhas sem viagem no GTFS e fora do GeoCuritiba: ${report.untraced.join(', ') || '-'}`);
 const byReason = {};
-for (const f of report.fallback)
-  (byReason[f.reason.startsWith('mapeamento') ? 'mapeamento baixo' : f.reason] ??= []).push(
-    `${f.code}${f.reason.startsWith('mapeamento') ? ` (${f.reason.slice(12)})` : ''}`,
-  );
+const LABEL = { mapeamento: 'paradas mapeadas abaixo de 90%', padrão: 'ida + volta cobrem menos de 50% das viagens' };
+for (const f of report.fallback) {
+  const pctIn = f.reason.match(/\d+%/)?.[0];
+  (byReason[LABEL[f.reason.split(' ')[0]] ?? f.reason] ??= []).push(pctIn ? `${f.code} (${pctIn})` : f.code);
+}
 for (const [reason, codes] of Object.entries(byReason))
   console.log(`Fallback GeoCuritiba, ${reason} (${codes.length}): ${codes.join(', ')}`);
 const m = report.stopMap;

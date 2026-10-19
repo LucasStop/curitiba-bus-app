@@ -202,6 +202,20 @@ const geo = {
       paradasVolta: ['101', '100'],
     },
     {
+      id: 'linha-401',
+      codigo: '401',
+      nome: 'PADRÃO FRACO',
+      categoria: 'interbairros',
+      terminalOrigem: 'Parada 100',
+      terminalDestino: 'Parada 101',
+      trajeto: [
+        [-25.4, -49.295],
+        [-25.4, -49.29],
+      ],
+      paradasIda: ['100', '101'],
+      paradasVolta: ['101', '100'],
+    },
+    {
       id: 'linha-607',
       codigo: '607',
       nome: 'MAPEAMENTO BAIXO',
@@ -221,11 +235,23 @@ const linhas = [
   { COD: '203', NOME: 'SANTA CÂNDIDA / CAPÃO RASO', CATEGORIA_SERVICO: 'EXPRESSO' },
   { COD: '500', NOME: 'MADRUGUEIRO', CATEGORIA_SERVICO: 'MADRUGUEIRO' },
   { COD: '300', NOME: 'SÓ IDA NO GTFS', CATEGORIA_SERVICO: 'CONVENCIONAL' },
+  { COD: '401', NOME: 'PADRÃO FRACO', CATEGORIA_SERVICO: 'INTERBAIRROS' },
+  // No getLinhas, sem viagem no GTFS e fora do GeoCuritiba.
+  { COD: 'X43', NOME: 'SEM VIAGEM', CATEGORIA_SERVICO: 'LIGEIRÃO' },
   { COD: '607', NOME: 'MAPEAMENTO BAIXO', CATEGORIA_SERVICO: 'ALIMENTADOR' },
   { COD: 'X37', NOME: 'LIGEIRÃO X37', CATEGORIA_SERVICO: 'LIGEIRÃO' },
 ];
 const gtfs = {
-  routes: csv(['route_id,route_short_name', 'r203,203', 'r300,300', 'r607,607', 'rX37,X37', 'r888,888']),
+  routes: csv([
+    'route_id,route_short_name',
+    'r203,203',
+    'r300,300',
+    'r401,401',
+    'r607,607',
+    'rX43,X43',
+    'rX37,X37',
+    'r888,888',
+  ]),
   stops: csv([
     'stop_id,stop_code,stop_name,stop_lat,stop_lon,parent_station',
     'sPA,,Terminal A,-25.4,-49.3,',
@@ -249,12 +275,20 @@ const gtfs = {
     'r888,1,t7,Terminal B,sh1',
     // Linha aberta só de ida no GTFS, com volta no GeoCuritiba.
     'r300,1,t9,Terminal B,sh1',
+    // Ida (2) + volta (1) = 3 de 7 viagens; o resto são trechos de outros shapes.
+    'r401,1,u1,Terminal B,sh1',
+    'r401,1,u2,Terminal B,sh1',
+    'r401,1,u3,Terminal A,sh2',
+    'r401,1,u4,Trecho,sh8',
+    'r401,1,u5,Trecho,sh8',
+    'r401,1,u6,Trecho,sh9',
+    'r401,1,u7,Trecho,sh9',
     // Variante no meio do pico: não pode entrar na frequência da 203.
     'r203,1,t8,Terminal B,sh9',
   ]),
   stopTimes: csv([
     'trip_id,departure_time,stop_id,stop_sequence',
-    ...['t1:06:00', 't2:06:30', 't6:06:10', 't7:06:20', 't9:06:40'].flatMap((s) => {
+    ...['t1:06:00', 't2:06:30', 't6:06:10', 't7:06:20', 't9:06:40', 'u1:06:00', 'u2:06:05'].flatMap((s) => {
       const [t, time] = [s.slice(0, 2), s.slice(3)];
       return [`${t},${time}:00,sA1,1`, `${t},${time}:00,s100,2`, `${t},${time}:00,s101,3`, `${t},${time}:00,sB1,4`];
     }),
@@ -265,6 +299,8 @@ const gtfs = {
     't3,07:15:00,sA1,5',
     't8,06:05:00,sA1,1',
     't8,06:10:00,s100,2',
+    'u3,07:00:00,sB1,1',
+    'u3,07:10:00,sA1,2',
     't5,08:00:00,sX1,1',
     't5,08:05:00,sX2,2',
     't5,08:10:00,s101,3',
@@ -341,6 +377,20 @@ describe('buildNetwork', () => {
     expect(report.fallback).toContainEqual({ code: '300', reason: 'um sentido só no GTFS' });
   });
 
+  it('falls back when the chosen ida/volta cover under half the weekday trips, without peak frequency', () => {
+    expect(line('401')).toMatchObject({ paradasIda: ['100', '101'], paradasVolta: ['101', '100'] });
+    expect(line('401').trajetoVolta).toBeUndefined();
+    expect(line('401').horarioFuncionamento).toBe('Dias úteis, 06:00–07:00');
+    expect(line('401').frequenciaMinutosPico).toBeUndefined();
+    expect(report.fallback).toContainEqual({ code: '401', reason: 'padrão cobre 43% das viagens' });
+    expect(report.weakPatterns).toEqual([{ code: '401', coverage: 0.43 }]);
+  });
+
+  it('reports getLinhas lines with no GTFS trips and no GeoCuritiba line', () => {
+    expect(line('X43')).toBeUndefined();
+    expect(report.untraced).toEqual(['X43']);
+  });
+
   it('removes lines missing from getLinhas and ignores GTFS lines outside it', () => {
     expect(line('202')).toBeUndefined();
     expect(report.removed).toEqual(['202']);
@@ -363,21 +413,21 @@ describe('buildNetwork', () => {
 
   it('recomputes stop.linhas from the final lines and drops orphan stops', () => {
     expect(stop('terminal-a').linhas).toEqual(['203', '500', 'X37']);
-    expect(stop('100').linhas).toEqual(['203', '300', 'X37']);
+    expect(stop('100').linhas).toEqual(['203', '300', '401', 'X37']);
     expect(stop('999')).toBeUndefined();
     expect(report.stopsDropped).toBe(1);
   });
 
   it('reports coverage and stop mapping', () => {
-    expect(report.counts).toMatchObject({ getLinhas: 5, getLinhasWithTrips: 4, final: 5, fromGtfs: 2 });
+    expect(report.counts).toMatchObject({ getLinhas: 7, getLinhasWithTrips: 5, final: 6, fromGtfs: 2 });
     // Conta as viagens representativas de todas as linhas do GTFS, inclusive a 888 ignorada.
-    expect(report.stopMap).toMatchObject({ byCode: 11, byTerminal: 11, total: 24 });
+    expect(report.stopMap).toMatchObject({ byCode: 13, byTerminal: 15, total: 30 });
     expect(report.stopsNearShape.near).toBe(report.stopsNearShape.total);
   });
 
   it('validate applies the thresholds and flags missing required ids', () => {
     expect(validate(dataset, report, { requiredLines: ['203'], requiredStops: ['terminal-a'] })).toEqual([
-      'só 2/5 linhas vieram do GTFS',
+      'só 2/6 linhas vieram do GTFS',
     ]);
     expect(validate(dataset, report, { requiredLines: ['999'], requiredStops: ['nope'] }).slice(0, 2)).toEqual([
       'linha obrigatória ausente: 999',

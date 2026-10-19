@@ -18,6 +18,9 @@ const TERMINAL_RADIUS_M = 300;
 const CLOSED_LOOP_M = 300;
 const REVERSED_ENDS_M = 800;
 const MIN_MAPPED_RATIO = 0.9;
+// Ida + volta escolhidas precisam cobrir metade das viagens de dia útil. Abaixo disso a linha é
+// feita de trechos (a 022, Inter 2, tem 6 shapes, um por perna) e o par escolhido não é ida/volta.
+const MIN_PATTERN_COVERAGE = 0.5;
 const NEAR_SHAPE_M = 100;
 
 const distMeters = (a, b) => segmentDistanceMeters(a, b, b);
@@ -176,6 +179,7 @@ function buildNetwork({ geo, linhas, gtfs }) {
     added: [],
     fallback: [],
     ignoredGtfs: [],
+    untraced: [],
     weakPatterns: [],
     stopMap: { total: 0, byCode: 0, byTerminal: 0, maxTerminalDist: 0, misses: new Map() },
     stopsNearShape: { near: 0, total: 0 },
@@ -245,7 +249,8 @@ function buildNetwork({ geo, linhas, gtfs }) {
     const p = pickPatterns(list, endsOf);
     if (!p) continue;
     patterns.set(code, p);
-    if (p.coverage < 0.5) report.weakPatterns.push({ code, coverage: Math.round(p.coverage * 100) / 100 });
+    if (p.coverage < MIN_PATTERN_COVERAGE)
+      report.weakPatterns.push({ code, coverage: Math.round(p.coverage * 100) / 100 });
   }
 
   // 2ª passada: sequência completa só das viagens representativas.
@@ -326,14 +331,20 @@ function buildNetwork({ geo, linhas, gtfs }) {
     const repShapes = new Set([p.main.shape, p.back?.shape]);
     const groups = [p.main, p.back].filter(Boolean).map((g) => depsOf(g.trips));
     const others = depsOf(tripsByCode.get(code).filter((t) => !repShapes.has(t.shape)));
+    const schedule = summarizeSchedule(groups, others);
+    const weak = p.coverage < MIN_PATTERN_COVERAGE;
+    // Padrão fraco: a frequência dos dois trechos escolhidos não é a da linha.
+    if (weak) delete schedule.frequenciaMinutosPico;
     gtfsLine.set(code, {
       ok,
+      weak,
+      coverage: p.coverage,
       // Linha aberta com um sentido só: o feed perdeu a volta (a 184 tem 3 viagens, só de ida).
       oneWay: !p.back && !p.loop,
       ratio: total ? hits / total : 0,
       ida,
       volta,
-      schedule: summarizeSchedule(groups, others),
+      schedule,
     });
   }
 
@@ -380,7 +391,7 @@ function buildNetwork({ geo, linhas, gtfs }) {
     };
     // Se o GTFS perdeu a volta que o GeoCuritiba tem, vale o GeoCuritiba.
     const lostReturn = g?.oneWay && l.paradasVolta.length > 0;
-    if (g?.ok && !lostReturn) {
+    if (g?.ok && !g.weak && !lostReturn) {
       lines.push({ ...fromGtfs(base, g), fonte: 'gtfs' });
       continue;
     }
@@ -389,9 +400,11 @@ function buildNetwork({ geo, linhas, gtfs }) {
       code: l.codigo,
       reason: !g
         ? 'sem viagens no GTFS'
-        : lostReturn && g.ok
-          ? 'um sentido só no GTFS'
-          : `mapeamento ${Math.round(g.ratio * 100)}%`,
+        : g.weak
+          ? `padrão cobre ${Math.round(g.coverage * 100)}% das viagens`
+          : lostReturn && g.ok
+            ? 'um sentido só no GTFS'
+            : `mapeamento ${Math.round(g.ratio * 100)}%`,
     });
     lines.push({
       ...base,
@@ -406,7 +419,7 @@ function buildNetwork({ geo, linhas, gtfs }) {
   for (const [code, g] of gtfsLine) {
     if (geoCodes.has(code)) continue;
     const rec = linhaByCode?.get(code);
-    if (!rec || !g.ok) {
+    if (!rec || !g.ok || g.weak) {
       report.ignoredGtfs.push(code);
       continue;
     }
@@ -427,6 +440,8 @@ function buildNetwork({ geo, linhas, gtfs }) {
     });
   }
   lines.sort((a, b) => a.codigo.localeCompare(b.codigo));
+  // Linha vigente que não sai em lugar nenhum: sem viagem no GTFS e fora do GeoCuritiba (X37, X43).
+  if (linhaByCode) report.untraced = [...linhaByCode.keys()].filter((c) => !geoCodes.has(c) && !gtfsLine.has(c)).sort();
 
   const linesByStop = new Map();
   for (const l of lines)
