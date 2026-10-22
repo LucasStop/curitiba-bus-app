@@ -17,14 +17,16 @@ jobs:
     name: Typecheck · Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 22.13.0
-          cache: yarn
+          node-version: 22
 
-      - run: yarn install --frozen-lockfile
+      - run: yarn install --ignore-scripts
+
+      # --ignore-scripts barra o postinstall; o patch-package roda explicito.
+      - run: yarn patch-package
 
       # expo-env.d.ts e gerado pelo `expo start` e fica no .gitignore; sem ele o tsc
       # nao conhece os imports de .css. Recria o mesmo conteudo que o Expo gera.
@@ -51,7 +53,7 @@ jobs:
         run: yarn audit --level high
         continue-on-error: true
 
-      - uses: denoland/setup-deno@v2
+      - uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2
         with:
           deno-version: v2.x
 
